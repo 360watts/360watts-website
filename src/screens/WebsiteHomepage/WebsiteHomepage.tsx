@@ -391,7 +391,7 @@ export const WebsiteHomepage = (): JSX.Element => {
   };
 
   const createMessage = () => {
-    return `*New Contact Form Submission*\n\n` +
+    return `*Website Customer Contact Form Submission*\n\n` +
       `*Name:* ${formData.name}\n` +
       `*Email:* ${formData.email}\n` +
       `*Phone:* ${formData.phone}\n` +
@@ -430,7 +430,7 @@ export const WebsiteHomepage = (): JSX.Element => {
           city: formData.city,
           interest: formData.interest,
           message: formData.message || 'No message provided',
-          _subject: `New Contact Form Submission from ${formData.name}`,
+          _subject: `Website Customer Contact Form Submission from ${formData.name}`,
           _captcha: 'false',
           _template: 'table'
         })
@@ -456,7 +456,7 @@ export const WebsiteHomepage = (): JSX.Element => {
   };
 
   const createPartnershipMessage = () => {
-    return `*New Partnership Inquiry*\n\n` +
+    return `*Website Partnership Inquiry*\n\n` +
       `*Name:* ${partnershipData.name}\n` +
       `*Email:* ${partnershipData.email}\n` +
       `*Phone:* ${partnershipData.phone}\n` +
@@ -493,7 +493,7 @@ export const WebsiteHomepage = (): JSX.Element => {
           company: partnershipData.company,
           partnerType: partnershipData.partnerType,
           message: partnershipData.message || 'No message provided',
-          _subject: `New Partnership Inquiry from ${partnershipData.name} - ${partnershipData.company}`,
+          _subject: `Website Partnership Inquiry from ${partnershipData.name} - ${partnershipData.company}`,
           _captcha: 'false',
           _template: 'table'
         })
@@ -2081,7 +2081,7 @@ export const WebsiteHomepage = (): JSX.Element => {
             </div>
             <div className="relative flex justify-center">
               <div className="bg-gradient-to-r from-[#f7fff9] via-white to-[#f0fdf4] px-6 sm:px-8 md:px-10 py-2.5 sm:py-3 rounded-full shadow-md border-2 border-gray-100 hover:scale-105 transition-transform duration-300 hover:shadow-lg">
-                <p className="text-[12px] sm:text-[13px] md:text-[15px] text-[#4a5565] font-semibold tracking-wide">© 2025 Matterless Technologies. All rights reserved.</p>
+                <p className="text-[12px] sm:text-[13px] md:text-[15px] text-[#4a5565] font-semibold tracking-wide">© 2025 Matterless Technologies (OPC) Private Limited. All rights reserved.</p>
               </div>
             </div>
           </div>
