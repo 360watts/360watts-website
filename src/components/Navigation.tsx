@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, ArrowRight } from "lucide-react";
 
 const navItems = [
@@ -56,9 +56,12 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
           : "bg-white/95 backdrop-blur-md shadow-lg py-3"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 sm:gap-3">
+        <div 
+          onClick={(e) => handleNavClick(e, "hero-section")}
+          className="flex items-center gap-2 sm:gap-3 cursor-pointer"
+        >
           <img
             src="/final-logo-png-4x-2.png"
             alt="360Watts"
@@ -66,11 +69,10 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
           />
           <div className="flex flex-col">
             <span
-              className={`font-bold text-base sm:text-lg font-['Urbanist'] ${
-                showTransparent ? "text-white" : "text-neutral-950"
-              }`}
+              className={`font-extrabold text-base sm:text-lg font-['Biryani'] tracking-tight select-none`}
+              style={{ fontFamily: 'Biryani, sans-serif', fontWeight: 800 }}
             >
-              360watts
+              <span style={{ color: '#254D65' }}>360</span><span style={{ color: '#F07522' }}>watts</span>
             </span>
             <span
               className={`text-[10px] sm:text-xs font-['Poppins'] hidden sm:block ${
@@ -80,7 +82,7 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
               Drive what's next.
             </span>
           </div>
-        </Link>
+        </div>
 
         {/* Desktop Navigation */}
         <ul className="hidden lg:flex items-center gap-6 xl:gap-8">

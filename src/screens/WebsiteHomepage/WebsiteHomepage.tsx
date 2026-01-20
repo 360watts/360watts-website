@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ArrowRight, ChevronRight, ChevronLeft, Zap, MessageCircle, CheckCircle, ChevronDown, Volume2, VolumeX } from "lucide-react";
+import { ArrowRight, ChevronRight, ChevronLeft, MessageCircle, CheckCircle, ChevronDown, Volume2, VolumeX } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Navigation } from "../../components/Navigation";
 import { APP_IMAGES } from "../../lib/imageRegistry";
@@ -117,13 +117,12 @@ const faqSections: FaqSection[] = [
     id: "general",
     title: "General",
     items: [
-      { id: "install-time", question: "How long does installation take?", answer: "Typical solar installation takes 1-3 days depending on system size. Smart home setup can be completed in 4-6 hours. Our team coordinates everything to minimize disruption." },
+      { id: "install-time", question: "How long does installation take?", answer: "Typical solar installation takes 1-2 weeks depending on system size. Our team coordinates everything to minimize disruption." },
       {
         id: "warranty",
         question: "What warranty do you provide?",
-        answer: "We provide comprehensive warranties covering equipment (25 years for panels), installation workmanship (5 years), and system performance guarantees."
+        answer: "We provide comprehensive warranties covering equipment, installation workmanship, and system performance guarantees."
       },
-      { id: "service-areas", question: "Which areas do you service?", answer: "We currently service major cities across India. Contact us to check if we're available in your area." },
       { id: "upgrade", question: "Can I upgrade my system later?", answer: "Yes! Both solar and smart home systems are designed to be scalable. You can add more panels, batteries, or smart devices as your needs grow." },
     ],
   },
@@ -152,8 +151,6 @@ const faqSections: FaqSection[] = [
     title: "App",
     items: [
       { id: "connectivity", question: "What if I lose internet connectivity?", answer: "Core functions continue to work locally. Remote access and cloud features automatically resume once the connection is restored." },
-      { id: "updates", question: "How often is the app updated?", answer: "We release updates regularly with new features and improvements. All updates are free and automatic." },
-      { id: "tiers", question: "Are there subscription tiers?", answer: "Basic monitoring and control is included free. Premium features like advanced analytics and AI recommendations are available with our subscription plans." },
       { id: "family", question: "Can multiple family members access the app?", answer: "Yes. You can add multiple users and assign access levels, so everyone stays in control without compromising security." },
     ],
   },
@@ -166,7 +163,7 @@ const heroSlides = [
   {
     bg: APP_IMAGES.solarPowerStation,
     title: "Smarter Energy.\nSmarter Living",
-    subtitle: "360Watts unites solar power and smart home automation — helping you save more, live cleaner, and control everything effortlessly."
+    subtitle: "360Watts unites solar power and smart home automation, helping you save more, live cleaner, and control everything effortlessly."
   },
   {
     bg: APP_IMAGES.technicianSolarPanels,
@@ -192,7 +189,7 @@ const processSteps = {
     { 
       number: "2", 
       title: "Installation",
-      description: "Professional installation by certified technicians. We handle everything from permits to grid connection, typically completed in 1-3 days."
+      description: "Professional installation by certified technicians. We handle everything from permits to grid connection."
     },
     { 
       number: "3", 
@@ -220,15 +217,15 @@ const processSteps = {
 };
 
 const appFeatures = [
-  { icon: APP_IMAGES.iconAnalytics, title: "Real-time solar analytics", description: "Monitor your energy production" },
-  { icon: APP_IMAGES.iconDevice, title: "Smart device control", description: "Manage all your devices" },
-  { icon: APP_IMAGES.iconHealth, title: "Energy health insights", description: "Track system performance" },
-  { icon: APP_IMAGES.iconBill, title: "Bill tracking", description: "Monitor your savings" },
+  { icon: APP_IMAGES.appIcon1, title: "Real-time solar analytics", description: "Monitor your energy production" },
+  { icon: APP_IMAGES.appIcon2, title: "Smart device control", description: "Manage all your devices" },
+  { icon: APP_IMAGES.appIcon3, title: "Energy health insights", description: "Track system performance" },
+  { icon: APP_IMAGES.appIcon4, title: "Bill tracking", description: "Monitor your savings" },
 ];
 
 const contactMethods = [
   { icon: APP_IMAGES.iconEmail, title: "Email Us", value: "hello@360watts.com", note: "We reply within 24 hrs", href: "mailto:hello@360watts.com" },
-  { icon: APP_IMAGES.iconPhone, title: "Call Us", value: "9087610051", note: "Mon-Sat, 9 AM - 6 PM IST", href: "tel:9087610051" },
+  { icon: APP_IMAGES.iconPhone, title: "Call Us", value: "9087610051", note: <span className="inline-flex items-center gap-1">Mon-Fri, 9am-6pm </span>, href: "tel:+919087610051" },
   { icon: APP_IMAGES.iconLocation, title: "Visit Us", value: "Coimbatore, Tamil Nadu", note: "By appointment only", href: "https://www.google.com/maps/search/?api=1&query=GRG+INCUBATION+CENTER,+Coimbatore,+Tamil+Nadu" },
 ];
 
@@ -318,7 +315,7 @@ export const WebsiteHomepage = (): JSX.Element => {
   const [partnershipSubmittedMessage, setPartnershipSubmittedMessage] = useState("");
   
   // How It Works section state
-  const [expandedStep, setExpandedStep] = useState<string | null>(null);
+  // Removed expand/collapse feature for process steps
   const [activeCard, setActiveCard] = useState<'solar' | 'smartHome' | null>(null);
 
   // Touch swipe state for hero
@@ -332,7 +329,7 @@ export const WebsiteHomepage = (): JSX.Element => {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000);
+    }, 8000); // Increased from 5000ms (5s) to 8000ms (8s)
     return () => clearInterval(timer);
   }, []);
 
@@ -340,7 +337,7 @@ export const WebsiteHomepage = (): JSX.Element => {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentAppSlide((prev) => (prev + 1) % 4);
-    }, 3000);
+    }, 5000);
     return () => clearInterval(timer);
   }, []);
 
@@ -513,13 +510,13 @@ export const WebsiteHomepage = (): JSX.Element => {
   };
 
   return (
-    <div className="bg-[#f7fff9] min-h-screen font-['Poppins',sans-serif]">
+    <div className="bg-[#f7fff9] min-h-screen font-['Poppins',sans-serif] overflow-x-hidden">
       <Navigation transparent />
 
       {/* Hero Section */}
       <section 
         id="hero-section" 
-        className="relative h-screen overflow-hidden scroll-mt-20"
+        className="relative h-[60vh] sm:h-screen overflow-hidden scroll-mt-20"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -543,7 +540,7 @@ export const WebsiteHomepage = (): JSX.Element => {
         
         {/* Hero Content */}
         <div className="relative z-10 h-full flex items-center">
-          <div className="max-w-7xl mx-auto px-6 w-full">
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6">
             {heroSlides.map((slide, index) => (
               <div
                 key={index}
@@ -604,7 +601,7 @@ export const WebsiteHomepage = (): JSX.Element => {
 
       {/* Our Unified Solution Section */}
       <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
+        <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-6 sm:mb-8 md:mb-12">
             <h2 className="text-[30px] sm:text-[35px] md:text-[40px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-2 tracking-tight sm:tracking-[-1.6px]">Our Unified Solution</h2>
             <p className="text-[20px] sm:text-[24px] md:text-[27px] text-[#4a5565] font-['Poppins'] tracking-tight sm:tracking-[-1.08px]">Two products. One platform for all your energy needs.</p>
@@ -614,11 +611,11 @@ export const WebsiteHomepage = (): JSX.Element => {
             {/* Solar Solutions Card */}
             <div className="relative rounded-[20px] overflow-hidden w-full md:flex-1 lg:w-[567px] h-[280px] sm:h-[300px] md:h-[320px] lg:h-[342px]">
               <img 
-                src={APP_IMAGES.solarCard} 
+                src="/solar-panels-house-roof.jpg" 
                 alt="Solar Solutions" 
                 className="absolute inset-0 w-full h-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(204,204,204,0.6)] to-transparent rounded-[20px]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(204,204,204,0.3)] to-transparent rounded-[20px]" />
               <div className="absolute inset-0 p-3 sm:p-4 md:p-6 lg:p-[30px] flex flex-col justify-start text-left">
                 <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 lg:gap-[19px] pt-3 sm:pt-4 md:pt-6 lg:pt-[24px]">
                   <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14">
@@ -627,16 +624,16 @@ export const WebsiteHomepage = (): JSX.Element => {
                       <path d="M28 8V2M28 54V48M48 28H54M2 28H8M43 13L47 9M9 47L13 43M43 43L47 47M9 9L13 13" stroke="#FFA500" strokeWidth="4" strokeLinecap="round"/>
                     </svg>
                   </div>
-                  <div className="flex flex-col gap-[6px] sm:gap-[7px] md:gap-[8px]">
-                    <h3 className="text-[18px] sm:text-[20px] md:text-[24px] lg:text-[27px] xl:text-[30px] font-bold text-black font-['Urbanist'] leading-tight md:leading-8 lg:leading-9 drop-shadow-lg">Solar Solutions</h3>
-                    <p className="text-black text-[11px] sm:text-[12px] md:text-[13px] lg:text-[13.5px] xl:text-[14px] font-['Poppins'] leading-4 sm:leading-5 opacity-95 drop-shadow-md">Total control. Zero worries.</p>
+                  <div className="flex flex-col gap-[6px] sm:gap-[7px] md:gap-[8px] mt-8 sm:mt-0">
+                    <h3 className="text-[22px] sm:text-[20px] md:text-[24px] lg:text-[27px] xl:text-[30px] font-bold text-black font-['Urbanist'] leading-tight md:leading-8 lg:leading-9 drop-shadow-lg">Solar Solutions</h3>
+                    <p className="text-black text-[15px] sm:text-[12px] md:text-[13px] lg:text-[13.5px] xl:text-[14px] font-['Poppins'] leading-4 sm:leading-5 opacity-95 drop-shadow-md">Total control. Zero worries.</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Plus Icon */}
-            <div className="hidden md:flex items-center justify-center w-6 md:w-9 h-6 md:h-9 text-[#4a5565] text-2xl md:text-4xl font-light">+</div>
+            <div className="hidden md:flex items-center justify-center w-8 md:w-12 h-8 md:h-12 text-[#4a5565] text-3xl md:text-5xl font-light mt-20 md:mt-24">+</div>
 
             {/* Smart Home Solutions Card */}
             <div className="relative rounded-[20px] overflow-hidden w-full md:flex-1 lg:w-[567px] h-[280px] sm:h-[300px] md:h-[320px] lg:h-[342px]">
@@ -649,9 +646,9 @@ export const WebsiteHomepage = (): JSX.Element => {
               <div className="absolute inset-0 p-3 sm:p-4 md:p-6 lg:p-[30px] flex flex-col justify-start text-left">
                 <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 lg:gap-[19px] pt-3 sm:pt-4 md:pt-6 lg:pt-[24px]">
                   <img src={APP_IMAGES.iconSmartHome} alt="" className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
-                  <div className="flex flex-col gap-[6px] sm:gap-[7px] md:gap-[8px]">
-                    <h3 className="text-[16px] sm:text-[18px] md:text-[22px] lg:text-[25px] xl:text-[28px] font-bold text-black font-['Urbanist'] leading-tight md:leading-8 lg:leading-9 drop-shadow-lg">Smart Home Solutions</h3>
-                    <p className="text-black text-[10px] sm:text-[11px] md:text-[12px] lg:text-[12.5px] xl:text-[13px] font-['Poppins'] leading-4 sm:leading-5 drop-shadow-md">The future of living, powered by intelligence.</p>
+                  <div className="flex flex-col gap-[6px] sm:gap-[7px] md:gap-[8px] mt-8 sm:mt-0">
+                    <h3 className="text-[22px] sm:text-[20px] md:text-[22px] lg:text-[25px] xl:text-[28px] font-bold text-black font-['Urbanist'] leading-tight md:leading-8 lg:leading-9 drop-shadow-lg">Smart Home Solutions</h3>
+                    <p className="text-black text-[15px] sm:text-[13px] md:text-[12px] lg:text-[12.5px] xl:text-[13px] font-['Poppins'] leading-4 sm:leading-5 drop-shadow-md">The future of living, powered by intelligence.</p>
                   </div>
                 </div>
               </div>
@@ -672,7 +669,7 @@ export const WebsiteHomepage = (): JSX.Element => {
 
       {/* Why 360 Watts Section */}
       <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
+        <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-12 sm:mb-16 md:mb-20">
             <h2 className="text-[32px] sm:text-[38px] md:text-[44px] lg:text-[48px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-3 md:mb-4 tracking-[-1.5px]">Why 360 Watts?</h2>
             <p className="text-[16px] sm:text-[18px] md:text-[20px] text-[#4a5565] font-['Poppins'] tracking-[-0.5px]">Tangible benefits for your home</p>
@@ -700,13 +697,13 @@ export const WebsiteHomepage = (): JSX.Element => {
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#3b82f6] rounded-full blur-3xl"></div>
         </div>
 
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="w-full max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-12 sm:mb-16 md:mb-20">
             <div className="inline-block px-4 sm:px-6 py-2 bg-gradient-to-r from-[#dcfce7] to-[#ddefff] rounded-full mb-4 sm:mb-6">
               <span className="text-[13px] sm:text-[14px] md:text-[16px] font-semibold text-[#0a0a0a] font-['Urbanist']">Simple & Effective</span>
             </div>
             <h2 className="text-[34px] sm:text-[44px] md:text-[56px] font-bold text-[#0a0a0a] font-['Urbanist'] tracking-[-1.5px] mb-4 bg-gradient-to-r from-[#0a0a0a] to-[#4a5565] bg-clip-text text-transparent">How Does It Work?</h2>
-            <p className="text-[16px] sm:text-[18px] md:text-[20px] text-[#4a5565] font-['Poppins'] max-w-2xl mx-auto">Simple steps to transform your Home into a Smart Home, sustainable powerhouse</p>
+            <p className="text-[16px] sm:text-[18px] md:text-[20px] text-[#4a5565] font-['Poppins'] max-w-2xl mx-auto">Simple steps to transform your home into a Smart Home, sustainable powerhouse</p>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
@@ -724,7 +721,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                 </div>
                 <div>
                   <h3 className="text-[26px] sm:text-[29px] md:text-[32px] font-bold text-[#0a0a0a] font-['Urbanist'] tracking-[-0.8px]">Solar</h3>
-                  <p className="text-[12px] sm:text-[13px] md:text-[14px] text-[#4a5565] font-['Poppins']">Clean energy generation</p>
+                  <p className="text-[12px] sm:text-[13px] md:text-[14px] text-[#4a5565] font-['Poppins'] leading-4 sm:leading-5 opacity-95 drop-shadow-md">Clean energy generation</p>
                 </div>
               </div>
 
@@ -735,43 +732,23 @@ export const WebsiteHomepage = (): JSX.Element => {
 
               <div className="space-y-4">
                 {processSteps.solar.map((step, index) => {
-                  const stepId = `solar-${index}`;
-                  const isExpanded = expandedStep === stepId;
                   return (
                     <div 
                       key={index} 
-                      className={`group relative bg-gradient-to-r from-white to-[#f7fff9] rounded-[20px] p-5 border-2 transition-all duration-300 ${
-                        isExpanded 
-                          ? 'border-[#00a63e] shadow-lg scale-[1.02]' 
-                          : 'border-transparent hover:border-[#dcfce7] hover:shadow-md'
-                      }`}
-                      onClick={() => setExpandedStep(isExpanded ? null : stepId)}
+                      className="group relative bg-gradient-to-r from-white to-[#f7fff9] rounded-[20px] p-5 border-2 border-transparent hover:border-[#dcfce7] hover:shadow-md transition-all duration-300"
                     >
-                      <div className="flex items-start gap-3 sm:gap-4 cursor-pointer">
-                        <div className={`w-[44px] h-[44px] sm:w-[48px] sm:h-[48px] md:w-[50px] md:h-[50px] rounded-full flex items-center justify-center text-[17px] sm:text-[19px] md:text-[20px] font-bold font-['Urbanist'] flex-shrink-0 transition-all duration-300 ${
-                          isExpanded
-                            ? 'bg-gradient-to-br from-[#00a63e] to-[#007a55] text-white shadow-[0_4px_20px_rgba(0,166,62,0.4)] scale-110'
-                            : 'bg-gradient-to-br from-[#dcfce7] to-[#bbf7d0] text-[#0a0a0a] group-hover:scale-110'
-                        }`}>
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        <div className="w-[44px] h-[44px] sm:w-[48px] sm:h-[48px] md:w-[50px] md:h-[50px] rounded-full flex items-center justify-center text-[17px] sm:text-[19px] md:text-[20px] font-bold font-['Urbanist'] flex-shrink-0 bg-gradient-to-br from-[#dcfce7] to-[#bbf7d0] text-[#0a0a0a] group-hover:scale-110 transition-all duration-300">
                           {step.number}
                         </div>
                         <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <h4 className="text-[17px] sm:text-[19px] md:text-[22px] text-[#0a0a0a] font-bold font-['Urbanist'] tracking-[-0.5px] leading-tight sm:leading-7">
-                              {step.title}
-                            </h4>
-                            <ChevronDown className={`w-5 h-5 text-[#00a63e] transition-transform duration-300 flex-shrink-0 ml-2 ${
-                              isExpanded ? 'rotate-180' : ''
-                            }`} />
-                          </div>
-                          <div className={`grid transition-all duration-300 ${
-                            isExpanded ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0'
-                          }`}>
-                            <div className="overflow-hidden">
-                              <p className="text-[14px] sm:text-[15px] md:text-[16px] text-[#4a5565] font-['Poppins'] leading-relaxed">
-                                {step.description}
-                              </p>
-                            </div>
+                          <h4 className="text-[17px] sm:text-[19px] md:text-[22px] text-[#0a0a0a] font-bold font-['Urbanist'] tracking-[-0.5px] leading-tight sm:leading-7">
+                            {step.title}
+                          </h4>
+                          <div className="mt-3">
+                            <p className="text-[14px] sm:text-[15px] md:text-[16px] text-[#4a5565] font-['Poppins'] leading-relaxed">
+                              {step.description}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -795,7 +772,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                 </div>
                 <div>
                   <h3 className="text-[26px] sm:text-[29px] md:text-[32px] font-bold text-[#0a0a0a] font-['Urbanist'] tracking-[-0.8px]">Smart Home</h3>
-                  <p className="text-[12px] sm:text-[13px] md:text-[14px] text-[#4a5565] font-['Poppins']">Intelligent automation</p>
+                  <p className="text-[12px] sm:text-[13px] md:text-[14px] text-[#4a5565] font-['Poppins'] leading-4 sm:leading-5 drop-shadow-md">Intelligent automation</p>
                 </div>
               </div>
 
@@ -806,43 +783,23 @@ export const WebsiteHomepage = (): JSX.Element => {
 
               <div className="space-y-4">
                 {processSteps.smartHome.map((step, index) => {
-                  const stepId = `smartHome-${index}`;
-                  const isExpanded = expandedStep === stepId;
                   return (
                     <div 
                       key={index} 
-                      className={`group relative bg-gradient-to-r from-white to-[#f7fff9] rounded-[20px] p-5 border-2 transition-all duration-300 ${
-                        isExpanded 
-                          ? 'border-[#3b82f6] shadow-lg scale-[1.02]' 
-                          : 'border-transparent hover:border-[#ddefff] hover:shadow-md'
-                      }`}
-                      onClick={() => setExpandedStep(isExpanded ? null : stepId)}
+                      className="group relative bg-gradient-to-r from-white to-[#f7fff9] rounded-[20px] p-5 border-2 border-transparent hover:border-[#ddefff] hover:shadow-md transition-all duration-300"
                     >
-                      <div className="flex items-start gap-4 cursor-pointer">
-                        <div className={`w-[50px] h-[50px] rounded-full flex items-center justify-center text-[20px] font-bold font-['Urbanist'] flex-shrink-0 transition-all duration-300 ${
-                          isExpanded
-                            ? 'bg-gradient-to-br from-[#3b82f6] to-[#2563eb] text-white shadow-[0_4px_20px_rgba(59,130,246,0.4)] scale-110'
-                            : 'bg-gradient-to-br from-[#ddefff] to-[#bfdbfe] text-[#0a0a0a] group-hover:scale-110'
-                        }`}>
+                      <div className="flex items-start gap-4">
+                        <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center text-[20px] font-bold font-['Urbanist'] flex-shrink-0 bg-gradient-to-br from-[#ddefff] to-[#bfdbfe] text-[#0a0a0a] group-hover:scale-110 transition-all duration-300">
                           {step.number}
                         </div>
                         <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <h4 className="text-[22px] text-[#0a0a0a] font-bold font-['Urbanist'] tracking-[-0.5px] leading-7">
-                              {step.title}
-                            </h4>
-                            <ChevronDown className={`w-5 h-5 text-[#3b82f6] transition-transform duration-300 flex-shrink-0 ml-2 ${
-                              isExpanded ? 'rotate-180' : ''
-                            }`} />
-                          </div>
-                          <div className={`grid transition-all duration-300 ${
-                            isExpanded ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0'
-                          }`}>
-                            <div className="overflow-hidden">
-                              <p className="text-[14px] sm:text-[15px] md:text-[16px] text-[#4a5565] font-['Poppins'] leading-relaxed">
-                                {step.description}
-                              </p>
-                            </div>
+                          <h4 className="text-[22px] text-[#0a0a0a] font-bold font-['Urbanist'] tracking-[-0.5px] leading-7">
+                            {step.title}
+                          </h4>
+                          <div className="mt-3">
+                            <p className="text-[14px] sm:text-[15px] md:text-[16px] text-[#4a5565] font-['Poppins'] leading-relaxed">
+                              {step.description}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -866,20 +823,20 @@ export const WebsiteHomepage = (): JSX.Element => {
       </section>
 
       {/* App Section */}
-      <section className="py-20 px-6 bg-gradient-to-r from-[#00a63e] to-[#017c54]">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-20 px-4 sm:px-6 bg-gradient-to-r from-[#00a63e] to-[#017c54]">
+        <div className="w-full max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-white">
               <h2 className="text-4xl md:text-5xl font-bold font-['Urbanist'] mb-6">One App. For Everything.</h2>
               <div className="space-y-6">
                 {appFeatures.map((feature, index) => (
                   <div key={index} className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Zap className="w-5 h-5 text-white" />
+                    <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+                      <img src={feature.icon} alt="" className="w-7 h-7" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-lg font-['Poppins']">{feature.title}</h4>
-                      <p className="text-white/80 font-['Poppins']">{feature.description}</p>
+                      <h4 className="font-extrabold text-black text-xl font-['poppins']">{feature.title}</h4>
+                      <p className="text-white font-['Poppins']">{feature.description}</p>
                     </div>
                   </div>
                 ))}
@@ -888,28 +845,28 @@ export const WebsiteHomepage = (): JSX.Element => {
             </div>
             <div className="flex justify-center order-first lg:order-last">
               {/* Phone Showcase - Desktop */}
-              <div className="relative w-[400px] h-[500px] hidden lg:block">
+              <div className="relative w-[500px] h-[600px] hidden lg:block">
                 {/* App screens with sliding animation */}
                 <div className={`absolute transition-all duration-[3000ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
                   currentAppSlide === 0 ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-95 -translate-x-full'
                 }`}>
-                  <div className="absolute h-[364px] left-[20px] rounded-[30px] top-[69px] w-[174px]">
+                  <div className="absolute h-[437px] left-[5px] rounded-[30px] top-[83px] w-[218px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" className="absolute h-[130.22%] left-0 max-w-none top-[-0.02%] w-full" src={APP_IMAGES.image7} />
+                      <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image7} />
                     </div>
                   </div>
-                  <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[369px] left-[220px] rounded-[20px] top-[69px] w-[173px]">
+                  <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[443px] left-[275px] rounded-[20px] top-[83px] w-[216px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[20px]">
                       <img alt="" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image8} />
                     </div>
                   </div>
-                  <div className="absolute h-[405px] left-[60px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[39px] w-[187px]">
+                  <div className="absolute h-[486px] left-[55px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
                     <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image5} />
                   </div>
-                  <div className="absolute h-[405px] left-[160px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[39px] w-[187px]">
+                  <div className="absolute h-[486px] left-[200px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
                     <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image6} />
                   </div>
-                  <div className="absolute h-[417px] left-[100px] rounded-[30px] top-[22px] w-[196px]">
+                  <div className="absolute h-[500px] left-[125px] rounded-[30px] top-[26px] w-[245px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
                       <img alt="" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image4} />
                     </div>
@@ -919,23 +876,23 @@ export const WebsiteHomepage = (): JSX.Element => {
                 <div className={`absolute transition-all duration-[3000ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
                   currentAppSlide === 1 ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-95 -translate-x-full'
                 }`}>
-                  <div className="absolute h-[364px] left-[20px] rounded-[30px] top-[69px] w-[174px]">
+                  <div className="absolute h-[437px] left-[5px] rounded-[30px] top-[83px] w-[218px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" className="absolute h-[130.22%] left-0 max-w-none top-[-0.02%] w-full" src={APP_IMAGES.image8} />
+                      <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] sizets-none rounded-[30px] size-full" src={APP_IMAGES.image8} />
                     </div>
                   </div>
-                  <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[369px] left-[220px] rounded-[20px] top-[69px] w-[173px]">
+                  <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[443px] left-[275px] rounded-[20px] top-[83px] w-[216px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[20px]">
                       <img alt="" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image5} />
                     </div>
                   </div>
-                  <div className="absolute h-[405px] left-[60px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[39px] w-[187px]">
+                  <div className="absolute h-[486px] left-[55px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
                     <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image6} />
                   </div>
-                  <div className="absolute h-[405px] left-[160px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[39px] w-[187px]">
+                  <div className="absolute h-[486px] left-[200px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
                     <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image4} />
                   </div>
-                  <div className="absolute h-[417px] left-[100px] rounded-[30px] top-[22px] w-[196px]">
+                  <div className="absolute h-[500px] left-[125px] rounded-[30px] top-[26px] w-[245px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
                       <img alt="" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image7} />
                     </div>
@@ -945,23 +902,23 @@ export const WebsiteHomepage = (): JSX.Element => {
                 <div className={`absolute transition-all duration-[3000ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
                   currentAppSlide === 2 ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-95 -translate-x-full'
                 }`}>
-                  <div className="absolute h-[364px] left-[20px] rounded-[30px] top-[69px] w-[174px]">
+                  <div className="absolute h-[437px] left-[5px] rounded-[30px] top-[83px] w-[218px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" className="absolute h-[130.22%] left-0 max-w-none top-[-0.02%] w-full" src={APP_IMAGES.image5} />
+                      <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image5} />
                     </div>
                   </div>
-                  <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[369px] left-[220px] rounded-[20px] top-[69px] w-[173px]">
+                  <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[443px] left-[275px] rounded-[20px] top-[83px] w-[216px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[20px]">
                       <img alt="" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image6} />
                     </div>
                   </div>
-                  <div className="absolute h-[405px] left-[60px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[39px] w-[187px]">
+                  <div className="absolute h-[486px] left-[55px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
                     <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image4} />
                   </div>
-                  <div className="absolute h-[405px] left-[160px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[39px] w-[187px]">
+                  <div className="absolute h-[486px] left-[200px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
                     <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image7} />
                   </div>
-                  <div className="absolute h-[417px] left-[100px] rounded-[30px] top-[22px] w-[196px]">
+                  <div className="absolute h-[500px] left-[125px] rounded-[30px] top-[26px] w-[245px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
                       <img alt="" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image8} />
                     </div>
@@ -971,23 +928,23 @@ export const WebsiteHomepage = (): JSX.Element => {
                 <div className={`absolute transition-all duration-[3000ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
                   currentAppSlide === 3 ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-95 -translate-x-full'
                 }`}>
-                  <div className="absolute h-[364px] left-[20px] rounded-[30px] top-[69px] w-[174px]">
+                  <div className="absolute h-[437px] left-[5px] rounded-[30px] top-[83px] w-[218px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" className="absolute h-[130.22%] left-0 max-w-none top-[-0.02%] w-full" src={APP_IMAGES.image4} />
+                      <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image4} />
                     </div>
                   </div>
-                  <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[369px] left-[220px] rounded-[20px] top-[69px] w-[173px]">
+                  <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[443px] left-[275px] rounded-[20px] top-[83px] w-[216px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[20px]">
                       <img alt="" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image7} />
                     </div>
                   </div>
-                  <div className="absolute h-[405px] left-[60px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[39px] w-[187px]">
+                  <div className="absolute h-[486px] left-[55px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
                     <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image8} />
                   </div>
-                  <div className="absolute h-[405px] left-[160px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[39px] w-[187px]">
+                  <div className="absolute h-[486px] left-[200px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
                     <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image5} />
                   </div>
-                  <div className="absolute h-[417px] left-[100px] rounded-[30px] top-[22px] w-[196px]">
+                  <div className="absolute h-[500px] left-[125px] rounded-[30px] top-[26px] w-[245px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
                       <img alt="" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image6} />
                     </div>
@@ -995,7 +952,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                 </div>
 
                 {/* Phone frame - always visible */}
-                <div className="absolute h-[445px] left-[82px] top-[3px] w-[235px]">
+                <div className="absolute h-[535px] left-[108px] top-[3px] w-[283px]">
                   <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <img alt="" className="absolute h-[113.24%] left-[-59.94%] max-w-none top-[-4.9%] w-[218.98%]" src={APP_IMAGES.phone1401} />
                   </div>
@@ -1059,7 +1016,7 @@ export const WebsiteHomepage = (): JSX.Element => {
 
           {/* Solution selector below video */}
           <section className="bg-[#f7fff9] px-6 py-10">
-            <div className="max-w-4xl mx-auto flex justify-center gap-4 flex-wrap">
+            <div className="w-full max-w-4xl mx-auto flex justify-center gap-4 flex-wrap">
               {[
                 { key: "solar", label: "Smart Solar", target: "solar" },
                 { key: "smart-home", label: "Smart Home", target: "smart-home" },
@@ -1081,7 +1038,7 @@ export const WebsiteHomepage = (): JSX.Element => {
 
           {/* Smart solar solutions */}
           <section id="solar" className="bg-gradient-to-b from-[#f7fff9] via-[#f7fff9] to-white px-6 pt-14 pb-16 border-b border-black/5">
-            <div className="max-w-6xl mx-auto text-center space-y-4">
+            <div className="w-full max-w-6xl mx-auto text-center space-y-4">
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm border border-black/5 text-[24px] font-['Poppins'] text-[#0a0a0a">
                 <b>Smart Solar Solutions</b>
               </span>
@@ -1093,7 +1050,7 @@ export const WebsiteHomepage = (): JSX.Element => {
 
           {/* Solar hero image with callouts */}
           <section className="px-6 pb-16">
-            <div className="max-w-5xl mx-auto rounded-[20px] md:rounded-[24px] overflow-hidden shadow-[0_24px_50px_rgba(0,0,0,0.12)] relative">
+            <div className="w-full max-w-5xl mx-auto rounded-[20px] md:rounded-[24px] overflow-hidden shadow-[0_24px_50px_rgba(0,0,0,0.12)] relative">
               <img
                 src={APP_IMAGES.solutionsSolarHouse}
                 alt="Solar house"
@@ -1102,10 +1059,10 @@ export const WebsiteHomepage = (): JSX.Element => {
                 decoding="async"
               />
               <div className="absolute inset-0 pointer-events-none block">
-                <div className="absolute left-[5%] sm:left-[10%] top-[5%] bg-[rgba(255,255,255,0.8)] border border-[rgba(0,0,0,0.4)] rounded-[12px] sm:rounded-[16px] md:rounded-[20px] lg:rounded-[12px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-1 sm:p-3 md:p-4 w-[140px] sm:w-[200px] md:w-[240px] lg:w-[280px]">
+                <div className="absolute left-[5%] sm:left-[10%] top-[5%] bg-[rgba(255,255,255,0.8)] border border-[rgba(0,0,0,0.4)] rounded-[12px] sm:rounded-[16px] md:rounded-[20px] lg:rounded-[12px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-1 sm:p-3 md:p-4 lg:p-6 w-[140px] sm:w-[200px] md:w-[240px] lg:w-[280px]">
                   <div className="flex items-center gap-1 sm:gap-2 mb-1">
                     <div className="w-3 h-3 sm:w-6 sm:h-6 md:w-8 md:h-8 bg-[rgba(157,221,180,0.47)] rounded flex items-center justify-center"><Wrench property1="variant-2" vector="vector-2.svg" /></div>
-                    <p className="font-['Urbanist'] font-bold text-[9px] sm:text-[13px] md:text-[14px] lg:text-[16px] text-[#0a0a0a]">End-to</p>
+                    <p className="font-['Urbanist'] font-bold text-[9px] sm:text-[13px] md:text-[14px] lg:text-[16px] text-[#0a0a0a]">End-to-End</p>
                   </div>  
                   <p className="font-['Poppins'] text-[7px] sm:text-[11px] md:text-[12px] lg:text-[14px] text-[rgba(0,0,0,0.7)]">From design to installation to maintenance</p>
                 </div>
@@ -1132,7 +1089,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                 </div>
               </div>
             </div>
-            <div className="max-w-5xl mx-auto mt-6 flex justify-center">
+            <div className="w-full max-w-5xl mx-auto mt-6 flex justify-center">
               <a
                 href="#contact-section"
                 onClick={(e) => {
@@ -1148,15 +1105,13 @@ export const WebsiteHomepage = (): JSX.Element => {
 
           {/* Journey */}
           <section className="px-6 pb-20 bg-gradient-to-b from-white via-[#f2fbff] to-[#e8f5ff]">
-            <div className="max-w-6xl mx-auto text-center mb-12">
-              <h2 className="text-[32px] md:text-[40px] font-['Urbanist'] font-bold tracking-[-1.4px] text-[#0a0a0a]">
-                Your journey to smarter solar
-              </h2>
+            <div className="w-full max-w-6xl mx-auto text-center mb-12">
+              <h2 className="text-[32px] sm:text-[38px] md:text-[44px] lg:text-[48px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-3 md:mb-4 tracking-[-1.5px]">Your journey to smarter solar</h2>
               <p className="text-[18px] text-[#4a5565] font-['Poppins']">
                 From assessment to ongoing support, we're with you every step of the way
               </p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-5 md:gap-6">
+            <div className="w-full max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-5 md:gap-6">
               {[
                 { title: "Online Proposal", desc: "Upload your bills and location to get your solar proposal with 3D layout." },
                 { title: "Site Assessment", desc: "Our team validates your design & finalizes proposal." },
@@ -1180,14 +1135,14 @@ export const WebsiteHomepage = (): JSX.Element => {
 
           {/* Smart home solutions */}
           <section id="smart-home" className="px-4 sm:px-6 py-12 sm:py-14 md:py-16 bg-gradient-to-b from-[#f7fff9] via-[#eef8ff] to-white">
-            <div className="max-w-6xl mx-auto text-center space-y-2 sm:space-y-3 mb-8 sm:mb-10">
+            <div className="w-full max-w-6xl mx-auto text-center space-y-2 sm:space-y-3 mb-8 sm:mb-10">
               <p className="text-[32px] sm:text-[40px] md:text-[50px] font-['Urbanist'] text-[#0a0a0a] font-bold">Smart home solutions</p>
               <p className="text-[14px] sm:text-[15px] md:text-[17px] font-['Poppins'] text-[#4a5565]">
                 Our intelligent automation connects your home's devices to your solar flow.
               </p>
             </div>
 
-            <div className="relative max-w-6xl mx-auto rounded-[24px] overflow-hidden shadow-[0_24px_50px_rgba(0,0,0,0.12)]">
+            <div className="relative w-full max-w-6xl mx-auto rounded-[24px] overflow-hidden shadow-[0_24px_50px_rgba(0,0,0,0.12)]">
               <img
                 src={APP_IMAGES.solutionsSmartHomeScene}
                 alt="Smart home"
@@ -1214,7 +1169,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                 </div>
               </div>
             </div>
-            <div className="max-w-6xl mx-auto mt-10 flex justify-center">
+            <div className="w-full max-w-6xl mx-auto mt-10 flex justify-center">
               <a
                 href="#contact-section"
                 onClick={(e) => {
@@ -1230,7 +1185,7 @@ export const WebsiteHomepage = (): JSX.Element => {
 
           {/* Smarter Living */}
           <section className="px-4 sm:px-6 py-12 sm:py-16 md:py-20 bg-gradient-to-b from-white via-[#f4faff] to-[#e4f0ff]">
-            <div className="max-w-6xl mx-auto text-center mb-10 sm:mb-12 md:mb-16">
+            <div className="w-full max-w-6xl mx-auto text-center mb-10 sm:mb-12 md:mb-16">
               <h2 className="text-[30px] sm:text-[40px] md:text-[50px] lg:text-[54px] font-['Urbanist'] font-bold tracking-[-1px] sm:tracking-[-2px] text-[#0a0a0a] mb-3 sm:mb-4">
                 Smarter Living, Simplified
               </h2>
@@ -1238,7 +1193,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                 Transform your home into an intelligent, energy-efficient haven
               </p>
             </div>
-            <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6 justify-items-center">
+            <div className="w-full max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6 justify-items-center">
               {[
                 { title: "Smart-Home Planning", desc: "We understand your lifestyle and automation needs — from high-load appliances up to full home." },
                 { title: "Smart devices", desc: "We suggest a list of smart devices for your automation. You can expand to new devices as you wish." },
@@ -1266,66 +1221,92 @@ export const WebsiteHomepage = (): JSX.Element => {
 
           {/* 360Watts App */}
           <section id="app" className="px-3 sm:px-4 md:px-6 py-16 sm:py-20 md:py-24 lg:py-28 bg-gradient-to-b from-[#e4f0ff] via-white to-[#f7fff9]">
-            <div className="max-w-6xl mx-auto space-y-12 sm:space-y-16 md:space-y-24 lg:space-y-60">
-              <div className="space-y-2 sm:space-y-3 relative">
-                <div className="block absolute left-0 top-0 sm:-left-6 sm:-top-4 lg:-left-10 lg:-top-8 rotate-[-12deg] drop-shadow-xl z-10">
-                  <div className="bg-white rounded-[24px] shadow-[0_16px_36px_rgba(0,0,0,0.15)] overflow-hidden border border-black/5 w-[120px] sm:w-[240px] lg:w-[360px]">
-                    <img src={APP_IMAGES.solutionsAppPhoneSchedule} alt="App overview" className="w-full h-full object-cover" loading="lazy" decoding="async" />
-                  </div>
-                </div>
-                <div className="flex flex-col items-end text-right ml-auto w-1/2 space-y-2 sm:space-y-3 md:space-y-4">
-                  <p className="text-[13px] sm:text-[15px] md:text-[17px] lg:text-[19px] text-[#0a0a0a]/60 font-['Poppins'] pl-3 sm:pl-4">Presenting</p>
-                  <h2 className="text-[28px] sm:text-[36px] md:text-[45px] lg:text-[54px] leading-tight font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-0.8px] sm:tracking-[-1px] md:tracking-[-2px] pl-3 sm:pl-4">360Watts App</h2>
-                  <p className="text-[14px] sm:text-[16px] md:text-[19px] lg:text-[22px] text-[#0a0a0a]/70 font-['Poppins'] pl-3 sm:pl-4">Our Unified App Ecosystem</p>
-                  <p className="text-[12px] sm:text-[14px] md:text-[16px] lg:text-[20px] text-[#0a0a0a]/70 font-['Poppins'] max-w-3xl pr-3 sm:pr-4 leading-relaxed">
-                    The 360Watts app bridges solar and smart living. View real-time energy flows, control devices, and get actionable insights — all in one intuitive dashboard.
+            <div className="w-full max-w-7xl mx-auto">
+              {/* Header */}
+              <div className="text-center mb-16 sm:mb-20 md:mb-24 lg:mb-32">
+                <h2 className="text-[60px] sm:text-[80px] md:text-[99px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-3.96px] mb-2 sm:mb-4">360watts App</h2>
+                <p className="text-[23px] text-[#0a0a0a]/50 font-['Poppins'] tracking-[-0.92px] mb-6 sm:mb-8">Our Unified App Ecosystem</p>
+                <div className="max-w-2xl mx-auto">
+                  <p className="text-[23px] text-[#0a0a0a]/60 font-['Poppins'] tracking-[-0.92px] leading-relaxed">
+                    The 360Watts app bridges solar and smart living. View real-time energy flows, control devices, and get actionable insights ; all in one dashboard.
                   </p>
                 </div>
               </div>
 
-              {/* Zig-zag feature list */}
-              <div className="space-y-6 sm:space-y-8 md:space-y-10 lg:space-y-12 mt-16 sm:mt-20 md:mt-24 lg:mt-32">
-                {[
-                  {
-                    img: APP_IMAGES.solutionsAppPhoneInsights,
-                    title: "Smart Scheduling",
-                    desc: "Automatically run high-load devices when solar power is abundant to maximize efficiency and reduce costs.",
-                  },
-                  {
-                    img: APP_IMAGES.solutionsAppPhoneModes,
-                    title: "Real-time Insights",
-                    desc: "Monitor your energy generation, consumption, and savings live, all in one intuitive dashboard.",
-                  },
-                  {
-                    img: APP_IMAGES.solutionsAppPhoneHero,
-                    title: "Maintenance and Care",
-                    desc: "Easily book service appointments and keep your solar and smart systems performing at their best.",
-                  },
-                  {
-                    img:  APP_IMAGES.solutionsAppPhoneMonitor,
-                    title: "Routines and Modes",
-                    desc: "Set your home to match your daily life. Lights, fans, and devices adjust automatically to your routine.",
-                  },
-                ].map((item, idx) => (
-                  <div key={item.title} className={`${idx % 2 === 1 ? 'flex flex-row-reverse' : 'flex flex-row'} items-center gap-4 sm:gap-6 md:gap-8`}>
-                    <div className="shrink-0">
-                      <div className="bg-white rounded-[12px] sm:rounded-[16px] md:rounded-[20px] lg:rounded-[24px] shadow-[0_16px_36px_rgba(0,0,0,0.15)] overflow-hidden border border-black/5 w-[90px] sm:w-[110px] md:w-[150px] lg:w-[220px]">
-                        <img src={item.img} alt={item.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
-                      </div>
-                    </div>
-                    <div className={`flex-1 min-w-0 ${idx % 2 === 1 ? 'text-right' : 'text-left'}`}>
-                      <h3 className="text-[18px] sm:text-[21px] md:text-[24px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] mb-1 sm:mb-2">{item.title}</h3>
-                      <p className="text-[13px] sm:text-[14px] md:text-[16px] lg:text-[18px] font-['Poppins'] text-[#4a5565] leading-relaxed break-words">{item.desc}</p>
-                    </div>
+              {/* Phone Grid Layout */}
+              <div className="space-y-16 sm:space-y-20 md:space-y-24 lg:space-y-32">
+                {/* Real-time Insights - First row */}
+                <div className="flex flex-row items-center gap-12">
+                  <div className="flex-1 text-center px-2 sm:text-center sm:px-6">
+                    <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-4">
+                      Real-time Insights
+                    </h3>
+                    <p className="text-[14px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
+                      Monitor your energy generation, consumption, and savings live, all in one intuitive dashboard.
+                    </p>
                   </div>
-                ))}
+                  <div className="flex-shrink-0 relative w-[220px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
+                    {/* App Screenshot */}
+                    <img src={APP_IMAGES.solutionsAppPhoneInsights} alt="Real-time Insights" className="absolute inset-[10%] w-[80%] h-[80%] object-cover rounded-[20px]" />
+                    {/* Phone Frame Overlay */}
+                    <img src={APP_IMAGES.phone1401} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
+                  </div>
+                </div>
+                {/* Smart Scheduling - Second row */}
+                <div className="flex flex-row-reverse items-center gap-12">
+                  <div className="flex-1 text-center px-2 sm:text-center sm:px-6">
+                    <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-4">Smart Scheduling</h3>
+                    <p className="text-[14px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
+                      Automatically run high-load devices when solar power is abundant to maximize efficiency and reduce costs.
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0 relative w-[220px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
+                    {/* App Screenshot */}
+                    <img src={APP_IMAGES.solutionsAppPhoneMonitor} alt="Smart Scheduling" className="absolute inset-[14%] top-[10%] w-[75%] h-[80%] object-cover rounded-[10px]" />
+                    {/* Phone Frame Overlay */}
+                    <img src={APP_IMAGES.phone1401} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Routines and Modes - Third row (zig-zag) */}
+                <div className="flex flex-row items-center gap-12">
+                  <div className="flex-1 text-center px-2 sm:text-center sm:px-6">
+                    <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-4">Routines and Modes</h3>
+                    <p className="text-[14px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
+                      Set your home to match your daily life. Lights, fans, and devices adjust automatically to your routine.
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0 relative w-[200px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
+                    {/* App Screenshot */}
+                    <img src={APP_IMAGES.solutionsAppPhoneModes} alt="Routines and Modes" className="absolute inset-[11.5%] top-[10%] w-[77%] h-[83%] object-cover rounded-[20px]" />
+                    {/* Phone Frame Overlay */}
+                    <img src={APP_IMAGES.phone1401} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Maintenance and Care - Fourth row (zig-zag) */}
+                <div className="flex flex-row-reverse items-center gap-12">
+                  <div className="flex-1 text-center px-2 sm:text-center sm:px-6">
+                    <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-4">Maintenance and Care</h3>
+                    <p className="text-[14px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
+                      Easily book service appointments and keep your solar and smart systems performing at their best.
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0 relative w-[220px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
+                    {/* App Screenshot */}
+                    <img src={APP_IMAGES.solutionsAppPhoneHero} alt="Maintenance and Care" className="absolute inset-[14.5%] top-[9%] bottom-[6%] w-[75%] object-cover rounded-[20px]" />
+                    {/* Phone Frame Overlay */}
+                    <img src={APP_IMAGES.phone1401} alt="" className="absolute inset-2 w-full h-full object-cover pointer-events-none" />
+                  </div>
+                </div>
+
               </div>
             </div>
           </section>
 
           {/* CTA Section */}
           <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-white">
-            <div className="max-w-4xl mx-auto text-center">
+            <div className="w-full max-w-4xl mx-auto text-center">
               <h2 className="text-[28px] sm:text-[36px] md:text-[40px] lg:text-5xl font-bold text-[#0a0a0a] font-['Urbanist'] mb-4 sm:mb-6">
                 Want to explore the future?
               </h2>
@@ -1345,7 +1326,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                 </a>
                 <button
                   onClick={() => window.location.href = `tel:9087610051`}
-                  className="border-2 border-[#0a0a0a] text-[#0a0a0a] font-bold px-5 sm:px-6 md:px-8 py-3 sm:py-4 rounded-[10px] hover:bg-black/5 transition-colors text-[14px] sm:text-[15px] md:text-base"
+                  className="border-2 border-[#0a0a0a] text-[#0a0a0a] font-bold px-5 sm:px-6 md:px-8 py-3 sm:py-4 rounded-[10px] hover:bg-black/5 transition-colors text-[14px] sm:text-[15px] md:text-[16px]"
                 >
                   Call us
                 </button>
@@ -1387,25 +1368,25 @@ export const WebsiteHomepage = (): JSX.Element => {
             </div>
 
             <div className="relative">
-              <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-gradient-to-b from-[#9ee2b4] via-[#9ee2b4]/60 to-transparent" />
+              <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-gradient-to-b from-[#9ee2b4] via-[#9ee2b4]/60 to-transparent z-0" />
 
-              <div className="space-y-10 sm:space-y-12 md:space-y-16">
+              <div className="space-y-10 sm:space-y-12 md:space-y-16 relative z-10">
                 {storySteps.map((step, idx) => (
                   <div
                     key={idx}
                     className={`flex flex-col ${step.align === "left" ? "md:flex-row" : "md:flex-row-reverse"} items-center gap-6 sm:gap-8 md:gap-12 relative`}
                   >
                     <div className="w-full md:w-1/2">
-                      <div className="bg-white shadow-sm border border-[#e5f3e9] rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8">
+                      <div className="shadow-sm border border-[#e5f3e9] rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 bg-white relative z-10">
                         <h3 className="text-lg sm:text-xl md:text-2xl font-bold font-['Urbanist'] mb-2 sm:mb-3 leading-snug">{step.title}</h3>
                         {step.body && <p className="text-[#4a5565] font-['Poppins'] text-sm sm:text-base md:text-lg leading-relaxed">{step.body}</p>}
                       </div>
                     </div>
-                    <div className="w-full md:w-1/2 flex justify-center">
+                    <div className="w-full md:w-1/2 flex justify-center relative z-10">
                       <img
                         src={step.image}
                         alt="Story visual"
-                        className="w-full max-w-sm sm:max-w-md h-64 sm:h-80 md:h-96 object-contain"
+                        className="w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl h-64 sm:h-80 md:h-96 object-contain"
                       />
                     </div>
                   </div>
@@ -1416,9 +1397,8 @@ export const WebsiteHomepage = (): JSX.Element => {
             <div className="mt-12 sm:mt-14 md:mt-16 text-center space-y-3 sm:space-y-4">
               <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-['Urbanist']">The sun started it.</h3>
               <p className="text-base sm:text-lg text-[#4a5565] font-['Poppins']">We are just making it smarter.</p>
-              <div className="flex flex-col items-center gap-2 sm:gap-3 pt-3 sm:pt-4">
-                <img src={APP_IMAGES.aboutLogo} alt="360Watts logo" className="w-20 sm:w-24 md:w-28 h-auto" />
-                <p className="text-[#244d65] font-['Figtree'] text-lg sm:text-xl font-bold">360Watts</p>
+              <div className="flex flex-col items-center gap-2 sm:gap-3 pt-6 sm:pt-8">
+                <img src={APP_IMAGES.aboutLogo} alt="360Watts logo" className="w-24 sm:w-24 md:w-28 h-auto ml-4" />
                 <p className="text-[#244d65] font-['Figtree'] text-sm sm:text-base">Drive what's next.</p>
               </div>
             </div>
@@ -1426,7 +1406,7 @@ export const WebsiteHomepage = (): JSX.Element => {
         </section>
 
         {/* Team */}
-        <section className="py-12 sm:py-14 md:py-16 px-4 sm:px-6 bg-[#f7fff9]">
+        <section className="py-1 sm:py-14 md:py-1 px-4 sm:px-6 bg-[#f7fff9]">
           <div className="max-w-5xl mx-auto text-center">
             <div className="mb-8 sm:mb-10">
               <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-['Urbanist']">Meet Our Team</h3>
@@ -1440,7 +1420,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                     <img src={member.photo} alt={member.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = APP_IMAGES.aboutAvatar; }} />
                   </div>
                   <p className="text-[11px] sm:text-[13px] md:text-base font-semibold font-['Urbanist'] leading-tight">{member.name}</p>
-                  <p className="text-[10px] sm:text-[11px] md:text-sm text-[#4a5565] font-['Poppins'] leading-snug">{member.role}</p>
+                  <p className="text-[10px] sm:text-[11px] md:text-[12px] lg:text-[13px] text-[#4a5565] font-['Poppins'] leading-snug">{member.role}</p>
                 </div>
               ))}
             </div>
@@ -1556,7 +1536,7 @@ export const WebsiteHomepage = (): JSX.Element => {
           </div>
           
           {/* Contact form */}
-          <div className="border border-[rgba(0,0,0,0.3)] rounded-[16px] sm:rounded-[20px] md:rounded-[25px] lg:rounded-[30px] p-4 sm:p-6 md:p-8 lg:p-12 shadow-[0px_3px_4px_0px_rgba(0,0,0,0.45)] max-w-[939px] mx-auto">
+          <div className="border border-[rgba(0,0,0,0.3)] rounded-[20px] sm:rounded-[25px] md:rounded-[30px] p-4 sm:p-6 md:p-8 lg:p-12 shadow-[0px_3px_4px_0px_rgba(0,0,0,0.45)] max-w-[939px] mx-auto">
             {isSubmitted ? (
               <div className="text-center">
                 <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -1650,7 +1630,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                 </div>
 
                 <div>
-                  <label className="block text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] text-[#0a0a0a] tracking-[-0.5px] sm:tracking-[-0.76px] mb-1.5">Interested in *</label>
+                  <label className="block text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] text-[#0a0a0a] tracking-[-0.5px] sm:tracking-[-0.76px] mb-1">Interested in *</label>
                   <div className="relative">
                     <select 
                       name="interest" 
@@ -1864,10 +1844,9 @@ export const WebsiteHomepage = (): JSX.Element => {
                 {/* Address Card */}
                 <div className="bg-white rounded-[14px] sm:rounded-[18px] md:rounded-[20px] p-4 sm:p-5 md:p-6 shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-[#e5f3e9] hover:shadow-[0_8px_25px_rgba(0,166,62,0.12)] transition-shadow">
                   <div className="flex items-start gap-3 sm:gap-4">
-                    <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-gradient-to-br from-[#dcfce7] to-[#bbf7d0] rounded-[10px] sm:rounded-[12px] flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#00a63e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-[#dcfce7] to-[#bbf7d0] rounded-[10px] sm:rounded-[12px] flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#00a63e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2zm0 0c-3.314 0-6 2.239-6 5v1a1 1 0 001 1h10a1 1 0 001-1v-1c0-2.761-2.686-5-6-5z" />
                       </svg>
                     </div>
                     <div>
@@ -1880,8 +1859,8 @@ export const WebsiteHomepage = (): JSX.Element => {
                 {/* Email Card */}
                 <div className="bg-white rounded-[14px] sm:rounded-[18px] md:rounded-[20px] p-4 sm:p-5 md:p-6 shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-[#e5f3e9] hover:shadow-[0_8px_25px_rgba(0,166,62,0.12)] transition-shadow">
                   <div className="flex items-start gap-3 sm:gap-4">
-                    <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-gradient-to-br from-[#ddefff] to-[#bfdbfe] rounded-[10px] sm:rounded-[12px] flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#3b82f6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-[#ddefff] to-[#bfdbfe] rounded-[10px] sm:rounded-[12px] flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#3b82f6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
                     </div>
@@ -1895,9 +1874,9 @@ export const WebsiteHomepage = (): JSX.Element => {
                 {/* Hours Card */}
                 <div className="bg-white rounded-[14px] sm:rounded-[18px] md:rounded-[20px] p-4 sm:p-5 md:p-6 shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-[#e5f3e9] hover:shadow-[0_8px_25px_rgba(0,166,62,0.12)] transition-shadow">
                   <div className="flex items-start gap-3 sm:gap-4">
-                    <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-gradient-to-br from-[#fef3c7] to-[#fce7f3] rounded-[10px] sm:rounded-[12px] flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#f97316]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 2m6-11a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-[#fef3c7] to-[#fce7f3] rounded-[10px] sm:rounded-[12px] flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#f97316]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
                     <div>
@@ -1926,7 +1905,6 @@ export const WebsiteHomepage = (): JSX.Element => {
           </div>
         </div>
       </section>
-
       {/* Footer */}
       <footer className="relative py-14 sm:py-18 md:py-24 px-4 sm:px-6 rounded-t-[30px] sm:rounded-t-[40px] md:rounded-t-[50px] overflow-hidden" style={{
         background: "linear-gradient(135deg, rgba(247, 255, 248, 1) 0%, rgba(240, 253, 244, 1) 50%, rgba(236, 254, 255, 1) 100%)",
@@ -1944,23 +1922,22 @@ export const WebsiteHomepage = (): JSX.Element => {
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='1.5'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
         }}></div>
 
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="w-full max-w-7xl mx-auto relative z-10">
           {/* Main Footer Content */}
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-12 gap-6 sm:gap-8 md:gap-10 lg:gap-12 mb-10 sm:mb-12 md:mb-14 lg:mb-16 items-start">
             {/* Logo Section - Left Aligned */}
             <div className="col-span-2 sm:col-span-2 md:col-span-4 flex flex-col items-center sm:items-start gap-2 group">
               <div className="relative">
                 <img
-                  src={APP_IMAGES.finalLogo}
+                  src={APP_IMAGES.footerLogo}
                   alt="360Watts"
-                  className="h-[80px] sm:h-[100px] md:h-[120px] w-auto transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 drop-shadow-md"
+                  className="h-[85px] sm:h-[100px] md:h-[120px] w-auto transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 drop-shadow-md"
                   onError={(e) => { (e.target as HTMLImageElement).src = localFinalLogo; }}
                 />
-                <div className="absolute -inset-4 bg-gradient-to-r from-[#00a63e]/20 to-[#017c54]/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute -inset-4 bg-gradient-to-r from-[#00a63e]/20 to-[#007a55]/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
               <div className="text-center sm:text-left">
-                <div className="text-[26px] sm:text-[32px] md:text-[38px] lg:text-[42px] font-bold text-[#0a0a0a] font-['Figtree',sans-serif] tracking-[-1px] mb-0 group-hover:text-[#00a63e] transition-colors duration-300">360watts</div>
-                <div className="text-[13px] sm:text-[15px] md:text-[17px] text-[#4a5565] font-['Figtree',sans-serif] tracking-[-0.3px] font-medium mb-2 sm:mb-3 md:mb-4">Drive what's next.</div>
+                <div className="text-[13px] sm:text-[15px] md:text-[17px] text-[#4a5565] font-['Figtree',sans-serif] tracking-[-0.3px] sm:tracking-[-0.76px] mb-2 sm:mb-3 md:mb-4">Drive what's next.</div>
                 <p className="text-[12px] sm:text-[13px] md:text-[14px] lg:text-[15px] text-[#4a5565] leading-relaxed max-w-xs">
                   Revolutionizing home energy with smart solar and automation solutions.
                 </p>
@@ -1971,7 +1948,7 @@ export const WebsiteHomepage = (): JSX.Element => {
             <div className="col-span-1 md:col-span-3 space-y-3 sm:space-y-4 md:space-y-5">
               <h4 className="text-[16px] sm:text-[18px] md:text-[20px] lg:text-[24px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-3 sm:mb-4 md:mb-6 leading-6 relative inline-block">
                 Quick Links
-                <div className="absolute -bottom-1 sm:-bottom-2 left-0 w-8 sm:w-10 md:w-12 h-0.5 sm:h-1 bg-gradient-to-r from-[#00a63e] to-[#017c54] rounded-full"></div>
+                <div className="absolute -bottom-1 sm:-bottom-2 left-0 w-8 sm:w-10 md:w-12 h-0.5 sm:h-1 bg-gradient-to-r from-[#00a63e] to-[#007a55] rounded-full"></div>
               </h4>
               <nav className="flex flex-col space-y-2 sm:space-y-3">
                 {[
@@ -2001,7 +1978,7 @@ export const WebsiteHomepage = (): JSX.Element => {
             <div className="col-span-1 md:col-span-3 space-y-3 sm:space-y-4 md:space-y-5">
               <h4 className="text-[16px] sm:text-[18px] md:text-[20px] lg:text-[24px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-3 sm:mb-4 md:mb-6 leading-6 relative inline-block">
                 Contact Us
-                <div className="absolute -bottom-1 sm:-bottom-2 left-0 w-8 sm:w-10 md:w-12 h-0.5 sm:h-1 bg-gradient-to-r from-[#00a63e] to-[#017c54] rounded-full"></div>
+                <div className="absolute -bottom-1 sm:-bottom-2 left-0 w-8 sm:w-10 md:w-12 h-0.5 sm:h-1 bg-gradient-to-r from-[#00a63e] to-[#007a55] rounded-full"></div>
               </h4>
               <div className="space-y-3 sm:space-y-4">
                 <a
@@ -2009,7 +1986,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                   className="flex items-center gap-2 sm:gap-3 text-[14px] sm:text-[15px] md:text-[16px] text-[#4a5565] hover:text-[#017c54] transition-colors duration-200 font-medium leading-6 sm:leading-7 group"
                 >
                   <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-gradient-to-br from-[#00a63e]/10 to-[#017c54]/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg className="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5 text-[#00a63e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#00a63e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                   </div>
@@ -2020,7 +1997,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                   className="flex items-center gap-2 sm:gap-3 text-[14px] sm:text-[15px] md:text-[16px] text-[#4a5565] font-medium leading-6 sm:leading-7 hover:text-[#00a63e] transition-colors group"
                 >
                   <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-gradient-to-br from-[#00a63e]/10 to-[#017c54]/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <svg className="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5 text-[#00a63e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#00a63e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
                   </div>
@@ -2033,7 +2010,7 @@ export const WebsiteHomepage = (): JSX.Element => {
             <div className="col-span-2 sm:col-span-2 md:col-span-2 space-y-3 sm:space-y-4 md:space-y-5">
               <h4 className="text-[16px] sm:text-[18px] md:text-[20px] lg:text-[24px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-3 sm:mb-4 md:mb-6 leading-6 relative inline-block">
                 Follow Us
-                <div className="absolute -bottom-1 sm:-bottom-2 left-0 w-8 sm:w-10 md:w-12 h-0.5 sm:h-1 bg-gradient-to-r from-[#00a63e] to-[#017c54] rounded-full"></div>
+                <div className="absolute -bottom-1 sm:-bottom-2 left-0 w-8 sm:w-10 md:w-12 h-0.5 sm:h-1 bg-gradient-to-r from-[#00a63e] to-[#007a55] rounded-full"></div>
               </h4>
               <div className="flex flex-wrap gap-2 sm:gap-3">
                 <a
@@ -2045,7 +2022,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-[#00a63e]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <svg className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white group-hover:brightness-125 transition-all duration-200 relative z-10" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.645.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                   </svg>
                 </a>
                 <a

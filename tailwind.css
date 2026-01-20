@@ -3,6 +3,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* CSS Reset for body margins and padding */
+body {
+  margin: 0;
+  padding: 0;
+}
+
 @layer components {
   .all-\[unset\] {
     all: unset;

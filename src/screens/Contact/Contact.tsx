@@ -110,7 +110,7 @@ export const Contact = (): JSX.Element => {
 
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-6 bg-gradient-to-br from-[#017c54]/10 to-[#00a63e]/5">
-        <div className="max-w-7xl mx-auto text-center">
+        <div className="w-full max-w-7xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-neutral-950 font-['Urbanist'] mb-6">
             Get in Touch
           </h1>
@@ -340,7 +340,7 @@ export const Contact = (): JSX.Element => {
 
       {/* Map Section */}
       <section className="py-16 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
+        <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold text-neutral-950 font-['Urbanist'] mb-3">
               Find Us
@@ -400,7 +400,7 @@ export const Contact = (): JSX.Element => {
 
       {/* Footer */}
       <footer className="py-12 px-6 bg-[#f7fff8]">
-        <div className="max-w-7xl mx-auto text-center">
+        <div className="w-full max-w-7xl mx-auto text-center">
           <p className="text-neutral-600 font-['Poppins']">
             © 2025 360WATTS. All rights reserved.
           </p>

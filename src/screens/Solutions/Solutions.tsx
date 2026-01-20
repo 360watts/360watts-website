@@ -379,7 +379,7 @@ export const Solutions = (): JSX.Element => {
 
       {/* Footer */}
       <footer className="bg-[#0a0a0a] text-white py-16 px-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="w-full max-w-7xl mx-auto">
           <div className="grid sm:grid-cols-4 gap-12 mb-12">
             {/* Brand */}
             <div>
