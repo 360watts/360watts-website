@@ -1,8 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { ArrowRight, ChevronRight, ChevronLeft, MessageCircle, CheckCircle, ChevronDown, Volume2, VolumeX } from "lucide-react";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+import CountUp from "react-countup";
+import { ArrowRight, Calculator, ChevronRight, ChevronLeft, MessageCircle, CheckCircle, ChevronDown, Volume2, VolumeX, Gauge, PiggyBank, Ruler, SunMedium, Wallet2, Zap, Share2, Copy} from "lucide-react";
 import { Link } from "react-router-dom";
 import { Navigation } from "../../components/Navigation";
 import { APP_IMAGES } from "../../lib/imageRegistry";
+import { calculateSolarRequirementsFromBill, BillInputs } from "../../utils/solar-physics";
 
 const Wrench = ({ 
   property1,
@@ -300,7 +304,176 @@ export const WebsiteHomepage = (): JSX.Element => {
   const [submittedMessage, setSubmittedMessage] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentAppSlide, setCurrentAppSlide] = useState(0);
-  
+  const [isCalcVisible, setIsCalcVisible] = useState(false);
+  const [isResultVisible, setIsResultVisible] = useState(false);
+  const [calcGlow, setCalcGlow] = useState({ x: 50, y: 50 });
+  const [resultGlow, setResultGlow] = useState({ x: 50, y: 50 });
+  const [isCalcHovering, setIsCalcHovering] = useState(false);
+  const [isResultHovering, setIsResultHovering] = useState(false);
+  const [isPageVisible, setIsPageVisible] = useState(true);
+  const [reduceMotion, setReduceMotion] = useState(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return false;
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  });
+
+  // --- Solar Calculator State ---
+  const [billAmount, setBillAmount] = useState<string>('');
+  const [estimatedUnits, setEstimatedUnits] = useState<number | undefined>();
+  const [calcResult, setCalcResult] = useState<ReturnType<typeof calculateSolarRequirementsFromBill> | null>(null);
+  const [hasAttemptedCalculation, setHasAttemptedCalculation] = useState(false);
+  const [showShareOptions, setShowShareOptions] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+
+  useEffect(() => {
+    // Initial calculation on mount - no live preview
+    const bill: BillInputs = {
+      totalBillAmount: billAmount ? Number(billAmount) : undefined,
+      estimatedUnits: estimatedUnits,
+      billingCycle: 'Bi-Monthly',
+    };
+    try {
+      setCalcResult(calculateSolarRequirementsFromBill(bill));
+    } catch (error) {
+      // If neither input is provided, don't calculate
+      setCalcResult(null);
+    }
+  }, []); // Empty dependency array for mount only
+
+  const handleBillAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Prevent typing 0 as first character or setting value to 0
+    if (value === '0' || value === '') {
+      setBillAmount('');
+    } else {
+      // Ensure it's a valid positive number
+      const numValue = Number(value);
+      if (!isNaN(numValue) && numValue > 0) {
+        setBillAmount(value);
+      }
+    }
+  };
+  const handleEstimatedUnitsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEstimatedUnits(value ? Number(value) : undefined);
+  };
+  const handleCalculatorSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setHasAttemptedCalculation(true);
+
+    // Validate inputs
+    const billAmountNum = billAmount ? Number(billAmount) : undefined;
+    const estimatedUnitsNum = estimatedUnits;
+
+    // Check if both fields are filled
+    if (billAmountNum && billAmountNum > 0 && estimatedUnitsNum && estimatedUnitsNum > 0) {
+      alert("Please enter either bill amount OR estimated units, not both. Choose the option you're more comfortable with.");
+      return;
+    }
+
+    // Check if neither field is filled or valid
+    if ((!billAmountNum || billAmountNum <= 0) && (!estimatedUnitsNum || estimatedUnitsNum <= 0)) {
+      alert("Please enter either a bill amount (₹) or estimated monthly units (kWh) to calculate your solar requirements.");
+      return;
+    }
+
+    // Check if bill amount is 0 or negative
+    if (billAmountNum !== undefined && billAmountNum <= 0) {
+      alert("Bill amount must be greater than 0.");
+      return;
+    }
+
+    const bill: BillInputs = {
+      totalBillAmount: billAmountNum,
+      estimatedUnits: estimatedUnitsNum,
+      billingCycle: 'Bi-Monthly',
+    };
+
+    try {
+      const result = calculateSolarRequirementsFromBill(bill);
+      setCalcResult(result);
+      setShowResults(true); // Show results after successful calculation
+      setIsResultVisible(true); // Make results visible immediately
+    } catch (error) {
+      console.error('Calculation error:', error);
+      alert("There was an error calculating your solar requirements. Please check your inputs and try again.");
+      setCalcResult(null);
+      setShowResults(false);
+    }
+  };
+
+  // Share functionality
+  const generateShareText = () => {
+    if (!calcResult) return "";
+    
+    const text = `🌞 My Solar Calculator Results from 360Watts:\n\n` +
+      `🏠 System Size: ${calcResult.recommendedCapacityKw.toFixed(1)} kW\n` +
+      `☀️ Solar Panels: ${calcResult.panelCount} panels\n` +
+      `⚡ Annual Generation: ${calcResult.annualGenerationKwh.toLocaleString()} kWh\n` +
+      `💰 Estimated Cost: ₹${(calcResult.estimatedCost / 100000).toFixed(1)}L\n` +
+      `💸 Annual Savings: ₹${(calcResult.annualSavings / 1000).toFixed(0)}k\n\n` +
+      `Calculate your solar savings at: https://360watts.com\n\n` +
+      `#SolarPower #360Watts #RenewableEnergy`;
+    
+    return text;
+  };
+
+  const shareViaWhatsApp = () => {
+    const text = encodeURIComponent(generateShareText());
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+  };
+
+  const shareViaFacebook = () => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent("Check out my solar calculator results from 360Watts!");
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank');
+  };
+
+  const shareViaTwitter = () => {
+    const text = encodeURIComponent(generateShareText().substring(0, 200) + "...");
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(generateShareText());
+      alert("Results copied to clipboard!");
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = generateShareText();
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert("Results copied to clipboard!");
+    }
+  };
+
+  // Animation variants
+  const revealVariant = {
+    hidden: { opacity: 0, y: reduceMotion ? 0 : 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  };
+
+  const sectionMotionProps = reduceMotion
+    ? {}
+    : {
+        initial: "hidden",
+        whileInView: "visible",
+        viewport: { once: false, amount: 0.1 },
+        variants: revealVariant,
+      };
+
+  const staggerMotionProps = reduceMotion
+    ? {}
+    : {
+        initial: "hidden",
+        whileInView: "visible",
+        viewport: { once: false, amount: 0.1 },
+        variants: { hidden: {}, visible: { transition: { staggerChildren: 0.12 } } },
+      };
+
   // Partnership form state
   const [partnershipData, setPartnershipData] = useState({ 
     name: "", 
@@ -325,21 +498,37 @@ export const WebsiteHomepage = (): JSX.Element => {
   // Video mute state
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const calculatorRef = useRef<HTMLDivElement>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
+  const calcRafRef = useRef<number | null>(null);
+  const resultRafRef = useRef<number | null>(null);
+  const [solutionsVideoRef, solutionsVideoInView] = useInView({ triggerOnce: false, threshold: 0.2 });
+  const [appShowcaseRef, appShowcaseInView] = useInView({ triggerOnce: false, threshold: 0.2 });
 
   useEffect(() => {
+    if (typeof document === "undefined") return;
+    const handleVisibility = () => setIsPageVisible(!document.hidden);
+    handleVisibility();
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, []);
+
+  useEffect(() => {
+    if (reduceMotion || !isPageVisible) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 8000); // Increased from 5000ms (5s) to 8000ms (8s)
     return () => clearInterval(timer);
-  }, []);
+  }, [isPageVisible, reduceMotion]);
 
   // Auto-slide app showcase
   useEffect(() => {
+    if (reduceMotion || !isPageVisible || !appShowcaseInView) return;
     const timer = setInterval(() => {
       setCurrentAppSlide((prev) => (prev + 1) % 4);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [appShowcaseInView, isPageVisible, reduceMotion]);
 
   // Scroll to contact section if hash is present
   useEffect(() => {
@@ -351,6 +540,69 @@ export const WebsiteHomepage = (): JSX.Element => {
         }
       }, 100);
     }
+  }, []);
+
+  // Respect prefers-reduced-motion
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => setReduceMotion(mediaQuery.matches);
+    updatePreference();
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", updatePreference);
+      return () => mediaQuery.removeEventListener("change", updatePreference);
+    }
+    mediaQuery.addListener(updatePreference);
+    return () => mediaQuery.removeListener(updatePreference);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (calcRafRef.current !== null) {
+        cancelAnimationFrame(calcRafRef.current);
+      }
+      if (resultRafRef.current !== null) {
+        cancelAnimationFrame(resultRafRef.current);
+      }
+    };
+  }, []);
+
+  // Pause/play solutions video based on visibility
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (solutionsVideoInView && !reduceMotion) {
+      const playPromise = video.play();
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => {});
+      }
+    } else {
+      video.pause();
+    }
+  }, [reduceMotion, solutionsVideoInView]);
+
+  // Animate sections on scroll into view (calculator + result)
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof IntersectionObserver === "undefined") {
+      setIsCalcVisible(true);
+      setIsResultVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.target === calculatorRef.current) setIsCalcVisible(entry.isIntersecting);
+          if (entry.target === resultRef.current) setIsResultVisible(entry.isIntersecting);
+        });
+      },
+      { threshold: 0.25 }
+    );
+
+    if (calculatorRef.current) observer.observe(calculatorRef.current);
+    if (resultRef.current) observer.observe(resultRef.current);
+
+    return () => observer.disconnect();
   }, []);
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
@@ -381,6 +633,42 @@ export const WebsiteHomepage = (): JSX.Element => {
 
   const toggleMute = () => {
     setIsMuted(!isMuted);
+  };
+
+  const handleCalcMouseMove = (e: React.MouseEvent) => {
+    if (!calculatorRef.current || typeof requestAnimationFrame === "undefined") return;
+    const { clientX, clientY } = e;
+    if (calcRafRef.current !== null) {
+      cancelAnimationFrame(calcRafRef.current);
+    }
+    calcRafRef.current = requestAnimationFrame(() => {
+      const rect = calculatorRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const x = ((clientX - rect.left) / rect.width) * 100;
+      const y = ((clientY - rect.top) / rect.height) * 100;
+      setCalcGlow({
+        x: Math.min(100, Math.max(0, x)),
+        y: Math.min(100, Math.max(0, y)),
+      });
+    });
+  };
+
+  const handleResultMouseMove = (e: React.MouseEvent) => {
+    if (!resultRef.current || typeof requestAnimationFrame === "undefined") return;
+    const { clientX, clientY } = e;
+    if (resultRafRef.current !== null) {
+      cancelAnimationFrame(resultRafRef.current);
+    }
+    resultRafRef.current = requestAnimationFrame(() => {
+      const rect = resultRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const x = ((clientX - rect.left) / rect.width) * 100;
+      const y = ((clientY - rect.top) / rect.height) * 100;
+      setResultGlow({
+        x: Math.min(100, Math.max(0, x)),
+        y: Math.min(100, Math.max(0, y)),
+      });
+    });
   };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -514,12 +802,13 @@ export const WebsiteHomepage = (): JSX.Element => {
       <Navigation transparent />
 
       {/* Hero Section */}
-      <section 
+      <motion.section 
         id="hero-section" 
         className="relative h-[60vh] sm:h-screen overflow-hidden scroll-mt-20"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        {...sectionMotionProps}
       >
         {/* Background Image */}
         {heroSlides.map((slide, index) => (
@@ -549,21 +838,32 @@ export const WebsiteHomepage = (): JSX.Element => {
                 }`}
               >
                 {index === currentSlide && (
-                  <div className="max-w-3xl px-4 sm:px-0">
+                  <motion.div
+                    initial={reduceMotion ? undefined : { opacity: 0, y: 22 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.75, ease: "easeOut" }}
+                    className="max-w-3xl px-4 sm:px-0"
+                  >
                     <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-[99px] font-bold text-[rgba(247,255,249,0.8)] font-['Urbanist'] mb-4 sm:mb-6 leading-[1.1] tracking-tight sm:tracking-[-3.96px] whitespace-pre-line">
                       {slide.title}
                     </h1>
                     <p className="text-base sm:text-lg md:text-xl lg:text-[23px] text-white font-['Poppins'] max-w-xl mb-8 sm:mb-10 leading-relaxed">
                       {slide.subtitle}
                     </p>
-                    <Link 
-                      to="/contact" 
-                      className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#00a63e] to-[#007a55] text-white font-semibold rounded-xl hover:opacity-90 active:scale-95 transition-all text-sm sm:text-base"
+                    <motion.div
+                      whileHover={reduceMotion ? undefined : { y: -2, scale: 1.01 }}
+                      whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+                      className="inline-flex"
                     >
-                      Get Free Consultation 
-                      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </Link>
-                  </div>
+                      <Link 
+                        to="/contact" 
+                        className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#00a63e] to-[#007a55] text-white font-semibold rounded-xl hover:opacity-90 active:scale-95 transition-all text-sm sm:text-base"
+                      >
+                        Get Free Consultation 
+                        <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </Link>
+                    </motion.div>
+                  </motion.div>
                 )}
               </div>
             ))}
@@ -597,7 +897,7 @@ export const WebsiteHomepage = (): JSX.Element => {
             />
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* Our Unified Solution Section */}
       <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 bg-white">
@@ -609,7 +909,7 @@ export const WebsiteHomepage = (): JSX.Element => {
           
           <div className="flex flex-col md:flex-row gap-6 md:gap-8 lg:gap-[113px] justify-center items-stretch mb-8">
             {/* Solar Solutions Card */}
-            <div className="relative rounded-[20px] overflow-hidden w-full md:flex-1 lg:w-[567px] h-[280px] sm:h-[300px] md:h-[320px] lg:h-[342px]">
+            <div className="relative rounded-[20px] overflow-hidden w-full md:flex-1 lg:w-[567px] h-[280px] sm:h-[300px] md:h-[320px] lg:h-[342px] transition-transform duration-300 hover:-translate-y-2 hover:scale-[1.01]">
               <img 
                 src="/solar-panels-house-roof.jpg" 
                 alt="Solar Solutions" 
@@ -636,7 +936,7 @@ export const WebsiteHomepage = (): JSX.Element => {
             <div className="hidden md:flex items-center justify-center w-8 md:w-12 h-8 md:h-12 text-[#4a5565] text-3xl md:text-5xl font-light mt-20 md:mt-24">+</div>
 
             {/* Smart Home Solutions Card */}
-            <div className="relative rounded-[20px] overflow-hidden w-full md:flex-1 lg:w-[567px] h-[280px] sm:h-[300px] md:h-[320px] lg:h-[342px]">
+            <div className="relative rounded-[20px] overflow-hidden w-full md:flex-1 lg:w-[567px] h-[280px] sm:h-[300px] md:h-[320px] lg:h-[342px] transition-transform duration-300 hover:-translate-y-2 hover:scale-[1.01]">
               <img 
                 src={APP_IMAGES.digitalTablet} 
                 alt="Smart Home Solutions" 
@@ -677,7 +977,10 @@ export const WebsiteHomepage = (): JSX.Element => {
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-12">
             {benefitsData.map((benefit, index) => (
-              <div key={index} className="flex flex-col items-center text-center group">
+              <div
+                key={index}
+                className="flex flex-col items-center text-center group transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.02]"
+              >
                 <div className="w-[80px] h-[80px] sm:w-[90px] sm:h-[90px] md:w-[100px] md:h-[100px] bg-gradient-to-br from-[#dcfce7] to-[#bbf7d0] rounded-[16px] sm:rounded-[20px] flex items-center justify-center mb-4 sm:mb-5 md:mb-6 shadow-[0_4px_20px_rgba(0,166,62,0.15)] group-hover:shadow-[0_8px_30px_rgba(0,166,62,0.25)] transition-all duration-300">
                   <img src={benefit.icon} alt="" className="w-[38px] h-[38px] sm:w-[45px] sm:h-[45px] md:w-[50px] md:h-[50px]" />
                 </div>
@@ -823,7 +1126,7 @@ export const WebsiteHomepage = (): JSX.Element => {
       </section>
 
       {/* App Section */}
-      <section className="py-20 px-4 sm:px-6 bg-gradient-to-r from-[#00a63e] to-[#017c54]">
+      <section ref={appShowcaseRef} className="py-20 px-4 sm:px-6 bg-gradient-to-r from-[#00a63e] to-[#017c54]">
         <div className="w-full max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-white">
@@ -835,7 +1138,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                       <img src={feature.icon} alt="" className="w-7 h-7" />
                     </div>
                     <div>
-                      <h4 className="font-extrabold text-black text-xl font-['poppins']">{feature.title}</h4>
+                      <h4 className="font-extrabold text-black text-xl font-['Poppins']">{feature.title}</h4>
                       <p className="text-white font-['Poppins']">{feature.description}</p>
                     </div>
                   </div>
@@ -852,23 +1155,23 @@ export const WebsiteHomepage = (): JSX.Element => {
                 }`}>
                   <div className="absolute h-[437px] left-[5px] rounded-[30px] top-[83px] w-[218px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image7} />
+                      <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image7} />
                     </div>
                   </div>
                   <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[443px] left-[275px] rounded-[20px] top-[83px] w-[216px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[20px]">
-                      <img alt="" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image8} />
+                      <img alt="" loading="lazy" decoding="async" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image8} />
                     </div>
                   </div>
                   <div className="absolute h-[486px] left-[55px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
-                    <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image5} />
+                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image5} />
                   </div>
                   <div className="absolute h-[486px] left-[200px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
-                    <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image6} />
+                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image6} />
                   </div>
                   <div className="absolute h-[500px] left-[125px] rounded-[30px] top-[26px] w-[245px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image4} />
+                      <img alt="" loading="lazy" decoding="async" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image4} />
                     </div>
                   </div>
                 </div>
@@ -878,23 +1181,23 @@ export const WebsiteHomepage = (): JSX.Element => {
                 }`}>
                   <div className="absolute h-[437px] left-[5px] rounded-[30px] top-[83px] w-[218px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] sizets-none rounded-[30px] size-full" src={APP_IMAGES.image8} />
+                      <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image8} />
                     </div>
                   </div>
                   <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[443px] left-[275px] rounded-[20px] top-[83px] w-[216px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[20px]">
-                      <img alt="" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image5} />
+                      <img alt="" loading="lazy" decoding="async" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image5} />
                     </div>
                   </div>
                   <div className="absolute h-[486px] left-[55px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
-                    <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image6} />
+                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image6} />
                   </div>
                   <div className="absolute h-[486px] left-[200px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
-                    <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image4} />
+                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image4} />
                   </div>
                   <div className="absolute h-[500px] left-[125px] rounded-[30px] top-[26px] w-[245px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image7} />
+                      <img alt="" loading="lazy" decoding="async" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image7} />
                     </div>
                   </div>
                 </div>
@@ -904,23 +1207,23 @@ export const WebsiteHomepage = (): JSX.Element => {
                 }`}>
                   <div className="absolute h-[437px] left-[5px] rounded-[30px] top-[83px] w-[218px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image5} />
+                      <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image5} />
                     </div>
                   </div>
                   <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[443px] left-[275px] rounded-[20px] top-[83px] w-[216px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[20px]">
-                      <img alt="" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image6} />
+                      <img alt="" loading="lazy" decoding="async" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image6} />
                     </div>
                   </div>
                   <div className="absolute h-[486px] left-[55px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
-                    <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image4} />
+                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image4} />
                   </div>
                   <div className="absolute h-[486px] left-[200px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
-                    <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image7} />
+                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image7} />
                   </div>
                   <div className="absolute h-[500px] left-[125px] rounded-[30px] top-[26px] w-[245px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image8} />
+                      <img alt="" loading="lazy" decoding="async" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image8} />
                     </div>
                   </div>
                 </div>
@@ -930,23 +1233,23 @@ export const WebsiteHomepage = (): JSX.Element => {
                 }`}>
                   <div className="absolute h-[437px] left-[5px] rounded-[30px] top-[83px] w-[218px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image4} />
+                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image4} />
                     </div>
                   </div>
                   <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[443px] left-[275px] rounded-[20px] top-[83px] w-[216px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[20px]">
-                      <img alt="" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image7} />
+                    <img alt="" loading="lazy" decoding="async" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image7} />
                     </div>
                   </div>
                   <div className="absolute h-[486px] left-[55px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
-                    <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image8} />
+                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image8} />
                   </div>
                   <div className="absolute h-[486px] left-[200px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
-                    <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image5} />
+                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image5} />
                   </div>
                   <div className="absolute h-[500px] left-[125px] rounded-[30px] top-[26px] w-[245px]">
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image6} />
+                      <img alt="" loading="lazy" decoding="async" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image6} />
                     </div>
                   </div>
                 </div>
@@ -954,7 +1257,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                 {/* Phone frame - always visible */}
                 <div className="absolute h-[535px] left-[108px] top-[3px] w-[283px]">
                   <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    <img alt="" className="absolute h-[113.24%] left-[-59.94%] max-w-none top-[-4.9%] w-[218.98%]" src={APP_IMAGES.phone1401} />
+                <img alt="" loading="lazy" decoding="async" className="absolute h-[113.24%] left-[-59.94%] max-w-none top-[-4.9%] w-[218.98%]" src={APP_IMAGES.phone1401} />
                   </div>
                 </div>
               </div>
@@ -984,11 +1287,302 @@ export const WebsiteHomepage = (): JSX.Element => {
         </div>
       </section>
 
+      {/* Solar Calculator Section */}
+      <section id="solar-calculator" className="w-full max-w-7xl mx-auto px-4 py-12 sm:py-16 md:py-20">
+        <div
+          ref={calculatorRef}
+          className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0f2418] via-[#0c1e14] to-[#0f2f1e] text-white shadow-[0_24px_70px_rgba(0,0,0,0.22)] border border-white/10"
+          style={{
+            opacity: isCalcVisible ? 1 : 0,
+            transform: isCalcVisible ? "translateY(0)" : "translateY(40px)",
+            transition: "opacity 0.9s ease-out, transform 0.9s ease-out"
+          }}
+          onMouseMove={handleCalcMouseMove}
+          onMouseEnter={() => setIsCalcHovering(true)}
+          onMouseLeave={() => setIsCalcHovering(false)}
+        >
+          <div className="absolute -left-20 -top-24 h-64 w-64 rounded-full bg-[#00a63e]/20 blur-3xl" aria-hidden="true" />
+          <div className="absolute right-[-120px] bottom-[-80px] h-64 w-64 rounded-full bg-[#3b82f6]/15 blur-3xl" aria-hidden="true" />
+          <div
+            className="pointer-events-none absolute inset-0 transition-opacity duration-300"
+            style={{
+              opacity: isCalcHovering ? 1 : 0,
+              background: `radial-gradient(180px circle at ${calcGlow.x}% ${calcGlow.y}%, rgba(255,255,255,0.14), transparent 55%)`
+            }}
+            aria-hidden="true"
+          />
+          <div className="relative grid lg:grid-cols-[1.05fr_1fr]">
+            <div className="p-7 md:p-10 lg:p-12 flex flex-col gap-6">
+              <span className="inline-flex items-center gap-2 w-fit px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs sm:text-sm font-semibold tracking-[0.12em] uppercase">
+                <Calculator className="w-4 h-4" />
+                Solar Calculator
+              </span>
+              <div className="space-y-3">
+                <h2 className="font-['Urbanist'] font-bold text-2xl sm:text-3xl md:text-[34px] leading-tight text-white">
+                  Curious? Calculate your home's solar potential
+                </h2>
+                <p className="font-['Poppins'] text-base sm:text-lg text-white/80 max-w-xl">
+                  Drop in a few details to preview system size, energy generation, and savings before a site survey.
+                </p>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div className="flex items-start gap-3 bg-white/5 border border-white/10 rounded-2xl px-4 py-3">
+                  <CheckCircle className="w-5 h-5 text-[#8ff0b5]" />
+                  <p className="text-sm sm:text-[15px] font-['Poppins'] text-white/85">State-specific sunlight hours baked in.</p>
+                </div>
+                <div className="flex items-start gap-3 bg-white/5 border border-white/10 rounded-2xl px-4 py-3">
+                  <CheckCircle className="w-5 h-5 text-[#8ff0b5]" />
+                  <p className="text-sm sm:text-[15px] font-['Poppins'] text-white/85">Roof type + usable area drive panel count.</p>
+                </div>
+                <div className="flex items-start gap-3 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 sm:col-span-2">
+                  <CheckCircle className="w-5 h-5 text-[#8ff0b5]" />
+                  <p className="text-sm sm:text-[15px] font-['Poppins'] text-white/85">Expert consultation validates your estimate.</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 text-sm sm:text-base text-white/80">
+                <MessageCircle className="w-4 h-4" />
+                <span>We respond with a refined quote within one business day.</span>
+              </div>
+            </div>
+
+            <form onSubmit={handleCalculatorSubmit} className="bg-white text-[#0a0a0a] rounded-[24px] m-3 shadow-[0_20px_60px_rgba(0,0,0,0.12)] p-6 md:p-8 lg:p-10 flex flex-col gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2 md:col-span-2">
+                  <label className="font-['Poppins'] text-sm sm:text-base text-[#0a0a0a]">Bi-Monthly Bill Amount (₹)</label>
+                  <div className="bg-[#f7fff9] border border-[#d7eadd] rounded-xl px-4 py-3 shadow-[0_6px_20px_rgba(0,0,0,0.03)]">
+                    <input type="number" className="w-full bg-transparent outline-none text-[15px]" placeholder="Enter bill amount (e.g., 2500)" value={billAmount} onChange={handleBillAmountChange} min="1" />
+                  </div>
+                  <span className="text-[12px] text-[#4a5565]">Enter the total amount on your latest TANGEDCO bill (bottom of the paper). Choose this OR estimated units below.</span>
+                </div>
+                <div className="flex flex-col gap-2 md:col-span-2">
+                  <label className="font-['Poppins'] text-sm sm:text-base text-[#0a0a0a]">OR Estimated Monthly Units (kWh)</label>
+                  <div className="bg-[#f7fff9] border border-[#d7eadd] rounded-xl px-4 py-3 shadow-[0_6px_20px_rgba(0,0,0,0.03)]">
+                    <input type="number" className="w-full bg-transparent outline-none text-[15px]" placeholder="Enter Billing Units (e.g., 400)" value={estimatedUnits || ''} onChange={handleEstimatedUnitsChange} min="1" />
+                  </div>
+                  <span className="text-[12px] text-[#4a5565]">If you know your monthly electricity consumption in kWh. Choose this OR bill amount above.</span>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <div className="flex flex-wrap gap-3">
+                  <button type="submit" className="bg-gradient-to-r from-[#ffd166] via-[#ffb347] to-[#ff6b00] text-white font-semibold px-6 sm:px-8 py-3 rounded-xl shadow-[0_10px_30px_rgba(255,107,0,0.25)] hover:opacity-95 active:scale-95 transition">
+                    Calculate
+                  </button>
+                  {/* <button type="button" className="border border-[#ffd166] text-[#8b5b00] font-semibold px-6 sm:px-8 py-3 rounded-xl bg-[#fff9ed] hover:bg-[#ffefcf] transition">
+                    Upload your electricity bill
+                  </button> */}
+                </div>
+                <p className="text-[13px] sm:text-[14px] text-[#4a5565] font-['Poppins']">Instant preview—no OTP or payment needed.</p>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* Solar Calculator Result Section */}
+      {showResults && (
+        <section id="solar-calculator-result" className="w-full max-w-7xl mx-auto px-4 py-8">
+        <div
+          ref={resultRef}
+          className="relative overflow-hidden rounded-[28px] border border-[#d7eadd] bg-white shadow-[0_18px_60px_rgba(0,0,0,0.08)]"
+          style={{
+            opacity: isResultVisible ? 1 : 0,
+            transform: isResultVisible ? "translateY(0)" : "translateY(40px)",
+            transition: "opacity 0.95s ease-out, transform 0.95s ease-out",
+            transitionDelay: "0.12s"
+          }}
+          onMouseMove={handleResultMouseMove}
+          onMouseEnter={() => setIsResultHovering(true)}
+          onMouseLeave={() => setIsResultHovering(false)}
+        >
+          <div className="absolute -top-10 left-6 h-32 w-32 rounded-full bg-[#dcfce7] blur-3xl" aria-hidden="true" />
+          <div className="absolute bottom-[-80px] right-[-40px] h-48 w-48 rounded-full bg-[#e0f2fe] blur-3xl" aria-hidden="true" />
+          <div
+            className="pointer-events-none absolute inset-0 transition-opacity duration-300"
+            style={{
+              opacity: isResultHovering ? 1 : 0,
+              background: `radial-gradient(210px circle at ${resultGlow.x}% ${resultGlow.y}%, rgba(0,122,85,0.12), transparent 55%)`
+            }}
+            aria-hidden="true"
+          />
+          <div className="relative p-6 md:p-10 flex flex-col gap-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="space-y-2">
+                <p className="uppercase tracking-[0.18em] text-xs font-semibold text-[#0a0a0a]/70">Results preview</p>
+                <h3 className="font-['Urbanist'] font-bold text-[24px] sm:text-[28px] md:text-[32px] text-[#0a0a0a] leading-tight">
+                  Your instant solar estimate
+                </h3>
+                <p className="text-sm sm:text-base text-[#4a5565] max-w-2xl">
+                  These numbers are calculated based on your inputs. Final proposal is validated after our on-site survey.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="px-3 py-2 rounded-full bg-[#f0fdf4] border border-[#d7eadd] text-sm font-semibold text-[#0a0a0a]">Results preview</span>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowShareOptions(!showShareOptions)}
+                    disabled={!calcResult}
+                    className={`px-3 py-2 rounded-full border text-sm font-semibold transition-all flex items-center gap-2 ${
+                      calcResult
+                        ? 'bg-[#eef2ff] border-[#dcdafc] text-[#312e81] hover:bg-[#e0e7ff] cursor-pointer'
+                        : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    <Share2 className="w-4 h-4" />
+                    Share result
+                  </button>
+                  
+                  {showShareOptions && calcResult && (
+                    <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50 min-w-[200px]">
+                      <button
+                        onClick={() => { shareViaWhatsApp(); setShowShareOptions(false); }}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-sm"
+                      >
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                        </svg>
+                        WhatsApp
+                      </button>
+                      <button
+                        onClick={() => { shareViaFacebook(); setShowShareOptions(false); }}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-sm"
+                      >
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                        Facebook
+                      </button>
+                      <button
+                        onClick={() => { shareViaTwitter(); setShowShareOptions(false); }}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-sm"
+                      >
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                        </svg>
+                        Twitter
+                      </button>
+                      <button
+                        onClick={() => { copyToClipboard(); setShowShareOptions(false); }}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-sm"
+                      >
+                        <Copy className="w-4 h-4 text-gray-600" />
+                        Copy Link
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              {calcResult ? [
+                { label: "System Size", value: calcResult.recommendedCapacityKw, decimals: 2, suffix: "kW", helper: "Sized for your roof & bill", icon: Gauge, accent: "from-[#dcfce7] to-[#f5fff9]" },
+                { label: "No. of Panels", value: calcResult.panelCount, decimals: 0, suffix: "panels", helper: "TOP CON, 550-600W", icon: SunMedium, accent: "from-[#e0f2fe] to-[#f7fff9]" },
+                { label: "Estimated Annual Generation", value: calcResult.annualGenerationKwh, decimals: 0, suffix: "kWh", helper: "Based on 4.5-5 sun hours/day", icon: Zap, accent: "from-[#fef9c3] to-[#fffaf0]" },
+                { label: "Estimated Cost", value: calcResult.estimatedCost / 100000, decimals: 2, prefix: "Rs ", suffix: "L", helper: "Turnkey incl. installation", icon: Wallet2, accent: "from-[#f1f5f9] to-[#f7fff9]" },
+                { label: "Savings", value: calcResult.annualSavings / 1000, decimals: 1, prefix: "Rs ", suffix: "k/yr", helper: "Versus current bill", icon: PiggyBank, accent: "from-[#e0f2fe] to-[#f7fff9]" },
+                { label: "Space Required", value: calcResult.requiredAreaSqFt, decimals: 0, suffix: "sq.ft", helper: "Shadow-free usable area", icon: Ruler, accent: "from-[#dcfce7] to-[#f7fff9]" },
+              ].map((stat) => {
+                const Icon = stat.icon;
+                const staticValue = typeof stat.value === "number" ? stat.value.toLocaleString(undefined, { maximumFractionDigits: stat.decimals ?? 0 }) : stat.value;
+                return (
+                  <div
+                    key={stat.label}
+                    className="group relative overflow-hidden rounded-[20px] border border-[#e2efe6] bg-white shadow-[0_10px_30px_rgba(0,0,0,0.06)] p-5 flex flex-col gap-2 transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(0,0,0,0.12)]"
+                  >
+                    <div className={`absolute inset-0 bg-gradient-to-br ${stat.accent} opacity-80 transition-transform duration-300 group-hover:scale-105`} aria-hidden="true" />
+                    <div className="relative flex items-start justify-between gap-3">
+                      <p className="font-['Poppins'] text-[15px] text-[#0a0a0a] leading-tight">{stat.label}</p>
+                      <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/80 border border-[#d7eadd] shadow-sm transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-[1px]">
+                        <Icon className="w-5 h-5 text-[#0a0a0a] group-hover:text-[#0f2f1e]" />
+                      </span>
+                    </div>
+                    <div className="relative flex items-baseline gap-1">
+                      <span className="font-['Urbanist'] font-bold text-[30px] md:text-[32px] text-[#0a0a0a] leading-none">
+                        {isResultVisible && !reduceMotion ? (
+                          <CountUp
+                            key={`${stat.label}-${isResultVisible}`}
+                            end={typeof stat.value === "number" ? stat.value : parseFloat(stat.value)}
+                            duration={1.25}
+                            decimals={stat.decimals ?? 0}
+                            separator="," 
+                            prefix={stat.prefix ?? ""}
+                          />
+                        ) : (
+                          `${stat.prefix ?? ""}${staticValue}`
+                        )}
+                      </span>
+                      {stat.suffix ? (
+                        <span className="font-['Poppins'] text-[16px] text-[#4a5565] leading-none">{stat.suffix}</span>
+                      ) : null}
+                    </div>
+                    {stat.helper ? (
+                      <p className="relative font-['Poppins'] text-sm text-[#4a5565] leading-relaxed">{stat.helper}</p>
+                    ) : null}
+                  </div>
+                );
+              }) : hasAttemptedCalculation ? (
+                <div className="col-span-full flex flex-col items-center justify-center py-12 px-6 text-center">
+                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+                    <Calculator className="w-8 h-8 text-orange-600" />
+                  </div>
+                  <h3 className="font-['Urbanist'] font-bold text-[18px] sm:text-[20px] text-[#0a0a0a] mb-2">
+                    Enter your details to see results
+                  </h3>
+                  <p className="text-sm text-[#6b7280] max-w-md">
+                    Please enter either your monthly bill amount or estimated electricity consumption to calculate your solar system requirements.
+                  </p>
+                </div>
+              ) : (
+                <div className="col-span-full flex flex-col items-center justify-center py-12 px-6 text-center">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <Calculator className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="font-['Urbanist'] font-bold text-[18px] sm:text-[20px] text-[#0a0a0a] mb-2">
+                    Ready to calculate
+                  </h3>
+                  <p className="text-sm text-[#6b7280] max-w-md">
+                    Fill in your electricity bill amount or monthly units above, then click Calculate to see your personalized solar system estimate.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Consultation CTA Section */}
+            <div className="mt-6 p-6 bg-gradient-to-r from-[#f0fdf4] to-[#f7fff9] border border-[#d7eadd] rounded-[20px]">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="space-y-2">
+                  <h4 className="font-['Urbanist'] font-bold text-[18px] sm:text-[20px] text-[#0a0a0a]">
+                    Ready to go solar?
+                  </h4>
+                  <p className="text-sm text-[#4a5565] max-w-lg">
+                    Get a free, detailed consultation with our solar experts. We'll visit your home, assess your roof, and provide a customized proposal.
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    // Scroll to contact section
+                    const contactSection = document.getElementById('contact-section');
+                    if (contactSection) {
+                      contactSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                  className="bg-gradient-to-r from-[#ffd166] via-[#ffb347] to-[#ff6b00] text-white font-semibold px-6 sm:px-8 py-3 rounded-xl shadow-[0_10px_30px_rgba(255,107,0,0.25)] hover:opacity-95 active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  Get Free Consultation
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      )}
+
       {/* Solutions Section */}
       <section id="solutions-section" className="scroll-mt-20">
         <div className="bg-[#f7fff9] min-h-screen text-[#0a0a0a]">
           {/* Video Hero */}
-          <section className="relative w-full flex justify-center items-center h-[280px] sm:h-[400px] md:h-[500px] lg:h-auto py-0 lg:py-12">
+          <section ref={solutionsVideoRef} className="relative w-full flex justify-center items-center h-[280px] sm:h-[400px] md:h-[500px] lg:h-auto py-0 lg:py-12">
             {/* Modern gradient background for desktop */}
             <div className="hidden lg:block absolute inset-0 w-full h-full z-0" aria-hidden="true"
               style={{background: 'linear-gradient(120deg, #e0e7ff 0%, #f7fff9 60%, #d1fae5 100%)'}} />
@@ -996,10 +1590,12 @@ export const WebsiteHomepage = (): JSX.Element => {
               <video
                 ref={videoRef}
                 className="absolute inset-0 w-full h-full object-cover"
-                autoPlay
+                autoPlay={solutionsVideoInView && !reduceMotion}
                 muted={isMuted}
                 loop
                 playsInline
+                preload="metadata"
+                poster={APP_IMAGES.solutionsSolarHouse}
               >
                 <source src={APP_IMAGES.solutionsVideo} type="video/mp4" />
               </video>
@@ -1022,8 +1618,9 @@ export const WebsiteHomepage = (): JSX.Element => {
                 { key: "smart-home", label: "Smart Home", target: "smart-home" },
                 { key: "app", label: "App", target: "app" },
               ].map((tab) => (
-                <button
+                <motion.button
                   key={tab.key}
+                  type="button"
                   onClick={() => {
                     const el = document.getElementById(tab.target);
                     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1031,26 +1628,26 @@ export const WebsiteHomepage = (): JSX.Element => {
                   className="px-6 py-3 rounded-[10px] font-['Urbanist'] font-bold text-[19px] transition-all border border-black/10 shadow-sm bg-white text-[#0a0a0a] hover:bg-black/5"
                 >
                   {tab.label}
-                </button>
+                </motion.button>
               ))}
             </div>
           </section>
 
           {/* Smart solar solutions */}
-          <section id="solar" className="bg-gradient-to-b from-[#f7fff9] via-[#f7fff9] to-white px-6 pt-14 pb-16 border-b border-black/5">
-            <div className="w-full max-w-6xl mx-auto text-center space-y-4">
+          <motion.section id="solar" className="bg-gradient-to-b from-[#f7fff9] via-[#f7fff9] to-white px-6 pt-14 pb-16 border-b border-black/5" {...sectionMotionProps}>
+            <motion.div className="w-full max-w-6xl mx-auto text-center space-y-4" variants={revealVariant}>
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm border border-black/5 text-[24px] font-['Poppins'] text-[#0a0a0a">
                 <b>Smart Solar Solutions</b>
               </span>
               <p className="text-[18px] text-[#4a5565] font-['Poppins']">
                 We design, install, and maintain high-performance solar systems tailored for your home
               </p>
-            </div>
-          </section>
+            </motion.div>
+          </motion.section>
 
           {/* Solar hero image with callouts */}
-          <section className="px-6 pb-16">
-            <div className="w-full max-w-5xl mx-auto rounded-[20px] md:rounded-[24px] overflow-hidden shadow-[0_24px_50px_rgba(0,0,0,0.12)] relative">
+          <motion.section className="px-6 pb-16" {...sectionMotionProps}>
+            <motion.div className="w-full max-w-5xl mx-auto rounded-[20px] md:rounded-[24px] overflow-hidden shadow-[0_24px_50px_rgba(0,0,0,0.12)] relative" variants={revealVariant}>
               <img
                 src={APP_IMAGES.solutionsSolarHouse}
                 alt="Solar house"
@@ -1059,36 +1656,52 @@ export const WebsiteHomepage = (): JSX.Element => {
                 decoding="async"
               />
               <div className="absolute inset-0 pointer-events-none block">
-                <div className="absolute left-[5%] sm:left-[10%] top-[5%] bg-[rgba(255,255,255,0.8)] border border-[rgba(0,0,0,0.4)] rounded-[12px] sm:rounded-[16px] md:rounded-[20px] lg:rounded-[12px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-1 sm:p-3 md:p-4 lg:p-6 w-[140px] sm:w-[200px] md:w-[240px] lg:w-[280px]">
+                <motion.div
+                  className="absolute left-[5%] sm:left-[10%] top-[5%] bg-[rgba(255,255,255,0.8)] border border-[rgba(0,0,0,0.4)] rounded-[12px] sm:rounded-[16px] md:rounded-[20px] lg:rounded-[12px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-1 sm:p-3 md:p-4 lg:p-6 w-[140px] sm:w-[200px] md:w-[240px] lg:w-[280px]"
+                  animate={reduceMotion ? undefined : { y: [0, -6, 0] }}
+                  transition={reduceMotion ? undefined : { duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                >
                   <div className="flex items-center gap-1 sm:gap-2 mb-1">
                     <div className="w-3 h-3 sm:w-6 sm:h-6 md:w-8 md:h-8 bg-[rgba(157,221,180,0.47)] rounded flex items-center justify-center"><Wrench property1="variant-2" vector="vector-2.svg" /></div>
                     <p className="font-['Urbanist'] font-bold text-[9px] sm:text-[13px] md:text-[14px] lg:text-[16px] text-[#0a0a0a]">End-to-End</p>
                   </div>  
                   <p className="font-['Poppins'] text-[7px] sm:text-[11px] md:text-[12px] lg:text-[14px] text-[rgba(0,0,0,0.7)]">From design to installation to maintenance</p>
-                </div>
-                <div className="absolute right-[5%] sm:right-[10%] top-[15%] bg-[rgba(255,255,255,0.8)] border border-[rgba(0,0,0,0.4)] rounded-[12px] sm:rounded-[16px] md:rounded-[20px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-1 sm:p-3 md:p-4 w-[140px] sm:w-[200px] md:w-[240px] lg:w-[280px]">
+                </motion.div>
+                <motion.div
+                  className="absolute right-[5%] sm:right-[10%] top-[15%] bg-[rgba(255,255,255,0.8)] border border-[rgba(0,0,0,0.4)] rounded-[12px] sm:rounded-[16px] md:rounded-[20px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-1 sm:p-3 md:p-4 w-[140px] sm:w-[200px] md:w-[240px] lg:w-[280px]"
+                  animate={reduceMotion ? undefined : { y: [0, -5, 0] }}
+                  transition={reduceMotion ? undefined : { duration: 6.4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+                >
                   <div className="flex items-center gap-1 sm:gap-2 mb-1">
                     <div className="w-3 h-3 sm:w-6 sm:h-6 md:w-8 md:h-8 bg-[rgba(157,221,180,0.47)] rounded flex items-center justify-center"><Wrench property1="variant-3" slidersHorizontalVector="vector-3.svg" /></div>
                     <p className="font-['Urbanist'] font-bold text-[9px] sm:text-[13px] md:text-[14px] lg:text-[16px] text-[#0a0a0a]">Remote performance monitoring</p>
                   </div>
                   <p className="font-['Poppins'] text-[7px] sm:text-[11px] md:text-[12px] lg:text-[14px] text-[rgba(0,0,0,0.7)]">Track your system 24/7</p>
-                </div>
-                <div className="absolute right-[5%] sm:right-[10%] bottom-[50%] bg-[rgba(255,255,255,0.8)] border border-[rgba(0,0,0,0.4)] rounded-[12px] sm:rounded-[16px] md:rounded-[20px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-1 sm:p-3 md:p-4 w-[140px] sm:w-[200px] md:w-[240px] lg:w-[280px]">
+                </motion.div>
+                <motion.div
+                  className="absolute right-[5%] sm:right-[10%] bottom-[50%] bg-[rgba(255,255,255,0.8)] border border-[rgba(0,0,0,0.4)] rounded-[12px] sm:rounded-[16px] md:rounded-[20px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-1 sm:p-3 md:p-4 w-[140px] sm:w-[200px] md:w-[240px] lg:w-[280px]"
+                  animate={reduceMotion ? undefined : { y: [0, -4, 0] }}
+                  transition={reduceMotion ? undefined : { duration: 6.8, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
+                >
                   <div className="flex items-center gap-1 sm:gap-2 mb-1">
                     <div className="w-3 h-3 sm:w-6 sm:h-6 md:w-8 md:h-8 bg-[rgba(157,221,180,0.47)] rounded flex items-center justify-center"><Wrench property1="variant-3" slidersHorizontalVector="vector-3.svg" /></div>
                     <p className="font-['Urbanist'] font-bold text-[9px] sm:text-[13px] md:text-[14px] lg:text-[16px] text-[#0a0a0a]">Maintenance & warranty</p>
                   </div>
                   <p className="font-['Poppins'] text-[7px] sm:text-[11px] md:text-[12px] lg:text-[14px] text-[rgba(0,0,0,0.7)]">Guaranteed performance and support</p>
-                </div>
-                <div className="absolute left-[5%] sm:left-[10%] bottom-[62%] bg-[rgba(255,255,255,0.8)] border border-[rgba(0,0,0,0.4)] rounded-[12px] sm:rounded-[16px] md:rounded-[20px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-2 sm:p-3 md:p-4 w-[140px] sm:w-[200px] md:w-[240px] lg:w-[280px]">
+                </motion.div>
+                <motion.div
+                  className="absolute left-[5%] sm:left-[10%] bottom-[62%] bg-[rgba(255,255,255,0.8)] border border-[rgba(0,0,0,0.4)] rounded-[12px] sm:rounded-[16px] md:rounded-[20px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-2 sm:p-3 md:p-4 w-[140px] sm:w-[200px] md:w-[240px] lg:w-[280px]"
+                  animate={reduceMotion ? undefined : { y: [0, -6, 0] }}
+                  transition={reduceMotion ? undefined : { duration: 6.2, repeat: Infinity, ease: "easeInOut", delay: 0.9 }}
+                >
                   <div className="flex items-center gap-1 sm:gap-2 mb-1">
                     <div className="w-3 h-3 sm:w-6 sm:h-6 md:w-8 md:h-8 bg-[rgba(157,221,180,0.47)] rounded flex items-center justify-center"><Wrench property1="default" vector="vector-2.svg" /></div>
                     <p className="font-['Urbanist'] font-bold text-[9px] sm:text-[13px] md:text-[14px] lg:text-[16px] text-[#0a0a0a]">Flexible models</p>
                   </div>
                   <p className="font-['Poppins'] text-[7px] sm:text-[11px] md:text-[12px] lg:text-[14px] text-[rgba(0,0,0,0.7)]">Subscription or purchase options</p>
-                </div>
+                </motion.div>
               </div>
-            </div>
+            </motion.div>
             <div className="w-full max-w-5xl mx-auto mt-6 flex justify-center">
               <a
                 href="#contact-section"
@@ -1101,17 +1714,17 @@ export const WebsiteHomepage = (): JSX.Element => {
                 Enquire Solar Plans
               </a>
             </div>
-          </section>
+          </motion.section>
 
           {/* Journey */}
-          <section className="px-6 pb-20 bg-gradient-to-b from-white via-[#f2fbff] to-[#e8f5ff]">
-            <div className="w-full max-w-6xl mx-auto text-center mb-12">
+          <motion.section className="px-6 pb-20 bg-gradient-to-b from-white via-[#f2fbff] to-[#e8f5ff]" {...sectionMotionProps}>
+            <motion.div className="w-full max-w-6xl mx-auto text-center mb-12" variants={revealVariant}>
               <h2 className="text-[32px] sm:text-[38px] md:text-[44px] lg:text-[48px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-3 md:mb-4 tracking-[-1.5px]">Your journey to smarter solar</h2>
               <p className="text-[18px] text-[#4a5565] font-['Poppins']">
                 From assessment to ongoing support, we're with you every step of the way
               </p>
-            </div>
-            <div className="w-full max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-5 md:gap-6">
+            </motion.div>
+            <motion.div className="w-full max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-5 md:gap-6" {...staggerMotionProps}>
               {[
                 { title: "Online Proposal", desc: "Upload your bills and location to get your solar proposal with 3D layout." },
                 { title: "Site Assessment", desc: "Our team validates your design & finalizes proposal." },
@@ -1119,8 +1732,9 @@ export const WebsiteHomepage = (): JSX.Element => {
                 { title: "Smart Monitoring", desc: "Control solar generation, savings, and system health - all in one app and from anywhere." },
                 { title: "Ongoing Support", desc: "With 360Care, stay worry-free. We cover all maintenance." },
               ].map((item, i) => (
-                <div
+                <motion.div
                   key={item.title}
+                  variants={revealVariant}
                   className="bg-white rounded-[16px] md:rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.08)] border border-black/5 px-3 sm:px-4 py-4 sm:py-5 flex flex-col items-center text-center gap-2 sm:gap-3"
                 >
                   <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-[#fdc700] to-[#ff6900] flex items-center justify-center text-white font-bold text-base sm:text-lg md:text-xl">
@@ -1128,21 +1742,21 @@ export const WebsiteHomepage = (): JSX.Element => {
                   </div>
                   <p className="font-['Urbanist'] font-bold text-[13px] sm:text-[14px] md:text-[16px] text-[#0a0a0a]">{item.title}</p>
                   <p className="font-['Poppins'] text-[10px] sm:text-[11px] md:text-[12px] text-[#4a5565] leading-[1.4]">{item.desc}</p>
-                </div>
+                </motion.div>
               ))}
-            </div>
-          </section>
+            </motion.div>
+          </motion.section>
 
           {/* Smart home solutions */}
-          <section id="smart-home" className="px-4 sm:px-6 py-12 sm:py-14 md:py-16 bg-gradient-to-b from-[#f7fff9] via-[#eef8ff] to-white">
-            <div className="w-full max-w-6xl mx-auto text-center space-y-2 sm:space-y-3 mb-8 sm:mb-10">
+          <motion.section id="smart-home" className="px-4 sm:px-6 py-12 sm:py-14 md:py-16 bg-gradient-to-b from-[#f7fff9] via-[#eef8ff] to-white" {...sectionMotionProps}>
+            <motion.div className="w-full max-w-6xl mx-auto text-center space-y-2 sm:space-y-3 mb-8 sm:mb-10" variants={revealVariant}>
               <p className="text-[32px] sm:text-[40px] md:text-[50px] font-['Urbanist'] text-[#0a0a0a] font-bold">Smart home solutions</p>
               <p className="text-[14px] sm:text-[15px] md:text-[17px] font-['Poppins'] text-[#4a5565]">
                 Our intelligent automation connects your home's devices to your solar flow.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="relative w-full max-w-6xl mx-auto rounded-[24px] overflow-hidden shadow-[0_24px_50px_rgba(0,0,0,0.12)]">
+            <motion.div className="relative w-full max-w-6xl mx-auto rounded-[24px] overflow-hidden shadow-[0_24px_50px_rgba(0,0,0,0.12)]" variants={revealVariant}>
               <img
                 src={APP_IMAGES.solutionsSmartHomeScene}
                 alt="Smart home"
@@ -1151,24 +1765,40 @@ export const WebsiteHomepage = (): JSX.Element => {
                 decoding="async"
               />
               <div className="absolute inset-0 pointer-events-none block">
-                <div className="absolute left-[5%] sm:left-[10%] top-[10%] sm:top-[15%] bg-white/94 rounded-[6px] sm:rounded-[8px] md:rounded-[10px] lg:rounded-[12px] px-1 sm:px-2 md:px-3 lg:px-4 py-1 sm:py-1 md:py-2 lg:py-3 shadow border border-black/5 max-w-[100px] sm:max-w-[120px] md:max-w-[160px] lg:max-w-[180px] xl:max-w-[210px]">
+                <motion.div
+                  className="absolute left-[5%] sm:left-[10%] top-[10%] sm:top-[15%] bg-white/94 rounded-[6px] sm:rounded-[8px] md:rounded-[10px] lg:rounded-[12px] px-1 sm:px-2 md:px-3 lg:px-4 py-1 sm:py-1 md:py-2 lg:py-3 shadow border border-black/5 max-w-[100px] sm:max-w-[120px] md:max-w-[160px] lg:max-w-[180px] xl:max-w-[210px]"
+                  animate={reduceMotion ? undefined : { y: [0, -4, 0] }}
+                  transition={reduceMotion ? undefined : { duration: 5.6, repeat: Infinity, ease: "easeInOut" }}
+                >
                   <p className="font-['Urbanist'] font-bold text-[8px] sm:text-[10px] md:text-[12px] lg:text-[13px] xl:text-[14px]">Device Scheduling</p>
                   <p className="font-['Poppins'] text-[6px] sm:text-[8px] md:text-[10px] lg:text-[11px] xl:text-[12px] text-[#3f3f3f] leading-tight">Automate based on your routine</p>
-                </div>
-                <div className="absolute right-[15%] sm:right-[10%] md:right-[20%] top-[32%] sm:top-[35%] bg-white/94 rounded-[6px] sm:rounded-[8px] md:rounded-[10px] lg:rounded-[12px] px-1 sm:px-2 md:px-3 lg:px-4 py-1 sm:py-1 md:py-2 lg:py-3 shadow border border-black/5 max-w-[110px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[200px] xl:max-w-[230px] text-right">
+                </motion.div>
+                <motion.div
+                  className="absolute right-[15%] sm:right-[10%] md:right-[20%] top-[32%] sm:top-[35%] bg-white/94 rounded-[6px] sm:rounded-[8px] md:rounded-[10px] lg:rounded-[12px] px-1 sm:px-2 md:px-3 lg:px-4 py-1 sm:py-1 md:py-2 lg:py-3 shadow border border-black/5 max-w-[110px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[200px] xl:max-w-[230px] text-right"
+                  animate={reduceMotion ? undefined : { y: [0, -5, 0] }}
+                  transition={reduceMotion ? undefined : { duration: 6.4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+                >
                   <p className="font-['Urbanist'] font-bold text-[8px] sm:text-[10px] md:text-[12px] lg:text-[13px] xl:text-[14px]">Predictive Energy Routines</p>
                   <p className="font-['Poppins'] text-[6px] sm:text-[8px] md:text-[10px] lg:text-[11px] xl:text-[12px] text-[#3f3f3f] leading-tight">AI learns your patterns</p>
-                </div>
-                <div className="absolute left-[40%] sm:left-[35%] md:left-[45%] top-[10%] sm:top-[15%] bg-white/94 rounded-[6px] sm:rounded-[8px] md:rounded-[10px] lg:rounded-[12px] px-1 sm:px-2 md:px-3 lg:px-4 py-1 sm:py-1 md:py-2 lg:py-3 shadow border border-black/5 max-w-[105px] sm:max-w-[130px] md:max-w-[170px] lg:max-w-[190px] xl:max-w-[220px]">
+                </motion.div>
+                <motion.div
+                  className="absolute left-[40%] sm:left-[35%] md:left-[45%] top-[10%] sm:top-[15%] bg-white/94 rounded-[6px] sm:rounded-[8px] md:rounded-[10px] lg:rounded-[12px] px-1 sm:px-2 md:px-3 lg:px-4 py-1 sm:py-1 md:py-2 lg:py-3 shadow border border-black/5 max-w-[105px] sm:max-w-[130px] md:max-w-[170px] lg:max-w-[190px] xl:max-w-[220px]"
+                  animate={reduceMotion ? undefined : { y: [0, -4, 0] }}
+                  transition={reduceMotion ? undefined : { duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
+                >
                   <p className="font-['Urbanist'] font-bold text-[8px] sm:text-[10px] md:text-[12px] lg:text-[13px] xl:text-[14px]">Seamless Integration</p>
                   <p className="font-['Poppins'] text-[6px] sm:text-[8px] md:text-[10px] lg:text-[11px] xl:text-[12px] text-[#3f3f3f] leading-tight">Works with existing smart devices</p>
-                </div>
-                <div className="absolute left-[23%] sm:left-[20%] md:left-[28%] bottom-[55%] sm:bottom-[56%] bg-white/94 rounded-[6px] sm:rounded-[8px] md:rounded-[10px] lg:rounded-[12px] px-1 sm:px-2 md:px-3 lg:px-4 py-1 sm:py-1 md:py-2 lg:py-3 shadow border border-black/5 max-w-[105px] sm:max-w-[130px] md:max-w-[170px] lg:max-w-[190px] xl:max-w-[220px] text-center">
+                </motion.div>
+                <motion.div
+                  className="absolute left-[23%] sm:left-[20%] md:left-[28%] bottom-[55%] sm:bottom-[56%] bg-white/94 rounded-[6px] sm:rounded-[8px] md:rounded-[10px] lg:rounded-[12px] px-1 sm:px-2 md:px-3 lg:px-4 py-1 sm:py-1 md:py-2 lg:py-3 shadow border border-black/5 max-w-[105px] sm:max-w-[130px] md:max-w-[170px] lg:max-w-[190px] xl:max-w-[220px] text-center"
+                  animate={reduceMotion ? undefined : { y: [0, -5, 0] }}
+                  transition={reduceMotion ? undefined : { duration: 6.2, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+                >
                   <p className="font-['Urbanist'] font-bold text-[8px] sm:text-[10px] md:text-[12px] lg:text-[13px] xl:text-[14px]">Cross Device Automation</p>
                   <p className="font-['Poppins'] text-[6px] sm:text-[8px] md:text-[10px] lg:text-[11px] xl:text-[12px] text-[#3f3f3f] leading-tight">All devices work together</p>
-                </div>
+                </motion.div>
               </div>
-            </div>
+            </motion.div>
             <div className="w-full max-w-6xl mx-auto mt-10 flex justify-center">
               <a
                 href="#contact-section"
@@ -1181,32 +1811,33 @@ export const WebsiteHomepage = (): JSX.Element => {
                 Enquire Smart Home
               </a>
             </div>
-          </section>
+          </motion.section>
 
           {/* Smarter Living */}
-          <section className="px-4 sm:px-6 py-12 sm:py-16 md:py-20 bg-gradient-to-b from-white via-[#f4faff] to-[#e4f0ff]">
-            <div className="w-full max-w-6xl mx-auto text-center mb-10 sm:mb-12 md:mb-16">
+          <motion.section className="px-4 sm:px-6 py-12 sm:py-16 md:py-20 bg-gradient-to-b from-white via-[#f4faff] to-[#e4f0ff]" {...sectionMotionProps}>
+            <motion.div className="w-full max-w-6xl mx-auto text-center mb-10 sm:mb-12 md:mb-16" variants={revealVariant}>
               <h2 className="text-[30px] sm:text-[40px] md:text-[50px] lg:text-[54px] font-['Urbanist'] font-bold tracking-[-1px] sm:tracking-[-2px] text-[#0a0a0a] mb-3 sm:mb-4">
                 Smarter Living, Simplified
               </h2>
               <p className="text-[14px] sm:text-[16px] md:text-[18px] text-[#4a5565] font-['Poppins'] max-w-3xl mx-auto">
                 Transform your home into an intelligent, energy-efficient haven
               </p>
-            </div>
-            <div className="w-full max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6 justify-items-center">
+            </motion.div>
+            <motion.div className="w-full max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6 justify-items-center" {...staggerMotionProps}>
               {[
-                { title: "Smart-Home Planning", desc: "We understand your lifestyle and automation needs — from high-load appliances up to full home." },
+                { title: "Smart-Home Planning", desc: "We understand your lifestyle and automation needs - from high-load appliances up to a full home." },
                 { title: "Smart devices", desc: "We suggest a list of smart devices for your automation. You can expand to new devices as you wish." },
                 { title: "Device Integration", desc: "Our 360Watts app effortlessly recognizes lighting, security, and smart appliances, keeping you connected from anywhere." },
                 { title: "Automation Setup", desc: "The 360Watts app guides you effortlessly in automation setup. Let AI suggest automations, or you can set them up manually." },
                 { title: "Continuous Support", desc: "We keep our 360Watts app updated to latest AI/ML developments. You can reach us for any technical support anytime." },
               ].map((item, i) => (
-                <div
+                <motion.div
                   key={item.title}
+                  variants={revealVariant}
                   className={`bg-white rounded-[16px] md:rounded-[20px] shadow-[0_5px_15px_rgba(0,0,0,0.15)] p-3 sm:p-4 md:p-5 flex flex-col items-center text-center ${
                     i === 3 ? 'md:col-start-2 lg:col-start-1' : i === 4 ? 'md:col-start-3 lg:col-span-0' : ''
                   }`}
-                  >
+                >
                   <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-[#51a2ff] to-[#615fff] flex items-center justify-center text-white font-bold text-base sm:text-lg md:text-xl">
                     {String(i + 1).padStart(2, "0")}
                   </div>
@@ -1214,29 +1845,29 @@ export const WebsiteHomepage = (): JSX.Element => {
                     <p className="font-['Urbanist'] font-bold text-[13px] sm:text-[14px] md:text-[16px] text-[#0a0a0a]">{item.title}</p>
                     <p className="font-['Poppins'] text-[10px] sm:text-[11px] md:text-[12px] text-[#4a5565] leading-[1.4]">{item.desc}</p>
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
-          </section>
+            </motion.div>
+          </motion.section>
 
           {/* 360Watts App */}
           <section id="app" className="px-3 sm:px-4 md:px-6 py-16 sm:py-20 md:py-24 lg:py-28 bg-gradient-to-b from-[#e4f0ff] via-white to-[#f7fff9]">
             <div className="w-full max-w-7xl mx-auto">
               {/* Header */}
-              <div className="text-center mb-16 sm:mb-20 md:mb-24 lg:mb-32">
+              <motion.div className="text-center mb-16 sm:mb-20 md:mb-24 lg:mb-32" {...sectionMotionProps}>
                 <h2 className="text-[60px] sm:text-[80px] md:text-[99px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-3.96px] mb-2 sm:mb-4">360watts App</h2>
                 <p className="text-[23px] text-[#0a0a0a]/50 font-['Poppins'] tracking-[-0.92px] mb-6 sm:mb-8">Our Unified App Ecosystem</p>
                 <div className="max-w-2xl mx-auto">
                   <p className="text-[23px] text-[#0a0a0a]/60 font-['Poppins'] tracking-[-0.92px] leading-relaxed">
-                    The 360Watts app bridges solar and smart living. View real-time energy flows, control devices, and get actionable insights ; all in one dashboard.
+                    The 360Watts app bridges solar and smart living. View real-time energy flows, control devices, and get actionable insights - all in one dashboard.
                   </p>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Phone Grid Layout */}
               <div className="space-y-16 sm:space-y-20 md:space-y-24 lg:space-y-32">
                 {/* Real-time Insights - First row */}
-                <div className="flex flex-row items-center gap-12">
+                <motion.div className="flex flex-row items-center gap-12" {...sectionMotionProps}>
                   <div className="flex-1 text-center px-2 sm:text-center sm:px-6">
                     <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-4">
                       Real-time Insights
@@ -1247,29 +1878,29 @@ export const WebsiteHomepage = (): JSX.Element => {
                   </div>
                   <div className="flex-shrink-0 relative w-[220px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
                     {/* App Screenshot */}
-                    <img src={APP_IMAGES.solutionsAppPhoneInsights} alt="Real-time Insights" className="absolute inset-[10%] w-[80%] h-[80%] object-cover rounded-[20px]" />
+                    <img src={APP_IMAGES.solutionsAppPhoneInsights} alt="Real-time Insights" className="absolute inset-[10%] w-[80%] h-[80%] object-cover rounded-[20px]" loading="lazy" decoding="async" />
                     {/* Phone Frame Overlay */}
-                    <img src={APP_IMAGES.phone1401} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
+                    <img src={APP_IMAGES.phone1401} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" loading="lazy" decoding="async" />
                   </div>
-                </div>
+                </motion.div>
                 {/* Smart Scheduling - Second row */}
-                <div className="flex flex-row-reverse items-center gap-12">
-                  <div className="flex-1 text-center px-2 sm:text-center sm:px-6">
-                    <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-4">Smart Scheduling</h3>
+                <motion.div className="flex flex-row-reverse items-center gap-12" {...sectionMotionProps}>
+                  <div className="flex-1 text-center px-1 sm:text-center sm:px-6">
+                    <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-2">Smart Scheduling</h3>
                     <p className="text-[14px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
                       Automatically run high-load devices when solar power is abundant to maximize efficiency and reduce costs.
                     </p>
                   </div>
                   <div className="flex-shrink-0 relative w-[220px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
                     {/* App Screenshot */}
-                    <img src={APP_IMAGES.solutionsAppPhoneMonitor} alt="Smart Scheduling" className="absolute inset-[14%] top-[10%] w-[75%] h-[80%] object-cover rounded-[10px]" />
+                    <img src={APP_IMAGES.solutionsAppPhoneMonitor} alt="Smart Scheduling" className="absolute inset-[14%] top-[10%] w-[75%] h-[80%] object-cover rounded-[10px]" loading="lazy" decoding="async" />
                     {/* Phone Frame Overlay */}
-                    <img src={APP_IMAGES.phone1401} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
+                    <img src={APP_IMAGES.phone1401} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" loading="lazy" decoding="async" />
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Routines and Modes - Third row (zig-zag) */}
-                <div className="flex flex-row items-center gap-12">
+                <motion.div className="flex flex-row items-center gap-12" {...sectionMotionProps}>
                   <div className="flex-1 text-center px-2 sm:text-center sm:px-6">
                     <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-4">Routines and Modes</h3>
                     <p className="text-[14px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
@@ -1278,14 +1909,14 @@ export const WebsiteHomepage = (): JSX.Element => {
                   </div>
                   <div className="flex-shrink-0 relative w-[200px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
                     {/* App Screenshot */}
-                    <img src={APP_IMAGES.solutionsAppPhoneModes} alt="Routines and Modes" className="absolute inset-[11.5%] top-[10%] w-[77%] h-[83%] object-cover rounded-[20px]" />
+                    <img src={APP_IMAGES.solutionsAppPhoneModes} alt="Routines and Modes" className="absolute inset-[11.5%] top-[10%] w-[77%] h-[83%] object-cover rounded-[20px]" loading="lazy" decoding="async" />
                     {/* Phone Frame Overlay */}
-                    <img src={APP_IMAGES.phone1401} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
+                    <img src={APP_IMAGES.phone1401} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" loading="lazy" decoding="async" />
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Maintenance and Care - Fourth row (zig-zag) */}
-                <div className="flex flex-row-reverse items-center gap-12">
+                <motion.div className="flex flex-row-reverse items-center gap-12" {...sectionMotionProps}>
                   <div className="flex-1 text-center px-2 sm:text-center sm:px-6">
                     <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-4">Maintenance and Care</h3>
                     <p className="text-[14px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
@@ -1294,19 +1925,19 @@ export const WebsiteHomepage = (): JSX.Element => {
                   </div>
                   <div className="flex-shrink-0 relative w-[220px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
                     {/* App Screenshot */}
-                    <img src={APP_IMAGES.solutionsAppPhoneHero} alt="Maintenance and Care" className="absolute inset-[14.5%] top-[9%] bottom-[6%] w-[75%] object-cover rounded-[20px]" />
+                    <img src={APP_IMAGES.solutionsAppPhoneHero} alt="Maintenance and Care" className="absolute inset-[14.5%] top-[9%] bottom-[6%] w-[75%] object-cover rounded-[20px]" loading="lazy" decoding="async" />
                     {/* Phone Frame Overlay */}
-                    <img src={APP_IMAGES.phone1401} alt="" className="absolute inset-2 w-full h-full object-cover pointer-events-none" />
+                    <img src={APP_IMAGES.phone1401} alt="" className="absolute inset-2 w-full h-full object-cover pointer-events-none" loading="lazy" decoding="async" />
                   </div>
-                </div>
+                </motion.div>
 
               </div>
             </div>
           </section>
 
           {/* CTA Section */}
-          <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-white">
-            <div className="w-full max-w-4xl mx-auto text-center">
+          <motion.section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-white" {...sectionMotionProps}>
+            <motion.div className="w-full max-w-4xl mx-auto text-center" variants={revealVariant}>
               <h2 className="text-[28px] sm:text-[36px] md:text-[40px] lg:text-5xl font-bold text-[#0a0a0a] font-['Urbanist'] mb-4 sm:mb-6">
                 Want to explore the future?
               </h2>
@@ -1331,23 +1962,25 @@ export const WebsiteHomepage = (): JSX.Element => {
                   Call us
                 </button>
               </div>
-            </div>
-          </section>
+            </motion.div>
+          </motion.section>
         </div>
       </section>
 
       {/* About Section */}
-      <section id="about-section" className="scroll-mt-20 bg-[#f7fff9] min-h-screen text-[#0a0a0a]">
+      <motion.section id="about-section" className="scroll-mt-20 bg-[#f7fff9] min-h-screen text-[#0a0a0a]" {...sectionMotionProps}>
         {/* Hero */}
-        <section className="relative h-[50vh] sm:h-[60vh] md:h-[70vh] min-h-[400px] sm:min-h-[450px] md:min-h-[520px] w-full overflow-hidden">
+        <motion.section className="relative h-[50vh] sm:h-[60vh] md:h-[70vh] min-h-[400px] sm:min-h-[450px] md:min-h-[520px] w-full overflow-hidden" {...sectionMotionProps}>
           <img
             src={APP_IMAGES.aboutHero}
             alt="Solar hero"
             className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/25 to-black/50" />
           <div className="relative z-10 max-w-5xl px-4 sm:px-6 pt-20 sm:pt-24 md:pt-32 lg:pt-36 flex items-start">
-            <div className="text-white space-y-2 sm:space-y-3 max-w-xl">
+            <motion.div className="text-white space-y-2 sm:space-y-3 max-w-xl" variants={revealVariant}>
               <p className="text-sm sm:text-base md:text-lg font-['Poppins']">360watts.com | solar + smart home solutions</p>
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold font-['Urbanist'] leading-tight">
                 We're on a mission.
@@ -1355,25 +1988,26 @@ export const WebsiteHomepage = (): JSX.Element => {
               <p className="text-sm sm:text-base md:text-lg font-['Poppins'] text-white/90">
                 To revolutionize how homes consume and manage energy.
               </p>
-            </div>
+            </motion.div>
           </div>
-        </section>
+      </motion.section>
 
         {/* Our Story */}
-        <section className="py-12 sm:py-14 md:py-16 px-4 sm:px-6 bg-[#f7fff9]">
+        <motion.section className="py-12 sm:py-14 md:py-16 px-4 sm:px-6 bg-[#f7fff9]" {...sectionMotionProps}>
           <div className="max-w-6xl mx-auto">
-            <div className="mb-8 sm:mb-10 md:mb-12">
+            <motion.div className="mb-8 sm:mb-10 md:mb-12" variants={revealVariant}>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-['Urbanist'] mb-2">Our Story.</h2>
               <p className="text-base sm:text-lg text-[#4a5565] font-['Poppins']">It all started with a question...</p>
-            </div>
+            </motion.div>
 
             <div className="relative">
               <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-gradient-to-b from-[#9ee2b4] via-[#9ee2b4]/60 to-transparent z-0" />
 
-              <div className="space-y-10 sm:space-y-12 md:space-y-16 relative z-10">
+              <motion.div className="space-y-10 sm:space-y-12 md:space-y-16 relative z-10" {...staggerMotionProps}>
                 {storySteps.map((step, idx) => (
-                  <div
+                  <motion.div
                     key={idx}
+                    variants={revealVariant}
                     className={`flex flex-col ${step.align === "left" ? "md:flex-row" : "md:flex-row-reverse"} items-center gap-6 sm:gap-8 md:gap-12 relative`}
                   >
                     <div className="w-full md:w-1/2">
@@ -1387,49 +2021,51 @@ export const WebsiteHomepage = (): JSX.Element => {
                         src={step.image}
                         alt="Story visual"
                         className="w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl h-64 sm:h-80 md:h-96 object-contain"
+                        loading="lazy"
+                        decoding="async"
                       />
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
 
-            <div className="mt-12 sm:mt-14 md:mt-16 text-center space-y-3 sm:space-y-4">
+            <motion.div className="mt-12 sm:mt-14 md:mt-16 text-center space-y-3 sm:space-y-4" variants={revealVariant}>
               <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-['Urbanist']">The sun started it.</h3>
               <p className="text-base sm:text-lg text-[#4a5565] font-['Poppins']">We are just making it smarter.</p>
               <div className="flex flex-col items-center gap-2 sm:gap-3 pt-6 sm:pt-8">
-                <img src={APP_IMAGES.aboutLogo} alt="360Watts logo" className="w-24 sm:w-24 md:w-28 h-auto ml-4" />
+                <img src={APP_IMAGES.aboutLogo} alt="360Watts logo" className="w-24 sm:w-24 md:w-28 h-auto ml-4" loading="lazy" decoding="async" />
                 <p className="text-[#244d65] font-['Figtree'] text-sm sm:text-base">Drive what's next.</p>
               </div>
-            </div>
+            </motion.div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Team */}
-        <section className="py-1 sm:py-14 md:py-1 px-4 sm:px-6 bg-[#f7fff9]">
+        <motion.section className="py-1 sm:py-14 md:py-1 px-4 sm:px-6 bg-[#f7fff9]" {...sectionMotionProps}>
           <div className="max-w-5xl mx-auto text-center">
-            <div className="mb-8 sm:mb-10">
+            <motion.div className="mb-8 sm:mb-10" variants={revealVariant}>
               <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-['Urbanist']">Meet Our Team</h3>
               <p className="text-base sm:text-lg text-[#4a5565] font-['Poppins']">The faces behind the innovation</p>
-            </div>
+            </motion.div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 sm:gap-6 md:gap-8 justify-items-center">
+            <motion.div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 sm:gap-6 md:gap-8 justify-items-center" {...staggerMotionProps}>
               {teamMembers.map((member, idx) => (
-                <div key={idx} className="flex flex-col items-center text-center gap-2 sm:gap-3">
+                <motion.div key={idx} variants={revealVariant} className="flex flex-col items-center text-center gap-2 sm:gap-3">
                   <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full overflow-hidden bg-[#e8f5ed] flex items-center justify-center">
-                    <img src={member.photo} alt={member.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = APP_IMAGES.aboutAvatar; }} />
+                    <img src={member.photo} alt={member.name} className="w-full h-full object-cover" loading="lazy" decoding="async" onError={(e) => { (e.target as HTMLImageElement).src = APP_IMAGES.aboutAvatar; }} />
                   </div>
                   <p className="text-[11px] sm:text-[13px] md:text-base font-semibold font-['Urbanist'] leading-tight">{member.name}</p>
                   <p className="text-[10px] sm:text-[11px] md:text-[12px] lg:text-[13px] text-[#4a5565] font-['Poppins'] leading-snug">{member.role}</p>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Partner CTA */}
-        <section className="py-10 sm:py-12 px-4 sm:px-6">
-          <div className="max-w-4xl mx-auto border-2 border-[#00a63e] rounded-[16px] sm:rounded-[20px] bg-white shadow-sm p-6 sm:p-8 md:p-10 text-center">
+        <motion.section className="py-10 sm:py-12 px-4 sm:px-6" {...sectionMotionProps}>
+          <motion.div className="max-w-4xl mx-auto border-2 border-[#00a63e] rounded-[16px] sm:rounded-[20px] bg-white shadow-sm p-6 sm:p-8 md:p-10 text-center" variants={revealVariant}>
             <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-['Urbanist'] mb-2 sm:mb-3">Partner with Us</h3>
             <p className="text-base sm:text-lg text-[#4a5565] font-['Poppins'] mb-4 sm:mb-6">
               Join us in revolutionizing home energy. Whether you're a supplier, installer, or technology partner, let's work together.
@@ -1444,40 +2080,44 @@ export const WebsiteHomepage = (): JSX.Element => {
             >
               Get in Touch <ArrowRight className="w-5 h-5" />
             </a>
-          </div>
-        </section>
-      </section>
+          </motion.div>
+        </motion.section>
+      </motion.section>
 
       {/* FAQ Section */}
-      <section id="faq-section" className="scroll-mt-20 bg-[#f7fff9]">
+      <motion.section id="faq-section" className="scroll-mt-20 bg-[#f7fff9]" {...sectionMotionProps}>
         {/* Top gradient header */}
         <div className="relative isolate">
           <div className="absolute inset-x-0 top-0 h-[280px] sm:h-[320px] md:h-[380px] bg-gradient-to-r from-[rgba(0,166,62,0.09)] to-[rgba(0,122,85,0.09)] rounded-b-[50px] sm:rounded-b-[60px] md:rounded-b-[80px]" />
           <header className="relative h-[280px] sm:h-[320px] md:h-[380px] flex items-center justify-center px-4 sm:px-6">
-            <div className="max-w-[960px] mx-auto text-center space-y-2">
+            <motion.div className="max-w-[960px] mx-auto text-center space-y-2" variants={revealVariant}>
               <h1 className="text-[26px] sm:text-[30px] md:text-[36px] font-bold tracking-[-0.04em] font-['Urbanist']">
                 Frequently Asked Questions
               </h1>
               <p className="text-[14px] sm:text-[17px] md:text-[20px] text-[#4a5565] font-['Poppins'] leading-snug">
                 Find answers to common questions about 360Watts solar and smart home solutions
               </p>
-            </div>
+            </motion.div>
           </header>
         </div>
 
         {/* Sections */}
         <main className="px-6 pb-20 mt-10 md:mt-14">
-          <div className="max-w-[1020px] mx-auto space-y-14">
+          <motion.div className="max-w-[1020px] mx-auto space-y-14" {...staggerMotionProps}>
             {faqSections.map((section) => (
-              <FAQSectionComponent key={section.id} section={section} />
+              <motion.div key={section.id} variants={revealVariant}>
+                <FAQSectionComponent section={section} />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </main>
 
         {/* CTA */}
-        <section className="py-8 sm:py-10 md:py-12 px-4 sm:px-6">
-          <div className="max-w-[724px] mx-auto text-center space-y-2 sm:space-y-3">
-            <h3 className="text-[18px] sm:text-[20px] md:text-[22px] lg:text-[24px] font-bold font-['Urbanist']">Still have questions?</h3>
+        <motion.section className="py-8 sm:py-10 md:py-12 px-4 sm:px-6" {...sectionMotionProps}>
+          <motion.div className="max-w-[724px] mx-auto text-center space-y-2 sm:space-y-3" variants={revealVariant}>
+            <h3 className="text-[18px] sm:text-[20px] md:text-[22px] lg:text-[24px] font-bold font-['Urbanist'] mb-3">
+              Still have questions?
+            </h3>
             <p className="text-[14px] sm:text-[15px] md:text-[16px] lg:text-[17px] text-[#4a5565] font-['Poppins']">
               Our team is here to help. Reach out anytime.
             </p>
@@ -1503,26 +2143,27 @@ export const WebsiteHomepage = (): JSX.Element => {
                 Call Us
               </a>
             </div>
-          </div>
-        </section>
-      </section>
+          </motion.div>
+        </motion.section>
+      </motion.section>
 
       {/* Contact Section */}
-      <section id="contact-section" className="py-10 sm:py-12 md:py-16 px-3 sm:px-4 md:px-6 bg-white scroll-mt-20">
+      <motion.section id="contact-section" className="py-10 sm:py-12 md:py-16 px-3 sm:px-4 md:px-6 bg-white scroll-mt-20" {...sectionMotionProps}>
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-8 sm:mb-10 md:mb-12">
+          <motion.div className="text-center mb-8 sm:mb-10 md:mb-12" variants={revealVariant}>
             <h2 className="text-[20px] sm:text-[24px] md:text-[28px] lg:text-[33px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-2 sm:mb-3 leading-tight">Let's build your smart solar home.</h2>
             <p className="text-[14px] sm:text-[15px] md:text-[17px] lg:text-[20px] text-[#4a5565] leading-relaxed">Get in touch with us for a free consultation and personalized energy assessment</p>
-          </div>
+          </motion.div>
 
           {/* Contact methods */}
-          <div className="flex flex-row sm:flex-row justify-center flex-wrap gap-4 sm:gap-6 md:gap-8 lg:gap-[134px] mb-8 sm:mb-10 md:mb-12">
+          <motion.div className="flex flex-row sm:flex-row justify-center flex-wrap gap-4 sm:gap-6 md:gap-8 lg:gap-[134px] mb-8 sm:mb-10 md:mb-12" {...staggerMotionProps}>
             {contactMethods.map((method, index) => (
-              <a 
+              <motion.a 
                 key={index}
                 href={method.href}
                 target="_blank"
                 rel="noopener noreferrer"
+                variants={revealVariant}
                 className="flex flex-col items-center w-[120px] sm:w-[150px] md:w-[180px] lg:w-[222px] group"
               >
                 <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-[#dcfce7] rounded-[8px] sm:rounded-[10px] flex items-center justify-center mb-2 group-hover:shadow-lg transition-shadow">
@@ -1531,14 +2172,14 @@ export const WebsiteHomepage = (): JSX.Element => {
                 <h3 className="text-[12px] sm:text-[13px] md:text-[15px] lg:text-[19px] text-[#0a0a0a] tracking-[-0.5px] sm:tracking-[-0.76px] mb-0.5 text-center font-semibold">{method.title}</h3>
                 <p className="text-[12px] sm:text-[13px] md:text-[14px] lg:text-[19px] text-[#4a5565] tracking-[-0.5px] sm:tracking-[-0.76px] text-center">{method.value}</p>
                 <p className="text-[10px] sm:text-[11px] md:text-[12px] lg:text-[16px] text-[rgba(74,85,101,0.6)] tracking-[-0.4px] sm:tracking-[-0.64px] text-center">{method.note}</p>
-              </a>
+              </motion.a>
             ))}
-          </div>
+          </motion.div>
           
           {/* Contact form */}
-          <div className="border border-[rgba(0,0,0,0.3)] rounded-[20px] sm:rounded-[25px] md:rounded-[30px] p-4 sm:p-6 md:p-8 lg:p-12 shadow-[0px_3px_4px_0px_rgba(0,0,0,0.45)] max-w-[939px] mx-auto">
+          <motion.div className="border border-[rgba(0,0,0,0.3)] rounded-[20px] sm:rounded-[25px] md:rounded-[30px] p-4 sm:p-6 md:p-8 lg:p-12 shadow-[0px_3px_4px_0px_rgba(0,0,0,0.45)] max-w-[939px] mx-auto" variants={revealVariant}>
             {isSubmitted ? (
-              <div className="text-center">
+              <div className="text-center" aria-live="polite">
                 <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <CheckCircle className="w-10 h-10 text-[#017c54]" />
                 </div>
@@ -1556,11 +2197,6 @@ export const WebsiteHomepage = (): JSX.Element => {
                   </button>
                 </div>
 
-                <div className="bg-gray-100 rounded-xl p-4 mb-8 text-left max-w-2xl mx-auto">
-                  <p className="text-sm text-gray-600 font-['Poppins'] mb-3">Your message:</p>
-                  <p className="text-sm text-neutral-700 font-['Poppins'] whitespace-pre-wrap break-words">{submittedMessage}</p>
-                </div>
-
                 <button
                   onClick={() => {
                     setIsSubmitted(false);
@@ -1576,63 +2212,73 @@ export const WebsiteHomepage = (): JSX.Element => {
               <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 md:space-y-6 lg:space-y-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 sm:gap-y-4 md:gap-y-6 lg:gap-y-[60px] gap-x-3 sm:gap-x-6 md:gap-x-8 lg:gap-x-[200px]">
                   <div>
-                    <label className="block text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] text-[#0a0a0a] tracking-[-0.5px] sm:tracking-[-0.76px] mb-1">Name *</label>
+                    <label htmlFor="contact-name" className="block text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] text-[#0a0a0a] tracking-[-0.5px] sm:tracking-[-0.76px] mb-1">Name *</label>
                     <input 
                       type="text" 
+                      id="contact-name"
                       name="name" 
                       placeholder="Your full name"
                       value={formData.name} 
                       onChange={handleFormChange} 
                       required
+                      autoComplete="name"
                       className="w-full text-[#4a5565] text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] tracking-[-0.5px] sm:tracking-[-0.76px] border-b border-gray-300 pb-2 focus:outline-none focus:border-[#017c54] bg-transparent" 
                     />
                   </div>
                   <div>
-                    <label className="block text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] text-[#0a0a0a] tracking-[-0.5px] sm:tracking-[-0.76px] mb-1">Email *</label>
+                    <label htmlFor="contact-email" className="block text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] text-[#0a0a0a] tracking-[-0.5px] sm:tracking-[-0.76px] mb-1">Email *</label>
                     <input 
                       type="email" 
+                      id="contact-email"
                       name="email" 
                       placeholder="your@email.com"
                       value={formData.email} 
                       onChange={handleFormChange} 
                       required
+                      autoComplete="email"
                       pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                       title="Please enter a valid email address"
                       className="w-full text-[#4a5565] text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] tracking-[-0.5px] sm:tracking-[-0.76px] border-b border-gray-300 pb-2 focus:outline-none focus:border-[#017c54] bg-transparent" 
                     />
                   </div>
                   <div>
-                    <label className="block text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] text-[#0a0a0a] tracking-[-0.5px] sm:tracking-[-0.76px] mb-1">Phone *</label>
+                    <label htmlFor="contact-phone" className="block text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] text-[#0a0a0a] tracking-[-0.5px] sm:tracking-[-0.76px] mb-1">Phone *</label>
                     <input 
                       type="tel" 
+                      id="contact-phone"
                       name="phone" 
                       placeholder="+91 XXXXX XXXXX"
                       value={formData.phone} 
                       onChange={handleFormChange} 
                       required
+                      autoComplete="tel"
+                      inputMode="tel"
                       pattern="[0-9]{10}"
                       title="Please enter a valid 10-digit phone number"
                       className="w-full text-[#4a5565] text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] tracking-[-0.5px] sm:tracking-[-0.76px] border-b border-gray-300 pb-2 focus:outline-none focus:border-[#017c54] bg-transparent" 
                     />
                   </div>
                   <div>
-                    <label className="block text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] text-[#0a0a0a] tracking-[-0.5px] sm:tracking-[-0.76px] mb-1">City *</label>
+                    <label htmlFor="contact-city" className="block text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] text-[#0a0a0a] tracking-[-0.5px] sm:tracking-[-0.76px] mb-1">City *</label>
                     <input 
                       type="text" 
+                      id="contact-city"
                       name="city" 
                       placeholder="Your city"
                       value={formData.city} 
                       onChange={handleFormChange} 
                       required
+                      autoComplete="address-level2"
                       className="w-full text-[#4a5565] text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] tracking-[-0.5px] sm:tracking-[-0.76px] border-b border-gray-300 pb-2 focus:outline-none focus:border-[#017c54] bg-transparent" 
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] text-[#0a0a0a] tracking-[-0.5px] sm:tracking-[-0.76px] mb-1">Interested in *</label>
+                  <label htmlFor="contact-interest" className="block text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] text-[#0a0a0a] tracking-[-0.5px] sm:tracking-[-0.76px] mb-1">Interested in *</label>
                   <div className="relative">
                     <select 
+                      id="contact-interest"
                       name="interest" 
                       value={formData.interest} 
                       onChange={handleFormChange} 
@@ -1648,13 +2294,15 @@ export const WebsiteHomepage = (): JSX.Element => {
                 </div>
 
                 <div>
-                  <label className="block text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] text-[#0a0a0a] tracking-[-0.5px] sm:tracking-[-0.76px] mb-1">Message (Optional)</label>
+                  <label htmlFor="contact-message" className="block text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] text-[#0a0a0a] tracking-[-0.5px] sm:tracking-[-0.76px] mb-1">Message (Optional)</label>
                   <input 
                     type="text" 
+                    id="contact-message"
                     name="message" 
                     placeholder="Tell us about your energy needs..."
                     value={formData.message} 
                     onChange={handleFormChange} 
+                    autoComplete="off"
                     className="w-full text-[#4a5565] text-[13px] sm:text-[14px] md:text-[16px] lg:text-[19px] tracking-[-0.5px] sm:tracking-[-0.76px] border-b border-gray-300 pb-2 focus:outline-none focus:border-[#017c54] bg-transparent" 
                   />
                 </div>
@@ -1668,21 +2316,21 @@ export const WebsiteHomepage = (): JSX.Element => {
                 </button>
               </form>
             )}
-          </div>
+          </motion.div>
 
           {/* Partnership Form */}
-          <div id="partnership" className="mt-12 sm:mt-16 md:mt-20">
-            <div className="text-center mb-8 sm:mb-10 md:mb-12">
+          <motion.div id="partnership" className="mt-12 sm:mt-16 md:mt-20" {...sectionMotionProps}>
+            <motion.div className="text-center mb-8 sm:mb-10 md:mb-12" variants={revealVariant}>
               <h2 className="text-[22px] sm:text-[25px] md:text-[27px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-3 sm:mb-4 leading-6">Partnership Inquiry</h2>
               <p className="text-[15px] sm:text-[17px] md:text-[19px] text-[#4a5565] tracking-[-0.76px]">
                 Interested in partnering with 360Watts?<br />
                 Whether you're a supplier, installer, or technology partner, let's work together.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="border border-[rgba(0,0,0,0.3)] rounded-[20px] sm:rounded-[25px] md:rounded-[30px] p-5 sm:p-8 md:p-12 shadow-[0px_3px_4px_0px_rgba(0,0,0,0.45)] bg-white max-w-[939px] mx-auto">
+            <motion.div className="border border-[rgba(0,0,0,0.3)] rounded-[20px] sm:rounded-[25px] md:rounded-[30px] p-5 sm:p-8 md:p-12 shadow-[0px_3px_4px_0px_rgba(0,0,0,0.45)] bg-white max-w-[939px] mx-auto" variants={revealVariant}>
               {isPartnershipSubmitted ? (
-                <div className="text-center">
+                <div className="text-center" aria-live="polite">
                   <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle className="w-10 h-10 text-[#ff6900]" />
                   </div>
@@ -1700,11 +2348,6 @@ export const WebsiteHomepage = (): JSX.Element => {
                     </button>
                   </div>
 
-                  <div className="bg-gray-100 rounded-xl p-4 mb-8 text-left max-w-2xl mx-auto">
-                    <p className="text-sm text-gray-600 font-['Poppins'] mb-3">Your inquiry:</p>
-                    <p className="text-sm text-neutral-700 font-['Poppins'] whitespace-pre-wrap break-words">{partnershipSubmittedMessage}</p>
-                  </div>
-
                   <button
                     onClick={() => {
                       setIsPartnershipSubmitted(false);
@@ -1720,63 +2363,73 @@ export const WebsiteHomepage = (): JSX.Element => {
                 <form onSubmit={handlePartnershipSubmit} className="space-y-5 sm:space-y-6 md:space-y-8">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-5 sm:gap-y-8 md:gap-y-[60px] gap-x-4 sm:gap-x-12 md:gap-x-[200px]">
                     <div>
-                      <label className="block text-[15px] sm:text-[17px] md:text-[19px] text-[#0a0a0a] tracking-[-0.76px] mb-1">Name *</label>
+                      <label htmlFor="partner-name" className="block text-[15px] sm:text-[17px] md:text-[19px] text-[#0a0a0a] tracking-[-0.76px] mb-1">Name *</label>
                       <input 
                         type="text" 
+                        id="partner-name"
                         name="name" 
                         placeholder="Your full name"
                         value={partnershipData.name} 
                         onChange={handlePartnershipChange} 
                         required
+                        autoComplete="name"
                         className="w-full text-[#4a5565] text-[15px] sm:text-[17px] md:text-[19px] tracking-[-0.76px] border-b border-gray-300 pb-2 focus:outline-none focus:border-[#ff6900] bg-transparent" 
                       />
                     </div>
                     <div>
-                      <label className="block text-[15px] sm:text-[17px] md:text-[19px] text-[#0a0a0a] tracking-[-0.76px] mb-1">Email *</label>
+                      <label htmlFor="partner-email" className="block text-[15px] sm:text-[17px] md:text-[19px] text-[#0a0a0a] tracking-[-0.76px] mb-1">Email *</label>
                       <input 
                         type="email" 
+                        id="partner-email"
                         name="email" 
                         placeholder="your@email.com"
                         value={partnershipData.email} 
                         onChange={handlePartnershipChange} 
                         required
+                        autoComplete="email"
                         pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                         title="Please enter a valid email address"
                         className="w-full text-[#4a5565] text-[15px] sm:text-[17px] md:text-[19px] tracking-[-0.76px] border-b border-gray-300 pb-2 focus:outline-none focus:border-[#ff6900] bg-transparent" 
                       />
                     </div>
                     <div>
-                      <label className="block text-[15px] sm:text-[17px] md:text-[19px] text-[#0a0a0a] tracking-[-0.76px] mb-1">Phone *</label>
+                      <label htmlFor="partner-phone" className="block text-[15px] sm:text-[17px] md:text-[19px] text-[#0a0a0a] tracking-[-0.76px] mb-1">Phone *</label>
                       <input 
                         type="tel" 
+                        id="partner-phone"
                         name="phone" 
                         placeholder="+91 XXXXX XXXXX"
                         value={partnershipData.phone} 
                         onChange={handlePartnershipChange} 
                         required
+                        autoComplete="tel"
+                        inputMode="tel"
                         pattern="[0-9]{10}"
                         title="Please enter a valid 10-digit phone number"
                         className="w-full text-[#4a5565] text-[15px] sm:text-[17px] md:text-[19px] tracking-[-0.76px] border-b border-gray-300 pb-2 focus:outline-none focus:border-[#ff6900] bg-transparent" 
                       />
                     </div>
                     <div>
-                      <label className="block text-[15px] sm:text-[17px] md:text-[19px] text-[#0a0a0a] tracking-[-0.76px] mb-1">Company/Organization *</label>
+                      <label htmlFor="partner-company" className="block text-[15px] sm:text-[17px] md:text-[19px] text-[#0a0a0a] tracking-[-0.76px] mb-1">Company/Organization *</label>
                       <input 
                         type="text" 
+                        id="partner-company"
                         name="company" 
                         placeholder="Company name"
                         value={partnershipData.company} 
                         onChange={handlePartnershipChange} 
                         required
+                        autoComplete="organization"
                         className="w-full text-[#4a5565] text-[15px] sm:text-[17px] md:text-[19px] tracking-[-0.76px] border-b border-gray-300 pb-2 focus:outline-none focus:border-[#ff6900] bg-transparent" 
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[15px] sm:text-[17px] md:text-[19px] text-[#0a0a0a] tracking-[-0.76px] mb-2">Partnership Type *</label>
+                    <label htmlFor="partner-type" className="block text-[15px] sm:text-[17px] md:text-[19px] text-[#0a0a0a] tracking-[-0.76px] mb-2">Partnership Type *</label>
                     <div className="relative">
                       <select 
+                        id="partner-type"
                         name="partnerType" 
                         value={partnershipData.partnerType} 
                         onChange={handlePartnershipChange} 
@@ -1795,12 +2448,14 @@ export const WebsiteHomepage = (): JSX.Element => {
                   </div>
 
                   <div>
-                    <label className="block text-[15px] sm:text-[17px] md:text-[19px] text-[#0a0a0a] tracking-[-0.76px] mb-1">Message (Optional)</label>
+                    <label htmlFor="partner-message" className="block text-[15px] sm:text-[17px] md:text-[19px] text-[#0a0a0a] tracking-[-0.76px] mb-1">Message (Optional)</label>
                     <textarea 
+                      id="partner-message"
                       name="message" 
                       placeholder="Tell us about your partnership proposal..."
                       value={partnershipData.message} 
                       onChange={handlePartnershipChange} 
+                      autoComplete="off"
                       rows={4}
                       className="w-full text-[#4a5565] text-[15px] sm:text-[17px] md:text-[19px] tracking-[-0.76px] border border-gray-300 rounded-[10px] p-2.5 sm:p-3 focus:outline-none focus:border-[#ff6900] bg-transparent resize-none" 
                     />
@@ -1816,18 +2471,18 @@ export const WebsiteHomepage = (): JSX.Element => {
                   </button>
                 </form>
               )}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
           
           {/* Location Information Section */}
-          <div className="mt-12 sm:mt-16 md:mt-20 mb-10 sm:mb-12 md:mb-16 bg-gradient-to-br from-[#f0fdf4] to-[#f7fff9] rounded-[20px] sm:rounded-[26px] md:rounded-[32px] p-5 sm:p-7 md:p-10 border border-[#dcfce7] shadow-[0_8px_30px_rgba(0,166,62,0.08)]">
-            <div className="text-center mb-6 sm:mb-8 md:mb-10">
+          <motion.div className="mt-12 sm:mt-16 md:mt-20 mb-10 sm:mb-12 md:mb-16 bg-gradient-to-br from-[#f0fdf4] to-[#f7fff9] rounded-[20px] sm:rounded-[26px] md:rounded-[32px] p-5 sm:p-7 md:p-10 border border-[#dcfce7] shadow-[0_8px_30px_rgba(0,166,62,0.08)]" {...sectionMotionProps}>
+            <motion.div className="text-center mb-6 sm:mb-8 md:mb-10" variants={revealVariant}>
               <h3 className="text-[24px] sm:text-[30px] md:text-[36px] lg:text-[40px] font-bold text-[#0a0a0a] font-['Urbanist'] tracking-[-1px] mb-2 sm:mb-3">Find Us</h3>
               <p className="text-[14px] sm:text-[16px] md:text-[18px] text-[#4a5565] font-['Poppins']">Visit our office in Coimbatore, Tamil Nadu</p>
-            </div>
+            </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-5 sm:gap-6 md:gap-8 mb-6 sm:mb-8 md:mb-10">
-              <div className="md:col-span-3 rounded-[16px] sm:rounded-[20px] md:rounded-[24px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.1)] h-[280px] sm:h-[340px] md:h-[400px]">
+            <motion.div className="grid grid-cols-1 md:grid-cols-5 gap-5 sm:gap-6 md:gap-8 mb-6 sm:mb-8 md:mb-10" {...staggerMotionProps}>
+              <motion.div className="md:col-span-3 rounded-[16px] sm:rounded-[20px] md:rounded-[24px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.1)] h-[280px] sm:h-[340px] md:h-[400px]" variants={revealVariant}>
                 <iframe
                   width="100%"
                   height="100%"
@@ -1838,11 +2493,11 @@ export const WebsiteHomepage = (): JSX.Element => {
                   aria-hidden="false"
                   tabIndex={0}
                 ></iframe>
-              </div>
+              </motion.div>
 
-              <div className="md:col-span-2 space-y-3 sm:space-y-4 md:space-y-5">
+              <motion.div className="md:col-span-2 space-y-3 sm:space-y-4 md:space-y-5" variants={revealVariant}>
                 {/* Address Card */}
-                <div className="bg-white rounded-[14px] sm:rounded-[18px] md:rounded-[20px] p-4 sm:p-5 md:p-6 shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-[#e5f3e9] hover:shadow-[0_8px_25px_rgba(0,166,62,0.12)] transition-shadow">
+                <motion.div variants={revealVariant} className="bg-white rounded-[14px] sm:rounded-[18px] md:rounded-[20px] p-4 sm:p-5 md:p-6 shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-[#e5f3e9] hover:shadow-[0_8px_25px_rgba(0,166,62,0.12)] transition-shadow">
                   <div className="flex items-start gap-3 sm:gap-4">
                     <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-[#dcfce7] to-[#bbf7d0] rounded-[10px] sm:rounded-[12px] flex items-center justify-center flex-shrink-0">
                       <svg className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#00a63e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1854,10 +2509,10 @@ export const WebsiteHomepage = (): JSX.Element => {
                       <p className="text-[12px] sm:text-[13px] md:text-[14px] text-[#4a5565] font-['Poppins'] leading-relaxed">GRG INCUBATION CENTER<br />Coimbatore, Tamil Nadu</p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Email Card */}
-                <div className="bg-white rounded-[14px] sm:rounded-[18px] md:rounded-[20px] p-4 sm:p-5 md:p-6 shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-[#e5f3e9] hover:shadow-[0_8px_25px_rgba(0,166,62,0.12)] transition-shadow">
+                <motion.div variants={revealVariant} className="bg-white rounded-[14px] sm:rounded-[18px] md:rounded-[20px] p-4 sm:p-5 md:p-6 shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-[#e5f3e9] hover:shadow-[0_8px_25px_rgba(0,166,62,0.12)] transition-shadow">
                   <div className="flex items-start gap-3 sm:gap-4">
                     <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-[#ddefff] to-[#bfdbfe] rounded-[10px] sm:rounded-[12px] flex items-center justify-center flex-shrink-0">
                       <svg className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#3b82f6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1869,10 +2524,10 @@ export const WebsiteHomepage = (): JSX.Element => {
                       <a href="mailto:hello@360watts.com" className="text-[12px] sm:text-[13px] md:text-[14px] text-[#00a63e] font-['Poppins'] hover:text-[#007a55] transition-colors underline">hello@360watts.com</a>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Hours Card */}
-                <div className="bg-white rounded-[14px] sm:rounded-[18px] md:rounded-[20px] p-4 sm:p-5 md:p-6 shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-[#e5f3e9] hover:shadow-[0_8px_25px_rgba(0,166,62,0.12)] transition-shadow">
+                <motion.div variants={revealVariant} className="bg-white rounded-[14px] sm:rounded-[18px] md:rounded-[20px] p-4 sm:p-5 md:p-6 shadow-[0_4px_15px_rgba(0,0,0,0.06)] border border-[#e5f3e9] hover:shadow-[0_8px_25px_rgba(0,166,62,0.12)] transition-shadow">
                   <div className="flex items-start gap-3 sm:gap-4">
                     <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-[#fef3c7] to-[#fce7f3] rounded-[10px] sm:rounded-[12px] flex items-center justify-center flex-shrink-0">
                       <svg className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#f97316]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1884,9 +2539,9 @@ export const WebsiteHomepage = (): JSX.Element => {
                       <p className="text-[12px] sm:text-[13px] md:text-[14px] text-[#4a5565] font-['Poppins']">Mon-Sat: 9 AM - 6 PM IST</p>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
+                </motion.div>
+              </motion.div>
+            </motion.div>
 
             {/* Call to Action */}
             <div className="flex flex-row items-center justify-center gap-3 sm:gap-4">
@@ -1902,9 +2557,9 @@ export const WebsiteHomepage = (): JSX.Element => {
                 Get Directions
               </a>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
       {/* Footer */}
       <footer className="relative py-14 sm:py-18 md:py-24 px-4 sm:px-6 rounded-t-[30px] sm:rounded-t-[40px] md:rounded-t-[50px] overflow-hidden" style={{
         background: "linear-gradient(135deg, rgba(247, 255, 248, 1) 0%, rgba(240, 253, 244, 1) 50%, rgba(236, 254, 255, 1) 100%)",
@@ -1924,7 +2579,7 @@ export const WebsiteHomepage = (): JSX.Element => {
 
         <div className="w-full max-w-7xl mx-auto relative z-10">
           {/* Main Footer Content */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-12 gap-6 sm:gap-8 md:gap-10 lg:gap-12 mb-10 sm:mb-12 md:mb-14 lg:mb-16 items-start">
+          <motion.div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-12 gap-6 sm:gap-8 md:gap-10 lg:gap-12 mb-10 sm:mb-12 md:mb-14 lg:mb-16 items-start" {...staggerMotionProps}>
             {/* Logo Section - Left Aligned */}
             <div className="col-span-2 sm:col-span-2 md:col-span-4 flex flex-col items-center sm:items-start gap-2 group">
               <div className="relative">
@@ -1932,6 +2587,8 @@ export const WebsiteHomepage = (): JSX.Element => {
                   src={APP_IMAGES.footerLogo}
                   alt="360Watts"
                   className="h-[85px] sm:h-[100px] md:h-[120px] w-auto transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 drop-shadow-md"
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => { (e.target as HTMLImageElement).src = localFinalLogo; }}
                 />
                 <div className="absolute -inset-4 bg-gradient-to-r from-[#00a63e]/20 to-[#007a55]/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -2022,7 +2679,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-[#00a63e]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <svg className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white group-hover:brightness-125 transition-all duration-200 relative z-10" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.645.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.645.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4z"/>
                   </svg>
                 </a>
                 <a
@@ -2049,7 +2706,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                 </a>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Footer Bottom */}
           <div className="relative pt-6 sm:pt-7 md:pt-8">
@@ -2067,3 +2724,4 @@ export const WebsiteHomepage = (): JSX.Element => {
     </div>
   );
 };
+

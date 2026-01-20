@@ -59,26 +59,30 @@ export const APP_IMAGES = {
   solutionsAppPhoneModes: "/image10.png",
 } as const;
 
-// Preload all critical images on app start
+const isImageAsset = (url: string) => /\.(png|jpe?g|svg|webp)$/i.test(url);
+
+let hasPreloaded = false;
+
+// Preload critical images on app start, then lazily warm the rest.
 export const preloadAllImages = () => {
+  if (hasPreloaded || typeof window === "undefined") return;
+  hasPreloaded = true;
+
   const criticalImages = [
     APP_IMAGES.finalLogo,
-    APP_IMAGES.solutionsSolarHouse,
-    APP_IMAGES.solutionsSmartHomeScene,
-    APP_IMAGES.sun21,
-    APP_IMAGES.smartHouse1,
-  ];
+    APP_IMAGES.solarPowerStation,
+    APP_IMAGES.technicianSolarPanels,
+    APP_IMAGES.digitalTablet,
+  ].filter(isImageAsset) as readonly string[];
 
-  const allImages = Object.values(APP_IMAGES) as string[];
+  const allImages = Array.from(
+    new Set(Object.values(APP_IMAGES).filter(isImageAsset))
+  );
+  const remainingImages = allImages.filter((img) => !criticalImages.includes(img));
 
-  // Preload critical images first
-  preloadImages(criticalImages).then(() => {
-    // Then preload the rest in background
-    preloadImages(allImages.filter(img => !(criticalImages as string[]).includes(img)));
+  preloadImages(Array.from(criticalImages)).then(() => {
+    window.setTimeout(() => {
+      preloadImages(remainingImages);
+    }, 1200);
   });
 };
-
-// Initialize preloading when module loads
-if (typeof window !== 'undefined') {
-  preloadAllImages();
-}
