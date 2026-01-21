@@ -25,7 +25,10 @@ export interface BillInputs {
 export const PHYSICS = {
     AREA_PER_KW: 60, // sq.ft (Includes safety factor for maintenance walkways)
     PANEL_WATTAGE: 600, // Wp (Modern PERC/TopCon Mono)
-    SYSTEM_LOSS_FACTOR: 0.72, // DC-to-AC ratio (Derating for temp & efficiency)
+    PANEL_LENGTH_M: 2.38, // meters
+    PANEL_WIDTH_M: 1.30, // meters
+    PANEL_AREA_M2: 3.11, // m² per panel
+    SYSTEM_LOSS_FACTOR: 0.80, // DC-to-AC ratio (Derating for temp & efficiency) - corrected from 0.72
     FIXED_CHARGE_DEDUCTION: 60, // Reduced from 120 (Service charge only, No Tax)
     TARIFF_ESCALATION: 0.05, // 5% annual rise in utility rates
     PANEL_DEGRADATION: 0.006, // 0.6% annual decay in output
@@ -34,11 +37,6 @@ export const PHYSICS = {
     LIFESPAN_YEARS: 25,
     DISCOUNT_RATE: 0.08, // 8% cost of capital
     SUN_HOURS_ANNUAL_AVG: 5.5, // PSH (Peak Sun Hours)
-    // Monthly PSH profile for Coimbatore (Lat 11.0N)
-    // Used to normalize seasonal consumption spikes (AC load vs Sun Hours correlation)
-    MONTHLY_SUN_HOURS: [
-        5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5,5.5, 5.5,5.5, 5.5,5.5
-    ] 
 };
 
 /**
@@ -61,16 +59,20 @@ export function estimateEnergyCharge(bill: BillInputs): number {
 
 /**
  * Estimate units from energy charge using slabs (bottom-up, telescopic)
+ * Fixed: Properly handles free slab - bill amount represents only paid consumption
  */
 export function estimateUnitsFromEnergyCharge(energyCharge: number): number {
     let units = 0;
     let remainingBill = energyCharge;
-    for (const slab of SLABS) {
-        if (slab.rate === 0) {
-            units += slab.limit;
-            continue;
-        }
+
+    // Always include free units (first 100)
+    units += SLABS[0].limit;
+
+    // Calculate paid units from remaining slabs
+    for (let i = 1; i < SLABS.length; i++) {
+        const slab = SLABS[i];
         const slabMaxCost = slab.limit * slab.rate;
+
         if (remainingBill >= slabMaxCost) {
             units += slab.limit;
             remainingBill -= slabMaxCost;
@@ -81,6 +83,7 @@ export function estimateUnitsFromEnergyCharge(energyCharge: number): number {
             break;
         }
     }
+
     return Math.round(units);
 }
 
@@ -123,7 +126,7 @@ export function calculateSolarRequirementsFromBill(
         throw new Error("Either totalBillAmount or estimatedUnits must be provided");
     }
     
-    // 2. Calculate daily consumption
+    // 2. Calculate daily consumption (bi-monthly = 60 days)
     const dailyConsumption = biMonthlyUnits / 60; // kWh/day
 
     // 3. System Sizing
@@ -140,6 +143,10 @@ export function calculateSolarRequirementsFromBill(
     const annualGen = dailyGen * 365;
     const systemCost = actualDcCapacityKw * PHYSICS.COST_PER_KW;
     const annualSavings = annualGen * PHYSICS.AVG_TARIFF;
+    
+    // Calculate required area using actual panel dimensions
+    const requiredAreaM2 = panelCount * PHYSICS.PANEL_AREA_M2;
+    const requiredAreaSqFt = requiredAreaM2 * 10.764; // Convert m² to sq ft
     
     // Simple Payback
     const roi = systemCost / annualSavings;
@@ -163,7 +170,7 @@ export function calculateSolarRequirementsFromBill(
         panelCount: panelCount,
         dailyGenerationKwh: parseFloat(dailyGen.toFixed(1)),
         annualGenerationKwh: Math.round(annualGen),
-        requiredAreaSqFt: Math.round(actualDcCapacityKw * PHYSICS.AREA_PER_KW),
+        requiredAreaSqFt: Math.round(requiredAreaSqFt),
         estimatedCost: systemCost,
         roiYears: parseFloat(roi.toFixed(1)),
         npv: Math.round(npv),
