@@ -74,13 +74,7 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
             >
               <span style={{ color: '#254D65' }}>360</span><span style={{ color: '#F07522' }}>watts</span>
             </span>
-            <span
-              className={`text-[10px] sm:text-xs font-['Poppins'] hidden sm:block ${
-                showTransparent ? "text-white/70" : "text-neutral-500"
-              }`}
-            >
-              Drive what's next.
-            </span>
+            
           </div>
         </div>
 
@@ -105,11 +99,12 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
 
         {/* Desktop CTA Button */}
         <a
-          href="#contact-section"
-          onClick={(e) => handleNavClick(e, "contact-section")}
+          href="#solar-calculator"
+          onClick={(e) => handleNavClick(e, "solar-calculator")}
           className="hidden lg:inline-flex items-center gap-2 px-4 xl:px-5 py-2 xl:py-2.5 bg-gradient-to-r from-[#00a63e] to-[#017c54] text-white font-medium rounded-lg hover:opacity-90 transition-all font-['Poppins'] text-sm xl:text-base cursor-pointer"
+          aria-label="Calculate your solar savings"
         >
-          Get Started <ArrowRight className="w-4 h-4" />
+          Calculate Savings <ArrowRight className="w-4 h-4" />
         </a>
 
         {/* Mobile Menu Button */}
@@ -145,11 +140,12 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
           ))}
           <div className="pt-3 mt-2 border-t border-gray-100">
             <a
-              href="#contact-section"
-              onClick={(e) => handleNavClick(e, "contact-section")}
+              href="#solar-calculator"
+              onClick={(e) => handleNavClick(e, "solar-calculator")}
               className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-gradient-to-r from-[#00a63e] to-[#017c54] text-white font-semibold rounded-xl font-['Poppins'] cursor-pointer"
+              aria-label="Calculate your solar savings"
             >
-              Get Started <ArrowRight className="w-5 h-5" />
+              Calculate Savings <ArrowRight className="w-5 h-5" />
             </a>
           </div>
         </div>

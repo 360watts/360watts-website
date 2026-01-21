@@ -2,11 +2,17 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import CountUp from "react-countup";
-import { ArrowRight, Calculator, ChevronRight, ChevronLeft, MessageCircle, CheckCircle, ChevronDown, Volume2, VolumeX, Gauge, PiggyBank, Ruler, SunMedium, Wallet2, Zap, Share2, Copy} from "lucide-react";
-import { Link } from "react-router-dom";
-import { Navigation } from "../../components/Navigation";
+import { ArrowRight, Calculator, ChevronRight, MessageCircle, CheckCircle, ChevronDown, Volume2, VolumeX, Gauge, PiggyBank, Ruler, SunMedium, Wallet2, Zap, Share2, Copy} from "lucide-react";
 import { APP_IMAGES } from "../../lib/imageRegistry";
+import {Navigation} from "../../components/Navigation";
 import { calculateSolarRequirementsFromBill, BillInputs } from "../../utils/solar-physics";
+import {
+  HeroSection,
+  UnifiedSolutionSection,
+  BenefitsSection,
+  HowItWorksSection,
+  AppSection
+} from "./components";
 
 const Wrench = ({ 
   property1,
@@ -69,10 +75,23 @@ const Wrench = ({
   );
 };
 
+
+type FaqItem = {
+  id: string;
+  question: string;
+  answer?: string;
+};
+
+type FaqSection = {
+  id: string;
+  title: string;
+  items: FaqItem[];
+};
+
 const storySteps = [
   {
     title: "Why should our homes depend on others for energy when the sun gives us everything we need?",
-    body: "From that spark, 360Watts was born.",
+    body: "From that spark, 360watts was born.",
     align: "left",
     image: APP_IMAGES.aboutWalk,
   },
@@ -89,7 +108,7 @@ const storySteps = [
     image: APP_IMAGES.aboutSmartHome,
   },
   {
-    title: "At 360Watts, we are building that world where homes think, energy flows freely, and independence is powered by intelligence.",
+    title: "At 360watts, we are building that world where homes think, energy flows freely, and independence is powered by intelligence.",
     body: "",
     align: "right",
     image: APP_IMAGES.aboutIdea,
@@ -103,18 +122,6 @@ const teamMembers = [
   { name: "Nancy", role: "IoT Developer", photo: APP_IMAGES.teamSelvaNancy },
   { name: "Rajeev", role: "Data/ML Engineer", photo: APP_IMAGES.teamRajeev },
 ];
-
-type FaqItem = {
-  id: string;
-  question: string;
-  answer?: string;
-};
-
-type FaqSection = {
-  id: string;
-  title: string;
-  items: FaqItem[];
-};
 
 const faqSections: FaqSection[] = [
   {
@@ -163,69 +170,9 @@ const faqSections: FaqSection[] = [
 // Fallback local assets
 const localFinalLogo = "/final-logo-png-4x-2.png";
 
-const heroSlides = [
-  {
-    bg: APP_IMAGES.solarPowerStation,
-    title: "Smarter Energy.\nSmarter Living",
-    subtitle: "360Watts unites solar power and smart home automation, helping you save more, live cleaner, and control everything effortlessly."
-  },
-  {
-    bg: APP_IMAGES.technicianSolarPanels,
-    title: "Power Your Home.\nSave the Planet.",
-    subtitle: "Harness the sun's energy with our cutting-edge solar solutions. Reduce bills and your carbon footprint simultaneously."
-  },
-];
 
-const benefitsData = [
-  { icon: APP_IMAGES.iconSavings, title: "Save on bills", description: "Reduce your energy costs significantly" },
-  { icon: APP_IMAGES.iconEnergy, title: "Energy self-dependence", description: "Generate your own clean power" },
-  { icon: APP_IMAGES.iconEco, title: "Eco-friendly living", description: "Reduce your carbon footprint" },
-  { icon: APP_IMAGES.iconAuto, title: "Intelligent automation", description: "Smart energy management" },
-];
 
-const processSteps = {
-  solar: [
-    { 
-      number: "1", 
-      title: "Solar System Design",
-      description: "Our experts analyze your roof, energy needs, and location to create a custom solar solution optimized for maximum efficiency."
-    },
-    { 
-      number: "2", 
-      title: "Installation",
-      description: "Professional installation by certified technicians. We handle everything from permits to grid connection."
-    },
-    { 
-      number: "3", 
-      title: "Maintenance",
-      description: "Regular monitoring and maintenance ensure peak performance. Our smart monitoring alerts you to any issues before they become problems."
-    },
-  ],
-  smartHome: [
-    { 
-      number: "1", 
-      title: "Set up Smart Devices",
-      description: "Install smart switches, sensors, and appliances. Our technicians ensure everything is properly connected and configured."
-    },
-    { 
-      number: "2", 
-      title: "Link it to the app",
-      description: "Connect all devices to the 360Watts app. Simple setup with QR codes and automatic device detection."
-    },
-    { 
-      number: "3", 
-      title: "Create Automations",
-      description: "Set up intelligent routines that maximize solar usage, reduce waste, and adapt to your lifestyle automatically."
-    },
-  ],
-};
 
-const appFeatures = [
-  { icon: APP_IMAGES.appIcon1, title: "Real-time solar analytics", description: "Monitor your energy production" },
-  { icon: APP_IMAGES.appIcon2, title: "Smart device control", description: "Manage all your devices" },
-  { icon: APP_IMAGES.appIcon3, title: "Energy health insights", description: "Track system performance" },
-  { icon: APP_IMAGES.appIcon4, title: "Bill tracking", description: "Monitor your savings" },
-];
 
 const contactMethods = [
   { icon: APP_IMAGES.iconEmail, title: "Email Us", value: "hello@360watts.com", note: "We reply within 24 hrs", href: "mailto:hello@360watts.com" },
@@ -301,9 +248,6 @@ export const WebsiteHomepage = (): JSX.Element => {
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", city: "", interest: "solar", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [submittedMessage, setSubmittedMessage] = useState("");
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [currentAppSlide, setCurrentAppSlide] = useState(0);
   const [isCalcVisible, setIsCalcVisible] = useState(false);
   const [isResultVisible, setIsResultVisible] = useState(false);
   const [calcGlow, setCalcGlow] = useState({ x: 50, y: 50 });
@@ -323,6 +267,8 @@ export const WebsiteHomepage = (): JSX.Element => {
   const [hasAttemptedCalculation, setHasAttemptedCalculation] = useState(false);
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [calcErrors, setCalcErrors] = useState<string[]>([]);
+  const [isCalculating, setIsCalculating] = useState(false);
 
   useEffect(() => {
     // Initial calculation on mount - no live preview
@@ -356,29 +302,35 @@ export const WebsiteHomepage = (): JSX.Element => {
     const value = e.target.value;
     setEstimatedUnits(value ? Number(value) : undefined);
   };
-  const handleCalculatorSubmit = (e: React.FormEvent) => {
+  const handleCalculatorSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setHasAttemptedCalculation(true);
+    setCalcErrors([]);
+    setIsCalculating(true);
 
     // Validate inputs
     const billAmountNum = billAmount ? Number(billAmount) : undefined;
     const estimatedUnitsNum = estimatedUnits;
+    const errors: string[] = [];
 
     // Check if both fields are filled
     if (billAmountNum && billAmountNum > 0 && estimatedUnitsNum && estimatedUnitsNum > 0) {
-      alert("Please enter either bill amount OR estimated units, not both. Choose the option you're more comfortable with.");
-      return;
+      errors.push("Please enter either bill amount OR estimated units, not both. Choose the option you're more comfortable with.");
     }
 
     // Check if neither field is filled or valid
     if ((!billAmountNum || billAmountNum <= 0) && (!estimatedUnitsNum || estimatedUnitsNum <= 0)) {
-      alert("Please enter either a bill amount (₹) or estimated monthly units (kWh) to calculate your solar requirements.");
-      return;
+      errors.push("Please enter either a bill amount (₹) or estimated monthly units (kWh) to calculate your solar requirements.");
     }
 
     // Check if bill amount is 0 or negative
     if (billAmountNum !== undefined && billAmountNum <= 0) {
-      alert("Bill amount must be greater than 0.");
+      errors.push("Bill amount must be greater than 0.");
+    }
+
+    if (errors.length > 0) {
+      setCalcErrors(errors);
+      setIsCalculating(false);
       return;
     }
 
@@ -389,15 +341,20 @@ export const WebsiteHomepage = (): JSX.Element => {
     };
 
     try {
+      // Add a small delay to show loading state
+      await new Promise(resolve => setTimeout(resolve, 500));
       const result = calculateSolarRequirementsFromBill(bill);
       setCalcResult(result);
-      setShowResults(true); // Show results after successful calculation
-      setIsResultVisible(true); // Make results visible immediately
+      setShowResults(true);
+      setIsResultVisible(true);
+      setCalcErrors([]);
     } catch (error) {
       console.error('Calculation error:', error);
-      alert("There was an error calculating your solar requirements. Please check your inputs and try again.");
+      setCalcErrors(["There was an error calculating your solar requirements. Please check your inputs and try again."]);
       setCalcResult(null);
       setShowResults(false);
+    } finally {
+      setIsCalculating(false);
     }
   };
 
@@ -405,14 +362,14 @@ export const WebsiteHomepage = (): JSX.Element => {
   const generateShareText = () => {
     if (!calcResult) return "";
     
-    const text = `🌞 My Solar Calculator Results from 360Watts:\n\n` +
+    const text = `🌞 My Solar Calculator Results from 360watts:\n\n` +
       `🏠 System Size: ${calcResult.recommendedCapacityKw.toFixed(1)} kW\n` +
       `☀️ Solar Panels: ${calcResult.panelCount} panels\n` +
       `⚡ Annual Generation: ${calcResult.annualGenerationKwh.toLocaleString()} kWh\n` +
       `💰 Estimated Cost: ₹${(calcResult.estimatedCost / 100000).toFixed(1)}L\n` +
       `💸 Annual Savings: ₹${(calcResult.annualSavings / 1000).toFixed(0)}k\n\n` +
       `Calculate your solar savings at: https://360watts.com\n\n` +
-      `#SolarPower #360Watts #RenewableEnergy`;
+      `#SolarPower #360watts #RenewableEnergy`;
     
     return text;
   };
@@ -424,7 +381,7 @@ export const WebsiteHomepage = (): JSX.Element => {
 
   const shareViaFacebook = () => {
     const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent("Check out my solar calculator results from 360Watts!");
+    const text = encodeURIComponent("Check out my solar calculator results from 360watts!");
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank');
   };
 
@@ -485,15 +442,8 @@ export const WebsiteHomepage = (): JSX.Element => {
   });
   const [isPartnershipSubmitting, setIsPartnershipSubmitting] = useState(false);
   const [isPartnershipSubmitted, setIsPartnershipSubmitted] = useState(false);
-  const [partnershipSubmittedMessage, setPartnershipSubmittedMessage] = useState("");
   
-  // How It Works section state
-  // Removed expand/collapse feature for process steps
-  const [activeCard, setActiveCard] = useState<'solar' | 'smartHome' | null>(null);
 
-  // Touch swipe state for hero
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   // Video mute state
   const [isMuted, setIsMuted] = useState(true);
@@ -503,7 +453,6 @@ export const WebsiteHomepage = (): JSX.Element => {
   const calcRafRef = useRef<number | null>(null);
   const resultRafRef = useRef<number | null>(null);
   const [solutionsVideoRef, solutionsVideoInView] = useInView({ triggerOnce: false, threshold: 0.2 });
-  const [appShowcaseRef, appShowcaseInView] = useInView({ triggerOnce: false, threshold: 0.2 });
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -513,22 +462,6 @@ export const WebsiteHomepage = (): JSX.Element => {
     return () => document.removeEventListener("visibilitychange", handleVisibility);
   }, []);
 
-  useEffect(() => {
-    if (reduceMotion || !isPageVisible) return;
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 8000); // Increased from 5000ms (5s) to 8000ms (8s)
-    return () => clearInterval(timer);
-  }, [isPageVisible, reduceMotion]);
-
-  // Auto-slide app showcase
-  useEffect(() => {
-    if (reduceMotion || !isPageVisible || !appShowcaseInView) return;
-    const timer = setInterval(() => {
-      setCurrentAppSlide((prev) => (prev + 1) % 4);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [appShowcaseInView, isPageVisible, reduceMotion]);
 
   // Scroll to contact section if hash is present
   useEffect(() => {
@@ -605,31 +538,7 @@ export const WebsiteHomepage = (): JSX.Element => {
     return () => observer.disconnect();
   }, []);
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
 
-  // Touch handlers for swipe
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
-    if (isLeftSwipe) {
-      nextSlide();
-    }
-    if (isRightSwipe) {
-      prevSlide();
-    }
-  };
 
   const toggleMute = () => {
     setIsMuted(!isMuted);
@@ -692,16 +601,41 @@ export const WebsiteHomepage = (): JSX.Element => {
     window.open(whatsappUrl, '_blank');
   };
 
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+
+    if (!formData.name.trim()) {
+      errors.name = "Name is required";
+    }
+
+    if (!formData.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+
+    if (!formData.phone.trim()) {
+      errors.phone = "Phone number is required";
+    } else if (!/^[6-9]\d{9}$/.test(formData.phone.replace(/\s+/g, ''))) {
+      errors.phone = "Please enter a valid 10-digit phone number";
+    }
+
+    if (!formData.city.trim()) {
+      errors.city = "City is required";
+    }
+
+    return errors;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) return;
+
     setIsSubmitting(true);
 
-    const messageText = createMessage();
-    setSubmittedMessage(messageText);
-
     try {
-      // Automatically send email via FormSubmit (free service, no API key needed)
-      // Replace 'hello@360watts.com' with your actual email
       const response = await fetch('https://formsubmit.co/hello@360watts.com', {
         method: 'POST',
         headers: {
@@ -729,9 +663,8 @@ export const WebsiteHomepage = (): JSX.Element => {
       }
     } catch (error) {
       console.error('Error sending email:', error);
-      // Fallback: still show success and offer WhatsApp
+      // Could add error state here if needed
       setIsSubmitting(false);
-      setIsSubmitted(true);
     }
   };
 
@@ -760,9 +693,6 @@ export const WebsiteHomepage = (): JSX.Element => {
   const handlePartnershipSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsPartnershipSubmitting(true);
-
-    const messageText = createPartnershipMessage();
-    setPartnershipSubmittedMessage(messageText);
 
     try {
       const response = await fetch('https://formsubmit.co/hello@360watts.com', {
@@ -798,494 +728,18 @@ export const WebsiteHomepage = (): JSX.Element => {
   };
 
   return (
-    <div className="bg-[#f7fff9] min-h-screen font-['Poppins',sans-serif] overflow-x-hidden">
+    <div className="min-h-screen font-['Poppins',sans-serif] overflow-x-hidden bg-gradient-to-b from-[#f7fff9] via-[#f0fdf4] via-[#e8f5ff] via-[#f0f9ff] to-[#f7fff9]">
       <Navigation transparent />
 
-      {/* Hero Section */}
-      <motion.section 
-        id="hero-section" 
-        className="relative h-[60vh] sm:h-screen overflow-hidden scroll-mt-20"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        {...sectionMotionProps}
-      >
-        {/* Background Image */}
-        {heroSlides.map((slide, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? "opacity-100" : "opacity-0"}`}
-          >
-            <img 
-              src={slide.bg} 
-              alt="" 
-              className="w-full h-full object-cover object-center"
-            />
-          </div>
-        ))}
-        
-        {/* Gradient Overlay - matching Figma */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(30,30,30,0.4)] to-[rgba(30,30,30,0.8)]" />
-        
-        {/* Hero Content */}
-        <div className="relative z-10 h-full flex items-center">
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6">
-            {heroSlides.map((slide, index) => (
-              <div
-                key={index}
-                className={`transition-all duration-700 ${
-                  index === currentSlide ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 absolute pointer-events-none"
-                }`}
-              >
-                {index === currentSlide && (
-                  <motion.div
-                    initial={reduceMotion ? undefined : { opacity: 0, y: 22 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.75, ease: "easeOut" }}
-                    className="max-w-3xl px-4 sm:px-0"
-                  >
-                    <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-[99px] font-bold text-[rgba(247,255,249,0.8)] font-['Urbanist'] mb-4 sm:mb-6 leading-[1.1] tracking-tight sm:tracking-[-3.96px] whitespace-pre-line">
-                      {slide.title}
-                    </h1>
-                    <p className="text-base sm:text-lg md:text-xl lg:text-[23px] text-white font-['Poppins'] max-w-xl mb-8 sm:mb-10 leading-relaxed">
-                      {slide.subtitle}
-                    </p>
-                    <motion.div
-                      whileHover={reduceMotion ? undefined : { y: -2, scale: 1.01 }}
-                      whileTap={reduceMotion ? undefined : { scale: 0.98 }}
-                      className="inline-flex"
-                    >
-                      <Link 
-                        to="/contact" 
-                        className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#00a63e] to-[#007a55] text-white font-semibold rounded-xl hover:opacity-90 active:scale-95 transition-all text-sm sm:text-base"
-                      >
-                        Get Free Consultation 
-                        <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                      </Link>
-                    </motion.div>
-                  </motion.div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+      <HeroSection reduceMotion={reduceMotion} isPageVisible={isPageVisible} />
 
-        {/* Navigation Arrows */}
-        <button 
-          onClick={prevSlide} 
-          className="hidden sm:hidden absolute left-2 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-30 w-14 h-14 sm:w-12 sm:h-12 bg-white/30 backdrop-blur-md rounded-full items-center justify-center text-white hover:bg-white/40 active:scale-95 transition-all shadow-lg border border-white/20"
-          aria-label="Previous slide"
-        >
-          <ChevronLeft className="w-7 h-7 sm:w-6 sm:h-6" />
-        </button>
-        <button 
-          onClick={nextSlide} 
-          className="hidden sm:hidden absolute right-2 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 w-14 h-14 sm:w-12 sm:h-12 bg-white/30 backdrop-blur-md rounded-full items-center justify-center text-white hover:bg-white/40 active:scale-95 transition-all shadow-lg border border-white/20"
-          aria-label="Next slide"
-        >
-          <ChevronRight className="w-7 h-7 sm:w-6 sm:h-6" />
-        </button>
-        
-        {/* Carousel Indicators */}
-        <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex gap-2 sm:gap-3 z-20">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`w-[12px] h-[12px] sm:w-[15px] sm:h-[15px] rounded-full transition-all duration-300 hover:scale-110 active:scale-95 ${index === currentSlide ? "bg-white" : "bg-white/50"}`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-      </motion.section>
+      <UnifiedSolutionSection reduceMotion={reduceMotion} />
 
-      {/* Our Unified Solution Section */}
-      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 bg-white">
-        <div className="w-full max-w-7xl mx-auto">
-          <div className="text-center mb-6 sm:mb-8 md:mb-12">
-            <h2 className="text-[30px] sm:text-[35px] md:text-[40px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-2 tracking-tight sm:tracking-[-1.6px]">Our Unified Solution</h2>
-            <p className="text-[20px] sm:text-[24px] md:text-[27px] text-[#4a5565] font-['Poppins'] tracking-tight sm:tracking-[-1.08px]">Two products. One platform for all your energy needs.</p>
-          </div>
-          
-          <div className="flex flex-col md:flex-row gap-6 md:gap-8 lg:gap-[113px] justify-center items-stretch mb-8">
-            {/* Solar Solutions Card */}
-            <div className="relative rounded-[20px] overflow-hidden w-full md:flex-1 lg:w-[567px] h-[280px] sm:h-[300px] md:h-[320px] lg:h-[342px] transition-transform duration-300 hover:-translate-y-2 hover:scale-[1.01]">
-              <img 
-                src="/solar-panels-house-roof.jpg" 
-                alt="Solar Solutions" 
-                className="absolute inset-0 w-full h-full object-cover object-center"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(204,204,204,0.3)] to-transparent rounded-[20px]" />
-              <div className="absolute inset-0 p-3 sm:p-4 md:p-6 lg:p-[30px] flex flex-col justify-start text-left">
-                <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 lg:gap-[19px] pt-3 sm:pt-4 md:pt-6 lg:pt-[24px]">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14">
-                    <svg viewBox="0 0 56 56" fill="none" className="w-full h-full">
-                      <circle cx="28" cy="28" r="12" fill="#FFA500"/>
-                      <path d="M28 8V2M28 54V48M48 28H54M2 28H8M43 13L47 9M9 47L13 43M43 43L47 47M9 9L13 13" stroke="#FFA500" strokeWidth="4" strokeLinecap="round"/>
-                    </svg>
-                  </div>
-                  <div className="flex flex-col gap-[6px] sm:gap-[7px] md:gap-[8px] mt-8 sm:mt-0">
-                    <h3 className="text-[22px] sm:text-[20px] md:text-[24px] lg:text-[27px] xl:text-[30px] font-bold text-black font-['Urbanist'] leading-tight md:leading-8 lg:leading-9 drop-shadow-lg">Solar Solutions</h3>
-                    <p className="text-black text-[15px] sm:text-[12px] md:text-[13px] lg:text-[13.5px] xl:text-[14px] font-['Poppins'] leading-4 sm:leading-5 opacity-95 drop-shadow-md">Total control. Zero worries.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <BenefitsSection reduceMotion={reduceMotion} />
 
-            {/* Plus Icon */}
-            <div className="hidden md:flex items-center justify-center w-8 md:w-12 h-8 md:h-12 text-[#4a5565] text-3xl md:text-5xl font-light mt-20 md:mt-24">+</div>
+      <HowItWorksSection reduceMotion={reduceMotion} />
 
-            {/* Smart Home Solutions Card */}
-            <div className="relative rounded-[20px] overflow-hidden w-full md:flex-1 lg:w-[567px] h-[280px] sm:h-[300px] md:h-[320px] lg:h-[342px] transition-transform duration-300 hover:-translate-y-2 hover:scale-[1.01]">
-              <img 
-                src={APP_IMAGES.digitalTablet} 
-                alt="Smart Home Solutions" 
-                className="absolute inset-0 w-full h-full object-cover object-center"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(204,204,204,0.75)] to-transparent rounded-[20px]" />
-              <div className="absolute inset-0 p-3 sm:p-4 md:p-6 lg:p-[30px] flex flex-col justify-start text-left">
-                <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 lg:gap-[19px] pt-3 sm:pt-4 md:pt-6 lg:pt-[24px]">
-                  <img src={APP_IMAGES.iconSmartHome} alt="" className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
-                  <div className="flex flex-col gap-[6px] sm:gap-[7px] md:gap-[8px] mt-8 sm:mt-0">
-                    <h3 className="text-[22px] sm:text-[20px] md:text-[22px] lg:text-[25px] xl:text-[28px] font-bold text-black font-['Urbanist'] leading-tight md:leading-8 lg:leading-9 drop-shadow-lg">Smart Home Solutions</h3>
-                    <p className="text-black text-[15px] sm:text-[13px] md:text-[12px] lg:text-[12.5px] xl:text-[13px] font-['Poppins'] leading-4 sm:leading-5 drop-shadow-md">The future of living, powered by intelligence.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center">
-            <a 
-              href="#solutions-section" 
-              className="inline-flex items-center gap-2 px-6 py-4 border border-[rgba(74,85,101,0.75)] rounded-[10px] text-[#4a5565] hover:bg-gray-50 transition-colors text-[19px] tracking-[-0.76px]"
-            >
-              Know more
-              <ArrowRight className="w-6 h-6" />
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Why 360 Watts Section */}
-      <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-white">
-        <div className="w-full max-w-7xl mx-auto">
-          <div className="text-center mb-12 sm:mb-16 md:mb-20">
-            <h2 className="text-[32px] sm:text-[38px] md:text-[44px] lg:text-[48px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-3 md:mb-4 tracking-[-1.5px]">Why 360 Watts?</h2>
-            <p className="text-[16px] sm:text-[18px] md:text-[20px] text-[#4a5565] font-['Poppins'] tracking-[-0.5px]">Tangible benefits for your home</p>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-12">
-            {benefitsData.map((benefit, index) => (
-              <div
-                key={index}
-                className="flex flex-col items-center text-center group transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.02]"
-              >
-                <div className="w-[80px] h-[80px] sm:w-[90px] sm:h-[90px] md:w-[100px] md:h-[100px] bg-gradient-to-br from-[#dcfce7] to-[#bbf7d0] rounded-[16px] sm:rounded-[20px] flex items-center justify-center mb-4 sm:mb-5 md:mb-6 shadow-[0_4px_20px_rgba(0,166,62,0.15)] group-hover:shadow-[0_8px_30px_rgba(0,166,62,0.25)] transition-all duration-300">
-                  <img src={benefit.icon} alt="" className="w-[38px] h-[38px] sm:w-[45px] sm:h-[45px] md:w-[50px] md:h-[50px]" />
-                </div>
-                <h3 className="text-[14px] sm:text-[17px] md:text-[20px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-2 sm:mb-3 leading-tight">{benefit.title}</h3>
-                <p className="text-[12px] sm:text-[14px] md:text-[16px] text-[#4a5565] leading-relaxed font-['Poppins']">{benefit.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How Does It Work Section */}
-      <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-gradient-to-br from-[#f7fff9] via-[#f0fdf4] to-[#f7fff9] relative overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-[#00a63e] rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#3b82f6] rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="w-full max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-12 sm:mb-16 md:mb-20">
-            <div className="inline-block px-4 sm:px-6 py-2 bg-gradient-to-r from-[#dcfce7] to-[#ddefff] rounded-full mb-4 sm:mb-6">
-              <span className="text-[13px] sm:text-[14px] md:text-[16px] font-semibold text-[#0a0a0a] font-['Urbanist']">Simple & Effective</span>
-            </div>
-            <h2 className="text-[34px] sm:text-[44px] md:text-[56px] font-bold text-[#0a0a0a] font-['Urbanist'] tracking-[-1.5px] mb-4 bg-gradient-to-r from-[#0a0a0a] to-[#4a5565] bg-clip-text text-transparent">How Does It Work?</h2>
-            <p className="text-[16px] sm:text-[18px] md:text-[20px] text-[#4a5565] font-['Poppins'] max-w-2xl mx-auto">Simple steps to transform your home into a Smart Home, sustainable powerhouse</p>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
-            {/* Solar Steps */}
-            <div 
-              className={`bg-white/80 backdrop-blur-sm rounded-[24px] sm:rounded-[28px] md:rounded-[32px] p-5 sm:p-7 md:p-10 shadow-[0_8px_40px_rgba(0,0,0,0.06)] border-2 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,166,62,0.15)] hover:-translate-y-2 cursor-pointer ${
-                activeCard === 'solar' ? 'border-[#00a63e] shadow-[0_20px_60px_rgba(0,166,62,0.2)]' : 'border-transparent'
-              }`}
-              onMouseEnter={() => setActiveCard('solar')}
-              onMouseLeave={() => setActiveCard(null)}
-            >
-              <div className="flex items-center gap-3 sm:gap-4 mb-8 sm:mb-10">
-                <div className="w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] md:w-[90px] md:h-[90px] bg-gradient-to-br from-[#dcfce7] to-[#bbf7d0] rounded-[16px] sm:rounded-[20px] flex items-center justify-center shadow-lg transform transition-transform hover:scale-110">
-                  <img src={APP_IMAGES.sun21} alt="Solar" className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] md:w-[60px] md:h-[60px] object-contain" />
-                </div>
-                <div>
-                  <h3 className="text-[26px] sm:text-[29px] md:text-[32px] font-bold text-[#0a0a0a] font-['Urbanist'] tracking-[-0.8px]">Solar</h3>
-                  <p className="text-[12px] sm:text-[13px] md:text-[14px] text-[#4a5565] font-['Poppins'] leading-4 sm:leading-5 opacity-95 drop-shadow-md">Clean energy generation</p>
-                </div>
-              </div>
-
-              {/* Progress bar */}
-              <div className="h-1 bg-gradient-to-r from-[#dcfce7] to-[#bbf7d0] rounded-full mb-8 overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-[#00a63e] to-[#007a55] w-full transform origin-left transition-transform duration-1000 ease-out" />
-              </div>
-
-              <div className="space-y-4">
-                {processSteps.solar.map((step, index) => {
-                  return (
-                    <div 
-                      key={index} 
-                      className="group relative bg-gradient-to-r from-white to-[#f7fff9] rounded-[20px] p-5 border-2 border-transparent hover:border-[#dcfce7] hover:shadow-md transition-all duration-300"
-                    >
-                      <div className="flex items-start gap-3 sm:gap-4">
-                        <div className="w-[44px] h-[44px] sm:w-[48px] sm:h-[48px] md:w-[50px] md:h-[50px] rounded-full flex items-center justify-center text-[17px] sm:text-[19px] md:text-[20px] font-bold font-['Urbanist'] flex-shrink-0 bg-gradient-to-br from-[#dcfce7] to-[#bbf7d0] text-[#0a0a0a] group-hover:scale-110 transition-all duration-300">
-                          {step.number}
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="text-[17px] sm:text-[19px] md:text-[22px] text-[#0a0a0a] font-bold font-['Urbanist'] tracking-[-0.5px] leading-tight sm:leading-7">
-                            {step.title}
-                          </h4>
-                          <div className="mt-3">
-                            <p className="text-[14px] sm:text-[15px] md:text-[16px] text-[#4a5565] font-['Poppins'] leading-relaxed">
-                              {step.description}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Smart Home Steps */}
-            <div 
-              className={`bg-white/80 backdrop-blur-sm rounded-[24px] sm:rounded-[28px] md:rounded-[32px] p-5 sm:p-7 md:p-10 shadow-[0_8px_40px_rgba(0,0,0,0.06)] border-2 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(59,130,246,0.15)] hover:-translate-y-2 cursor-pointer ${
-                activeCard === 'smartHome' ? 'border-[#3b82f6] shadow-[0_20px_60px_rgba(59,130,246,0.2)]' : 'border-transparent'
-              }`}
-              onMouseEnter={() => setActiveCard('smartHome')}
-              onMouseLeave={() => setActiveCard(null)}
-            >
-              <div className="flex items-center gap-3 sm:gap-4 mb-8 sm:mb-10">
-                <div className="w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] md:w-[90px] md:h-[90px] bg-gradient-to-br from-[#ddefff] to-[#bfdbfe] rounded-[16px] sm:rounded-[20px] flex items-center justify-center shadow-lg transform transition-transform hover:scale-110">
-                  <img src={APP_IMAGES.smartHouse1} alt="Smart Home" className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] md:w-[60px] md:h-[60px] object-contain" />
-                </div>
-                <div>
-                  <h3 className="text-[26px] sm:text-[29px] md:text-[32px] font-bold text-[#0a0a0a] font-['Urbanist'] tracking-[-0.8px]">Smart Home</h3>
-                  <p className="text-[12px] sm:text-[13px] md:text-[14px] text-[#4a5565] font-['Poppins'] leading-4 sm:leading-5 drop-shadow-md">Intelligent automation</p>
-                </div>
-              </div>
-
-              {/* Progress bar */}
-              <div className="h-1 bg-gradient-to-r from-[#ddefff] to-[#bfdbfe] rounded-full mb-8 overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-[#3b82f6] to-[#2563eb] w-full transform origin-left transition-transform duration-1000 ease-out" />
-              </div>
-
-              <div className="space-y-4">
-                {processSteps.smartHome.map((step, index) => {
-                  return (
-                    <div 
-                      key={index} 
-                      className="group relative bg-gradient-to-r from-white to-[#f7fff9] rounded-[20px] p-5 border-2 border-transparent hover:border-[#ddefff] hover:shadow-md transition-all duration-300"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center text-[20px] font-bold font-['Urbanist'] flex-shrink-0 bg-gradient-to-br from-[#ddefff] to-[#bfdbfe] text-[#0a0a0a] group-hover:scale-110 transition-all duration-300">
-                          {step.number}
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="text-[22px] text-[#0a0a0a] font-bold font-['Urbanist'] tracking-[-0.5px] leading-7">
-                            {step.title}
-                          </h4>
-                          <div className="mt-3">
-                            <p className="text-[14px] sm:text-[15px] md:text-[16px] text-[#4a5565] font-['Poppins'] leading-relaxed">
-                              {step.description}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center mt-10 sm:mt-12 md:mt-16">
-            <a 
-              href="#solutions-section" 
-              className="inline-flex items-center gap-2 px-6 py-4 border border-[rgba(74,85,101,0.75)] rounded-[10px] text-[#4a5565] hover:bg-gray-50 transition-colors text-[19px] tracking-[-0.76px]"
-            >
-              Explore Full Process
-              <ArrowRight className="w-5 h-5" />
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* App Section */}
-      <section ref={appShowcaseRef} className="py-20 px-4 sm:px-6 bg-gradient-to-r from-[#00a63e] to-[#017c54]">
-        <div className="w-full max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-white">
-              <h2 className="text-4xl md:text-5xl font-bold font-['Urbanist'] mb-6">One App. For Everything.</h2>
-              <div className="space-y-6">
-                {appFeatures.map((feature, index) => (
-                  <div key={index} className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
-                      <img src={feature.icon} alt="" className="w-7 h-7" />
-                    </div>
-                    <div>
-                      <h4 className="font-extrabold text-black text-xl font-['Poppins']">{feature.title}</h4>
-                      <p className="text-white font-['Poppins']">{feature.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-            </div>
-            <div className="flex justify-center order-first lg:order-last">
-              {/* Phone Showcase - Desktop */}
-              <div className="relative w-[500px] h-[600px] hidden lg:block">
-                {/* App screens with sliding animation */}
-                <div className={`absolute transition-all duration-[3000ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
-                  currentAppSlide === 0 ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-95 -translate-x-full'
-                }`}>
-                  <div className="absolute h-[437px] left-[5px] rounded-[30px] top-[83px] w-[218px]">
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image7} />
-                    </div>
-                  </div>
-                  <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[443px] left-[275px] rounded-[20px] top-[83px] w-[216px]">
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[20px]">
-                      <img alt="" loading="lazy" decoding="async" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image8} />
-                    </div>
-                  </div>
-                  <div className="absolute h-[486px] left-[55px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
-                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image5} />
-                  </div>
-                  <div className="absolute h-[486px] left-[200px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
-                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image6} />
-                  </div>
-                  <div className="absolute h-[500px] left-[125px] rounded-[30px] top-[26px] w-[245px]">
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" loading="lazy" decoding="async" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image4} />
-                    </div>
-                  </div>
-                </div>
-
-                <div className={`absolute transition-all duration-[3000ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
-                  currentAppSlide === 1 ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-95 -translate-x-full'
-                }`}>
-                  <div className="absolute h-[437px] left-[5px] rounded-[30px] top-[83px] w-[218px]">
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image8} />
-                    </div>
-                  </div>
-                  <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[443px] left-[275px] rounded-[20px] top-[83px] w-[216px]">
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[20px]">
-                      <img alt="" loading="lazy" decoding="async" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image5} />
-                    </div>
-                  </div>
-                  <div className="absolute h-[486px] left-[55px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
-                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image6} />
-                  </div>
-                  <div className="absolute h-[486px] left-[200px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
-                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image4} />
-                  </div>
-                  <div className="absolute h-[500px] left-[125px] rounded-[30px] top-[26px] w-[245px]">
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" loading="lazy" decoding="async" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image7} />
-                    </div>
-                  </div>
-                </div>
-
-                <div className={`absolute transition-all duration-[3000ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
-                  currentAppSlide === 2 ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-95 -translate-x-full'
-                }`}>
-                  <div className="absolute h-[437px] left-[5px] rounded-[30px] top-[83px] w-[218px]">
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image5} />
-                    </div>
-                  </div>
-                  <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[443px] left-[275px] rounded-[20px] top-[83px] w-[216px]">
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[20px]">
-                      <img alt="" loading="lazy" decoding="async" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image6} />
-                    </div>
-                  </div>
-                  <div className="absolute h-[486px] left-[55px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
-                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image4} />
-                  </div>
-                  <div className="absolute h-[486px] left-[200px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
-                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image7} />
-                  </div>
-                  <div className="absolute h-[500px] left-[125px] rounded-[30px] top-[26px] w-[245px]">
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" loading="lazy" decoding="async" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image8} />
-                    </div>
-                  </div>
-                </div>
-
-                <div className={`absolute transition-all duration-[3000ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
-                  currentAppSlide === 3 ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-95 -translate-x-full'
-                }`}>
-                  <div className="absolute h-[437px] left-[5px] rounded-[30px] top-[83px] w-[218px]">
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image4} />
-                    </div>
-                  </div>
-                  <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[443px] left-[275px] rounded-[20px] top-[83px] w-[216px]">
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[20px]">
-                    <img alt="" loading="lazy" decoding="async" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image7} />
-                    </div>
-                  </div>
-                  <div className="absolute h-[486px] left-[55px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
-                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image8} />
-                  </div>
-                  <div className="absolute h-[486px] left-[200px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
-                    <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image5} />
-                  </div>
-                  <div className="absolute h-[500px] left-[125px] rounded-[30px] top-[26px] w-[245px]">
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
-                      <img alt="" loading="lazy" decoding="async" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image6} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Phone frame - always visible */}
-                <div className="absolute h-[535px] left-[108px] top-[3px] w-[283px]">
-                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <img alt="" loading="lazy" decoding="async" className="absolute h-[113.24%] left-[-59.94%] max-w-none top-[-4.9%] w-[218.98%]" src={APP_IMAGES.phone1401} />
-                  </div>
-                </div>
-              </div>
-              {/* Phone Showcase - Mobile - Simpler flex layout */}
-              <div className="flex items-center justify-center lg:hidden py-4 scale-90 sm:scale-100">
-                <img 
-                  src="/image-5.png" 
-                  alt="App Screen" 
-                  className="w-20 sm:w-24 md:w-28 h-auto opacity-70 rounded-xl shadow-lg translate-x-3 translate-y-2"
-                  loading="eager"
-                />
-                <img 
-                  src="/image-4.png" 
-                  alt="360Watts App" 
-                  className="w-36 sm:w-44 md:w-52 h-auto drop-shadow-2xl relative z-10 rounded-2xl"
-                  loading="eager"
-                />
-                <img 
-                  src="/image-6.png" 
-                  alt="App Screen" 
-                  className="w-16 sm:w-20 h-auto opacity-70 rounded-xl shadow-lg -translate-x-3 translate-y-2"
-                  loading="eager"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <AppSection reduceMotion={reduceMotion} isPageVisible={isPageVisible} />
 
       {/* Solar Calculator Section */}
       <section id="solar-calculator" className="w-full max-w-7xl mx-auto px-4 py-12 sm:py-16 md:py-20">
@@ -1362,10 +816,41 @@ export const WebsiteHomepage = (): JSX.Element => {
                   <span className="text-[12px] text-[#4a5565]">If you know your monthly electricity consumption in kWh. Choose this OR bill amount above.</span>
                 </div>
               </div>
+              {/* Error Messages */}
+              {calcErrors.length > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4" role="alert" aria-live="polite">
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5">
+                      <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <ul className="text-sm text-red-700 space-y-1">
+                        {calcErrors.map((error, index) => (
+                          <li key={index}>{error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                 <div className="flex flex-wrap gap-3">
-                  <button type="submit" className="bg-gradient-to-r from-[#ffd166] via-[#ffb347] to-[#ff6b00] text-white font-semibold px-6 sm:px-8 py-3 rounded-xl shadow-[0_10px_30px_rgba(255,107,0,0.25)] hover:opacity-95 active:scale-95 transition">
-                    Calculate
+                  <button
+                    type="submit"
+                    disabled={isCalculating}
+                    className="bg-gradient-to-r from-[#ffd166] via-[#ffb347] to-[#ff6b00] text-white font-semibold px-6 sm:px-8 py-3 rounded-xl shadow-[0_10px_30px_rgba(255,107,0,0.25)] hover:opacity-95 active:scale-95 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {isCalculating ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        Calculating...
+                      </>
+                    ) : (
+                      'Calculate'
+                    )}
                   </button>
                   {/* <button type="button" className="border border-[#ffd166] text-[#8b5b00] font-semibold px-6 sm:px-8 py-3 rounded-xl bg-[#fff9ed] hover:bg-[#ffefcf] transition">
                     Upload your electricity bill
@@ -1580,7 +1065,7 @@ export const WebsiteHomepage = (): JSX.Element => {
 
       {/* Solutions Section */}
       <section id="solutions-section" className="scroll-mt-20">
-        <div className="bg-[#f7fff9] min-h-screen text-[#0a0a0a]">
+        <div className="bg-transparent min-h-screen text-[#0a0a0a]">
           {/* Video Hero */}
           <section ref={solutionsVideoRef} className="relative w-full flex justify-center items-center h-[280px] sm:h-[400px] md:h-[500px] lg:h-auto py-0 lg:py-12">
             {/* Modern gradient background for desktop */}
@@ -1611,7 +1096,7 @@ export const WebsiteHomepage = (): JSX.Element => {
           </section>
 
           {/* Solution selector below video */}
-          <section className="bg-[#f7fff9] px-6 py-10">
+          <section className="bg-transparent px-6 py-10">
             <div className="w-full max-w-4xl mx-auto flex justify-center gap-4 flex-wrap">
               {[
                 { key: "solar", label: "Smart Solar", target: "solar" },
@@ -1634,7 +1119,7 @@ export const WebsiteHomepage = (): JSX.Element => {
           </section>
 
           {/* Smart solar solutions */}
-          <motion.section id="solar" className="bg-gradient-to-b from-[#f7fff9] via-[#f7fff9] to-white px-6 pt-14 pb-16 border-b border-black/5" {...sectionMotionProps}>
+          <motion.section id="solar" className="bg-transparent px-6 pt-14 pb-16 border-b border-black/5" {...sectionMotionProps}>
             <motion.div className="w-full max-w-6xl mx-auto text-center space-y-4" variants={revealVariant}>
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm border border-black/5 text-[24px] font-['Poppins'] text-[#0a0a0a">
                 <b>Smart Solar Solutions</b>
@@ -1748,7 +1233,7 @@ export const WebsiteHomepage = (): JSX.Element => {
           </motion.section>
 
           {/* Smart home solutions */}
-          <motion.section id="smart-home" className="px-4 sm:px-6 py-12 sm:py-14 md:py-16 bg-gradient-to-b from-[#f7fff9] via-[#eef8ff] to-white" {...sectionMotionProps}>
+          <motion.section id="smart-home" className="px-4 sm:px-6 py-12 sm:py-14 md:py-16 bg-transparent" {...sectionMotionProps}>
             <motion.div className="w-full max-w-6xl mx-auto text-center space-y-2 sm:space-y-3 mb-8 sm:mb-10" variants={revealVariant}>
               <p className="text-[32px] sm:text-[40px] md:text-[50px] font-['Urbanist'] text-[#0a0a0a] font-bold">Smart home solutions</p>
               <p className="text-[14px] sm:text-[15px] md:text-[17px] font-['Poppins'] text-[#4a5565]">
@@ -1814,7 +1299,7 @@ export const WebsiteHomepage = (): JSX.Element => {
           </motion.section>
 
           {/* Smarter Living */}
-          <motion.section className="px-4 sm:px-6 py-12 sm:py-16 md:py-20 bg-gradient-to-b from-white via-[#f4faff] to-[#e4f0ff]" {...sectionMotionProps}>
+          <motion.section className="px-4 sm:px-6 py-12 sm:py-16 md:py-20 bg-transparent" {...sectionMotionProps}>
             <motion.div className="w-full max-w-6xl mx-auto text-center mb-10 sm:mb-12 md:mb-16" variants={revealVariant}>
               <h2 className="text-[30px] sm:text-[40px] md:text-[50px] lg:text-[54px] font-['Urbanist'] font-bold tracking-[-1px] sm:tracking-[-2px] text-[#0a0a0a] mb-3 sm:mb-4">
                 Smarter Living, Simplified
@@ -1827,9 +1312,9 @@ export const WebsiteHomepage = (): JSX.Element => {
               {[
                 { title: "Smart-Home Planning", desc: "We understand your lifestyle and automation needs - from high-load appliances up to a full home." },
                 { title: "Smart devices", desc: "We suggest a list of smart devices for your automation. You can expand to new devices as you wish." },
-                { title: "Device Integration", desc: "Our 360Watts app effortlessly recognizes lighting, security, and smart appliances, keeping you connected from anywhere." },
-                { title: "Automation Setup", desc: "The 360Watts app guides you effortlessly in automation setup. Let AI suggest automations, or you can set them up manually." },
-                { title: "Continuous Support", desc: "We keep our 360Watts app updated to latest AI/ML developments. You can reach us for any technical support anytime." },
+                { title: "Device Integration", desc: "Our 360watts app effortlessly recognizes lighting, security, and smart appliances, keeping you connected from anywhere." },
+                { title: "Automation Setup", desc: "The 360watts app guides you effortlessly in automation setup. Let AI suggest automations, or you can set them up manually." },
+                { title: "Continuous Support", desc: "We keep our 360watts app updated to latest AI/ML developments. You can reach us for any technical support anytime." },
               ].map((item, i) => (
                 <motion.div
                   key={item.title}
@@ -1859,7 +1344,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                 <p className="text-[23px] text-[#0a0a0a]/50 font-['Poppins'] tracking-[-0.92px] mb-6 sm:mb-8">Our Unified App Ecosystem</p>
                 <div className="max-w-2xl mx-auto">
                   <p className="text-[23px] text-[#0a0a0a]/60 font-['Poppins'] tracking-[-0.92px] leading-relaxed">
-                    The 360Watts app bridges solar and smart living. View real-time energy flows, control devices, and get actionable insights - all in one dashboard.
+                    The 360watts app bridges solar and smart living. View real-time energy flows, control devices, and get actionable insights - all in one dashboard.
                   </p>
                 </div>
               </motion.div>
@@ -1936,7 +1421,7 @@ export const WebsiteHomepage = (): JSX.Element => {
           </section>
 
           {/* CTA Section */}
-          <motion.section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-white" {...sectionMotionProps}>
+      <motion.section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-transparent" {...sectionMotionProps}>
             <motion.div className="w-full max-w-4xl mx-auto text-center" variants={revealVariant}>
               <h2 className="text-[28px] sm:text-[36px] md:text-[40px] lg:text-5xl font-bold text-[#0a0a0a] font-['Urbanist'] mb-4 sm:mb-6">
                 Want to explore the future?
@@ -1968,7 +1453,7 @@ export const WebsiteHomepage = (): JSX.Element => {
       </section>
 
       {/* About Section */}
-      <motion.section id="about-section" className="scroll-mt-20 bg-[#f7fff9] min-h-screen text-[#0a0a0a]" {...sectionMotionProps}>
+      <motion.section id="about-section" className="scroll-mt-20 bg-transparent min-h-screen text-[#0a0a0a]" {...sectionMotionProps}>
         {/* Hero */}
         <motion.section className="relative h-[50vh] sm:h-[60vh] md:h-[70vh] min-h-[400px] sm:min-h-[450px] md:min-h-[520px] w-full overflow-hidden" {...sectionMotionProps}>
           <img
@@ -1993,7 +1478,7 @@ export const WebsiteHomepage = (): JSX.Element => {
       </motion.section>
 
         {/* Our Story */}
-        <motion.section className="py-12 sm:py-14 md:py-16 px-4 sm:px-6 bg-[#f7fff9]" {...sectionMotionProps}>
+        <motion.section className="py-12 sm:py-14 md:py-16 px-4 sm:px-6 bg-transparent" {...sectionMotionProps}>
           <div className="max-w-6xl mx-auto">
             <motion.div className="mb-8 sm:mb-10 md:mb-12" variants={revealVariant}>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-['Urbanist'] mb-2">Our Story.</h2>
@@ -2034,7 +1519,7 @@ export const WebsiteHomepage = (): JSX.Element => {
               <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-['Urbanist']">The sun started it.</h3>
               <p className="text-base sm:text-lg text-[#4a5565] font-['Poppins']">We are just making it smarter.</p>
               <div className="flex flex-col items-center gap-2 sm:gap-3 pt-6 sm:pt-8">
-                <img src={APP_IMAGES.aboutLogo} alt="360Watts logo" className="w-24 sm:w-24 md:w-28 h-auto ml-4" loading="lazy" decoding="async" />
+                <img src={APP_IMAGES.aboutLogo} alt="360watts logo" className="w-24 sm:w-24 md:w-28 h-auto ml-4" loading="lazy" decoding="async" />
                 <p className="text-[#244d65] font-['Figtree'] text-sm sm:text-base">Drive what's next.</p>
               </div>
             </motion.div>
@@ -2042,7 +1527,7 @@ export const WebsiteHomepage = (): JSX.Element => {
         </motion.section>
 
         {/* Team */}
-        <motion.section className="py-1 sm:py-14 md:py-1 px-4 sm:px-6 bg-[#f7fff9]" {...sectionMotionProps}>
+        <motion.section className="py-1 sm:py-14 md:py-1 px-4 sm:px-6 bg-transparent" {...sectionMotionProps}>
           <div className="max-w-5xl mx-auto text-center">
             <motion.div className="mb-8 sm:mb-10" variants={revealVariant}>
               <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-['Urbanist']">Meet Our Team</h3>
@@ -2085,7 +1570,7 @@ export const WebsiteHomepage = (): JSX.Element => {
       </motion.section>
 
       {/* FAQ Section */}
-      <motion.section id="faq-section" className="scroll-mt-20 bg-[#f7fff9]" {...sectionMotionProps}>
+      <motion.section id="faq-section" className="scroll-mt-20 bg-transparent" {...sectionMotionProps}>
         {/* Top gradient header */}
         <div className="relative isolate">
           <div className="absolute inset-x-0 top-0 h-[280px] sm:h-[320px] md:h-[380px] bg-gradient-to-r from-[rgba(0,166,62,0.09)] to-[rgba(0,122,85,0.09)] rounded-b-[50px] sm:rounded-b-[60px] md:rounded-b-[80px]" />
@@ -2095,7 +1580,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                 Frequently Asked Questions
               </h1>
               <p className="text-[14px] sm:text-[17px] md:text-[20px] text-[#4a5565] font-['Poppins'] leading-snug">
-                Find answers to common questions about 360Watts solar and smart home solutions
+                Find answers to common questions about 360watts solar and smart home solutions
               </p>
             </motion.div>
           </header>
@@ -2148,7 +1633,7 @@ export const WebsiteHomepage = (): JSX.Element => {
       </motion.section>
 
       {/* Contact Section */}
-      <motion.section id="contact-section" className="py-10 sm:py-12 md:py-16 px-3 sm:px-4 md:px-6 bg-white scroll-mt-20" {...sectionMotionProps}>
+      <motion.section id="contact-section" className="py-10 sm:py-12 md:py-16 px-3 sm:px-4 md:px-6 bg-transparent scroll-mt-20" {...sectionMotionProps}>
         <div className="max-w-5xl mx-auto">
           <motion.div className="text-center mb-8 sm:mb-10 md:mb-12" variants={revealVariant}>
             <h2 className="text-[20px] sm:text-[24px] md:text-[28px] lg:text-[33px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-2 sm:mb-3 leading-tight">Let's build your smart solar home.</h2>
@@ -2201,7 +1686,6 @@ export const WebsiteHomepage = (): JSX.Element => {
                   onClick={() => {
                     setIsSubmitted(false);
                     setFormData({ name: "", email: "", phone: "", city: "", interest: "solar", message: "" });
-                    setSubmittedMessage("");
                   }}
                   className="text-[#017c54] font-medium hover:underline font-['Poppins']"
                 >
@@ -2323,7 +1807,7 @@ export const WebsiteHomepage = (): JSX.Element => {
             <motion.div className="text-center mb-8 sm:mb-10 md:mb-12" variants={revealVariant}>
               <h2 className="text-[22px] sm:text-[25px] md:text-[27px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-3 sm:mb-4 leading-6">Partnership Inquiry</h2>
               <p className="text-[15px] sm:text-[17px] md:text-[19px] text-[#4a5565] tracking-[-0.76px]">
-                Interested in partnering with 360Watts?<br />
+                Interested in partnering with 360watts?<br />
                 Whether you're a supplier, installer, or technology partner, let's work together.
               </p>
             </motion.div>
@@ -2352,7 +1836,6 @@ export const WebsiteHomepage = (): JSX.Element => {
                     onClick={() => {
                       setIsPartnershipSubmitted(false);
                       setPartnershipData({ name: "", email: "", phone: "", company: "", partnerType: "Supplier", message: "" });
-                      setPartnershipSubmittedMessage("");
                     }}
                     className="text-[#ff6900] font-medium hover:underline font-['Poppins']"
                   >
