@@ -306,7 +306,7 @@ export const Solutions = (): JSX.Element => {
             <h2 className="text-[54px] leading-[1] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-2px] pl-4">360watts App</h2>
             <p className="text-[22px] text-[#0a0a0a]/70 font-['Poppins'] pl-4">Our Unified App Ecosystem</p>
             <p className="text-[18px] text-[#0a0a0a]/70 font-['Poppins'] max-w-3xl pl-4">
-              The 360Watts app bridges solar and smart living. View real-time energy flows, control devices, and get actionable insights — all in one dashboard.
+              The 360watts app bridges solar and smart living. View real-time energy flows, control devices, and get actionable insights — all in one dashboard.
             </p>
             </div>
           </div>
@@ -383,7 +383,7 @@ export const Solutions = (): JSX.Element => {
           <div className="grid sm:grid-cols-4 gap-12 mb-12">
             {/* Brand */}
             <div>
-              <h3 className="text-2xl font-bold font-['Urbanist'] mb-4">360Watts</h3>
+              <h3 className="text-2xl font-bold font-['Urbanist'] mb-4">360watts</h3>
               <p className="text-white/60 font-['Poppins']">Making energy smarter for everyone</p>
             </div>
 
@@ -407,7 +407,7 @@ export const Solutions = (): JSX.Element => {
           </div>
 
           <div className="border-t border-white/10 pt-8 text-center text-white/40 font-['Poppins'] text-sm">
-            <p>&copy; 2024 360Watts. All rights reserved.</p>
+            <p>&copy; 2024 360watts. All rights reserved.</p>
           </div>
         </div>
       </footer>

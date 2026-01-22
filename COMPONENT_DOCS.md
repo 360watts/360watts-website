@@ -57,7 +57,7 @@ import { Hero } from "../../components/Hero";
 Located: `src/components/BenefitsSection.tsx`
 
 ### Description
-Displays the key benefits of choosing 360Watts.
+Displays the key benefits of choosing 360watts.
 
 ### Features
 - 4-column grid (responsive)
@@ -508,4 +508,4 @@ For questions about this codebase:
 
 **Last Updated**: January 9, 2026
 **Version**: 2.0.0
-**Maintained by**: 360Watts Development Team
+**Maintained by**: 360watts Development Team

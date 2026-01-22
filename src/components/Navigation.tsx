@@ -59,12 +59,12 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
         {/* Logo */}
         <div 
-          onClick={(e) => handleNavClick(e, "hero-section")}
+          onClick={(e: React.MouseEvent) => handleNavClick(e, "hero-section")}
           className="flex items-center gap-2 sm:gap-3 cursor-pointer"
         >
           <img
             src="/final-logo-png-4x-2.png"
-            alt="360Watts"
+            alt="360watts"
             className="h-10 sm:h-12 w-auto object-contain"
           />
           <div className="flex flex-col">
@@ -84,7 +84,7 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
             <li key={index}>
               <a
                 href={`#${item.sectionId}`}
-                onClick={(e) => handleNavClick(e, item.sectionId)}
+                onClick={(e: React.MouseEvent) => handleNavClick(e, item.sectionId)}
                 className={`font-medium font-['Poppins'] transition-colors text-sm xl:text-base cursor-pointer ${
                   showTransparent
                     ? "text-white hover:text-white/80"
@@ -100,7 +100,7 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
         {/* Desktop CTA Button */}
         <a
           href="#solar-calculator"
-          onClick={(e) => handleNavClick(e, "solar-calculator")}
+          onClick={(e: React.MouseEvent) => handleNavClick(e, "solar-calculator")}
           className="hidden lg:inline-flex items-center gap-2 px-4 xl:px-5 py-2 xl:py-2.5 bg-gradient-to-r from-[#00a63e] to-[#017c54] text-white font-medium rounded-lg hover:opacity-90 transition-all font-['Poppins'] text-sm xl:text-base cursor-pointer"
           aria-label="Calculate your solar savings"
         >
@@ -132,7 +132,7 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
             <a
               key={index}
               href={`#${item.sectionId}`}
-              onClick={(e) => handleNavClick(e, item.sectionId)}
+              onClick={(e: React.MouseEvent) => handleNavClick(e, item.sectionId)}
               className="block px-4 py-3 rounded-xl font-medium font-['Poppins'] transition-colors cursor-pointer text-neutral-700 hover:bg-gray-50"
             >
               {item.label}
@@ -141,7 +141,7 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
           <div className="pt-3 mt-2 border-t border-gray-100">
             <a
               href="#solar-calculator"
-              onClick={(e) => handleNavClick(e, "solar-calculator")}
+              onClick={(e: React.MouseEvent) => handleNavClick(e, "solar-calculator")}
               className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-gradient-to-r from-[#00a63e] to-[#017c54] text-white font-semibold rounded-xl font-['Poppins'] cursor-pointer"
               aria-label="Calculate your solar savings"
             >

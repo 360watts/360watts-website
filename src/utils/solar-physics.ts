@@ -28,14 +28,13 @@ export const PHYSICS = {
     PANEL_LENGTH_M: 2.38, // meters
     PANEL_WIDTH_M: 1.30, // meters
     PANEL_AREA_M2: 3.11, // m² per panel
-    SYSTEM_LOSS_FACTOR: 0.80, // DC-to-AC ratio (Derating for temp & efficiency) - corrected from 0.72
+    SYSTEM_LOSS_FACTOR: 0.75, // DC-to-AC ratio (Derating for temp & efficiency) - corrected from 0.72
     FIXED_CHARGE_DEDUCTION: 60, // Reduced from 120 (Service charge only, No Tax)
     TARIFF_ESCALATION: 0.05, // 5% annual rise in utility rates
     PANEL_DEGRADATION: 0.006, // 0.6% annual decay in output
     AVG_TARIFF: 7.0, // INR/kWh (Conservative weighted average)
     COST_PER_KW: 65000, // INR (Tier 1 components)
     LIFESPAN_YEARS: 25,
-    DISCOUNT_RATE: 0.08, // 8% cost of capital
     SUN_HOURS_ANNUAL_AVG: 5.5, // PSH (Peak Sun Hours)
 };
 
@@ -116,8 +115,8 @@ export function calculateSolarRequirementsFromBill(
     let biMonthlyUnits: number;
     
     if (bill.estimatedUnits !== undefined) {
-        // Direct units estimate (monthly) - convert to bi-monthly
-        biMonthlyUnits = bill.estimatedUnits * 2;
+        // Direct bi-monthly units estimate
+        biMonthlyUnits = bill.estimatedUnits;
     } else if (bill.totalBillAmount !== undefined) {
         // Decompose bill to get energy charge, then estimate units
         const energyCharge = estimateEnergyCharge(bill);
@@ -132,20 +131,23 @@ export function calculateSolarRequirementsFromBill(
     // 3. System Sizing
     // Capacity = Demand / (PSH * Derating)
     let systemKw = dailyConsumption / (PHYSICS.SUN_HOURS_ANNUAL_AVG * PHYSICS.SYSTEM_LOSS_FACTOR);
-    systemKw = Math.ceil(systemKw * 2) / 2; // Quantize to inverter steps (0.5kW)
+
+    // Round UP to nearest 0.5kW (inverter sizing - ensures adequate capacity)
+    // Examples: 2.1→2.5, 2.6→3.0, 2.9→3.0, 3.0→3.0
+    systemKw = Math.ceil(systemKw * 2) / 2;
 
     // 4. Component Quantization
     const panelCount = Math.ceil((systemKw * 1000) / PHYSICS.PANEL_WATTAGE);
     const actualDcCapacityKw = (panelCount * PHYSICS.PANEL_WATTAGE) / 1000;
 
     // 5. Projections (Year 1)
-    const dailyGen = actualDcCapacityKw * PHYSICS.SUN_HOURS_ANNUAL_AVG * PHYSICS.SYSTEM_LOSS_FACTOR;
+    const dailyGen = actualDcCapacityKw * PHYSICS.SUN_HOURS_ANNUAL_AVG;
     const annualGen = dailyGen * 365;
     const systemCost = actualDcCapacityKw * PHYSICS.COST_PER_KW;
     const annualSavings = annualGen * PHYSICS.AVG_TARIFF;
     
     // Calculate required area using actual panel dimensions
-    const requiredAreaM2 = panelCount * PHYSICS.PANEL_AREA_M2;
+    const requiredAreaM2 = panelCount * PHYSICS.PANEL_AREA_M2 * 1.20; // 20% extra for spacing
     const requiredAreaSqFt = requiredAreaM2 * 10.764; // Convert m² to sq ft
     
     // Simple Payback
@@ -158,7 +160,7 @@ export function calculateSolarRequirementsFromBill(
     
     for (let t = 1; t <= PHYSICS.LIFESPAN_YEARS; t++) {
         // Discount the cash flow back to present value
-        npv += currentYearSavings / Math.pow(1 + PHYSICS.DISCOUNT_RATE, t);
+        npv += currentYearSavings   ;
         
         // Prepare next year's savings:
         // Tariff goes UP, Panel Output goes DOWN

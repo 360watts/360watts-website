@@ -93,7 +93,7 @@ export const FAQ = (): JSX.Element => {
               Frequently Asked Questions
             </h1>
             <p className="text-[18px] md:text-[20px] text-[#4a5565] font-['Poppins'] leading-snug">
-              Find answers to common questions about 360Watts solar and smart home solutions
+              Find answers to common questions about 360watts solar and smart home solutions
             </p>
           </div>
         </header>
@@ -223,7 +223,7 @@ export const FAQ = (): JSX.Element => {
             </div>
           </div>
 
-          <p className="mt-6 text-center text-[12px] text-[#0a0a0a] font-['Poppins']">© 2025 360WATTS. All rights reserved.</p>
+          <p className="mt-6 text-center text-[12px] text-[#0a0a0a] font-['Poppins']">© 2025 360watts. All rights reserved.</p>
         </div>
       </footer>
     </div>

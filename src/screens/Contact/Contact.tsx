@@ -234,7 +234,7 @@ export const Contact = (): JSX.Element => {
                     </div>
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium text-neutral-700 font-['Poppins'] mb-2">
-                        Email Address *
+                        Email Address
                       </label>
                       <input
                         type="email"
@@ -242,7 +242,6 @@ export const Contact = (): JSX.Element => {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        required
                         className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#017c54] focus:border-transparent transition-all font-['Poppins']"
                         placeholder="john@example.com"
                       />
@@ -364,7 +363,7 @@ export const Contact = (): JSX.Element => {
               <Marker position={COIMBATORE_POSITION} icon={customIcon}>
                 <Popup>
                   <div className="text-center p-2">
-                    <h3 className="font-bold text-lg text-[#017c54] mb-2">360Watts</h3>
+                    <h3 className="font-bold text-lg text-[#017c54] mb-2">360watts</h3>
                     <p className="text-sm text-gray-600 mb-2">Coimbatore, Tamil Nadu</p>
                     <p className="text-xs text-gray-500">Mon-Sat: 9 AM - 6 PM IST</p>
                     <a
@@ -402,7 +401,7 @@ export const Contact = (): JSX.Element => {
       <footer className="py-12 px-6 bg-[#f7fff8]">
         <div className="w-full max-w-7xl mx-auto text-center">
           <p className="text-neutral-600 font-['Poppins']">
-            © 2025 360WATTS. All rights reserved.
+            © 2025 360watts. All rights reserved.
           </p>
         </div>
       </footer>
