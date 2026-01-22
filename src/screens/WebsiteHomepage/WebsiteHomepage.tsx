@@ -817,7 +817,7 @@ export const WebsiteHomepage = (): JSX.Element => {
       {/* Hero Section */}
       <motion.section 
         id="hero-section" 
-        className="relative h-[60vh] sm:h-screen overflow-hidden scroll-mt-20"
+        className="relative h-[70vh] sm:h-[80vh] md:h-[85vh] lg:h-screen overflow-hidden scroll-mt-20"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
