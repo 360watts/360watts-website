@@ -3,6 +3,7 @@ import { preloadImages } from './utils';
 // Global image registry - all images used across the app
 export const APP_IMAGES = {
   // Homepage images
+  smartEnergy : "/smartEnergy.png",
   solarPowerStation: "/solarPowerStation.jpg",
   finalLogo: "/final-logo-png-4x-1.png",
   footerLogo: "/logo_with_font.png",

@@ -165,12 +165,12 @@ const localFinalLogo = "/final-logo-png-4x-2.png";
 
 const heroSlides = [
   {
-    bg: APP_IMAGES.solarPowerStation,
+    bg: APP_IMAGES.smartEnergy,
     title: "Smarter Energy.\nSmarter Living",
     subtitle: "360watts unites solar power and smart home automation, helping you save more, live cleaner, and control everything effortlessly."
   },
   {
-    bg: APP_IMAGES.technicianSolarPanels,
+    bg: APP_IMAGES.solarPowerStation,
     title: "Power Your Home.\nSave the Planet.",
     subtitle: "Harness the sun's energy with our cutting-edge solar solutions. Reduce bills and your carbon footprint simultaneously."
   },
