@@ -272,14 +272,14 @@ const FAQSectionComponent = ({ section }: { section: FaqSection }) => {
                 <ChevronDown
                   className={`w-4 h-4 text-[#0a0a0a] transition-transform ${
                     isOpen ? "-rotate-90" : "rotate-90"
-                  } ${hasAnswer ? "opacity-100" : "opacity-60"}`}
+                  }`}
                 />
               </button>
 
               {hasAnswer ? (
                 <div
-                  className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
-                    isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                  className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
+                    isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
                   }`}
                 >
                   <div className="overflow-hidden">
@@ -311,10 +311,8 @@ export const WebsiteHomepage = (): JSX.Element => {
   const [isCalcHovering, setIsCalcHovering] = useState(false);
   const [isResultHovering, setIsResultHovering] = useState(false);
   const [isPageVisible, setIsPageVisible] = useState(true);
-  const [reduceMotion, setReduceMotion] = useState(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return false;
-    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  });
+  // Motion is intentionally disabled for this page.
+  const reduceMotion = true;
 
   // --- Solar Calculator State ---
   const [billAmount, setBillAmount] = useState<string>('');
@@ -341,20 +339,31 @@ export const WebsiteHomepage = (): JSX.Element => {
 
   const handleBillAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Prevent typing 0 as first character or setting value to 0
-    if (value === '0' || value === '') {
-      setBillAmount('');
-    } else {
-      // Ensure it's a valid positive number
-      const numValue = Number(value);
-      if (!isNaN(numValue) && numValue > 0) {
-        setBillAmount(value);
+    // Only allow numbers and empty string, reject scientific notation (e, E, +, -)
+    if (value === '' || (/^\d+$/.test(value) && !/[eE+\-]/.test(value))) {
+      if (value === '0' || value === '') {
+        setBillAmount('');
+      } else {
+        // Ensure it's a valid positive number
+        const numValue = Number(value);
+        if (!isNaN(numValue) && numValue > 0) {
+          setBillAmount(value);
+        }
       }
     }
   };
   const handleEstimatedUnitsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setEstimatedUnits(value ? Number(value) : undefined);
+    // Only allow numbers and empty string, reject scientific notation (e, E, +, -)
+    if (value === '' || (/^\d+$/.test(value) && !/[eE+\-]/.test(value))) {
+      setEstimatedUnits(value ? Number(value) : undefined);
+    }
+  };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Prevent scientific notation keys: e, E, +, -
+    if (e.key === 'e' || e.key === 'E' || e.key === '+' || e.key === '-') {
+      e.preventDefault();
+    }
   };
   const handleCalculatorSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -416,17 +425,21 @@ export const WebsiteHomepage = (): JSX.Element => {
   // Share functionality
   const generateShareText = () => {
     if (!calcResult) return "";
-    
-    const text = `🌞 My Solar Calculator Results from 360watts:\n\n` +
-      `🏠 System Size: ${calcResult.recommendedCapacityKw.toFixed(1)} kW\n` +
-      `☀️ Solar Panels: ${calcResult.panelCount} panels\n` +
-      `⚡ Annual Generation: ${calcResult.annualGenerationKwh.toLocaleString()} kWh\n` +
-      `💰 Estimated Cost: ₹${(calcResult.estimatedCost / 100000).toFixed(1)}L\n` +
-      `💸 Annual Savings: ₹${(calcResult.annualSavings / 1000).toFixed(0)}k\n` +
-      `📈 Net Present Value: ₹${(calcResult.npv / 100000).toFixed(1)}L\n\n` +
-      `Calculate your solar savings at: https://360watts.com\n\n` +
-      `#SolarPower #360watts #RenewableEnergy`;
-    
+
+    const text = `360watts is happy to guide your solar journey !!
+
+Your initial solar estimate from our website www.360watts.com is,
+
+System Size: ${calcResult.recommendedCapacityKw.toFixed(1)} kW
+Solar Panels: ${calcResult.panelCount} panels
+Annual Generation: ${calcResult.annualGenerationKwh.toLocaleString()} kWh
+Estimated Cost: ₹${(calcResult.estimatedCost / 100000).toFixed(1)}L
+Annual Savings: ₹${(calcResult.annualSavings / 1000).toFixed(0)}k
+
+For a detailed quotation, we recommend you to submit your energy bill for the last 1 to 2 years in the link below (--> https://360watts.com/contact)
+
+Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
+
     return text;
   };
 
@@ -465,8 +478,8 @@ export const WebsiteHomepage = (): JSX.Element => {
 
   // Animation variants
   const revealVariant = {
-    hidden: { opacity: 0, y: reduceMotion ? 0 : 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+    hidden: { y: reduceMotion ? 0 : 20 },
+    visible: { y: 0, transition: { duration: 0.6, ease: "easeOut" } },
   };
 
   const sectionMotionProps = reduceMotion
@@ -486,6 +499,12 @@ export const WebsiteHomepage = (): JSX.Element => {
         viewport: { once: false, amount: 0.1 },
         variants: { hidden: {}, visible: { transition: { staggerChildren: 0.12 } } },
       };
+
+  // Use a single motion class for the desktop app showcase and disable long transitions
+  // when the user prefers reduced motion.
+  const appSlideMotionClass = reduceMotion
+    ? "absolute inset-0"
+    : "absolute inset-0 transition-all duration-[3000ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] will-change-transform";
 
   // Partnership form state
   const [partnershipData, setPartnershipData] = useState({ 
@@ -555,20 +574,6 @@ export const WebsiteHomepage = (): JSX.Element => {
     }
   }, []);
 
-  // Respect prefers-reduced-motion
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return;
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const updatePreference = () => setReduceMotion(mediaQuery.matches);
-    updatePreference();
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener("change", updatePreference);
-      return () => mediaQuery.removeEventListener("change", updatePreference);
-    }
-    mediaQuery.addListener(updatePreference);
-    return () => mediaQuery.removeListener(updatePreference);
-  }, []);
-
   useEffect(() => {
     return () => {
       if (calcRafRef.current !== null) {
@@ -584,7 +589,7 @@ export const WebsiteHomepage = (): JSX.Element => {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (solutionsVideoInView && !reduceMotion) {
+    if (solutionsVideoInView) {
       const playPromise = video.play();
       if (playPromise && typeof playPromise.catch === "function") {
         playPromise.catch(() => {});
@@ -592,7 +597,7 @@ export const WebsiteHomepage = (): JSX.Element => {
     } else {
       video.pause();
     }
-  }, [reduceMotion, solutionsVideoInView]);
+  }, [solutionsVideoInView]);
 
   // Animate sections on scroll into view (calculator + result)
   useEffect(() => {
@@ -811,13 +816,13 @@ export const WebsiteHomepage = (): JSX.Element => {
   };
 
   return (
-    <div className="bg-[#f7fff9] min-h-screen font-['Poppins',sans-serif] overflow-x-hidden">
+    <div className="bg-gradient-to-b from-[#f7fff9] via-white to-[#f7fff9] min-h-screen font-['Poppins',sans-serif] overflow-x-hidden">
       <Navigation transparent />
 
       {/* Hero Section */}
       <motion.section 
         id="hero-section" 
-        className="relative h-[70vh] sm:h-[80vh] md:h-[85vh] lg:h-screen overflow-hidden scroll-mt-20"
+        className="relative mt-[52px] sm:mt-[60px] lg:mt-0 h-[30vh] sm:h-[40vh] md:h-[85vh] lg:h-screen overflow-hidden scroll-mt-20 bg-[#0c1e14]"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -827,7 +832,7 @@ export const WebsiteHomepage = (): JSX.Element => {
         {heroSlides.map((slide, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? "opacity-100" : "opacity-0"}`}
+            className={`absolute inset-0 ${index === currentSlide ? "" : "hidden"}`}
           >
             <img 
               src={slide.bg} 
@@ -842,25 +847,25 @@ export const WebsiteHomepage = (): JSX.Element => {
         
         {/* Hero Content */}
         <div className="relative z-10 h-full flex items-center">
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="w-full max-w-7xl mx-auto px-2 sm:px-6">
             {heroSlides.map((slide, index) => (
               <div
                 key={index}
                 className={`transition-all duration-700 ${
-                  index === currentSlide ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 absolute pointer-events-none"
+                  index === currentSlide ? "translate-y-0" : "translate-y-4 absolute pointer-events-none"
                 }`}
               >
                 {index === currentSlide && (
                   <motion.div
-                    initial={reduceMotion ? undefined : { opacity: 0, y: 22 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={reduceMotion ? undefined : { y: 22 }}
+                    animate={{ y: 0 }}
                     transition={{ duration: 0.75, ease: "easeOut" }}
-                    className="max-w-3xl px-4 sm:px-0"
+                    className="max-w-3xl px-2 sm:px-0"
                   >
-                    <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-[99px] font-bold text-[rgba(247,255,249,0.8)] font-['Urbanist'] mb-4 sm:mb-6 leading-[1.1] tracking-tight sm:tracking-[-3.96px] whitespace-pre-line">
+                    <h1 className="text-[16px] sm:text-5xl md:text-7xl lg:text-[99px] font-bold text-[rgba(247,255,249,0.8)] font-['Urbanist'] mb-1.5 sm:mb-6 leading-[1.1] tracking-tight sm:tracking-[-3.96px] whitespace-pre-line">
                       {slide.title}
                     </h1>
-                    <p className="text-base sm:text-lg md:text-xl lg:text-[23px] text-white font-['Poppins'] max-w-xl mb-8 sm:mb-10 leading-relaxed">
+                    <p className="text-[10px] sm:text-lg md:text-xl lg:text-[23px] text-white font-['Poppins'] max-w-xl mb-3 sm:mb-10 leading-relaxed">
                       {slide.subtitle}
                     </p>
                     <motion.div
@@ -870,10 +875,10 @@ export const WebsiteHomepage = (): JSX.Element => {
                     >
                       <Link 
                         to="/contact" 
-                        className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#00a63e] to-[#007a55] text-white font-semibold rounded-xl hover:opacity-90 active:scale-95 transition-all text-sm sm:text-base"
+                        className="inline-flex items-center justify-center gap-1.5 px-3 sm:px-8 py-1.5 sm:py-4 bg-gradient-to-r from-[#00a63e] to-[#007a55] text-white font-semibold rounded-md sm:rounded-xl hover:opacity-90 active:scale-95 transition-all text-[10px] sm:text-base"
                       >
                         Get Free Consultation 
-                        <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <ArrowRight className="w-3 h-3 sm:w-5 sm:h-5" />
                       </Link>
                     </motion.div>
                   </motion.div>
@@ -912,8 +917,15 @@ export const WebsiteHomepage = (): JSX.Element => {
         </div>
       </motion.section>
 
+      <div
+        className="relative"
+        style={{
+          background:
+            "radial-gradient(1200px 520px at 50% -18%, rgba(15,23,42,0.06), transparent 60%), radial-gradient(900px 520px at 110% 12%, rgba(59,130,246,0.10), transparent 66%), linear-gradient(180deg, #f7fff9 0%, #f6fdf8 36%, #eef9f3 72%, #e3f3ea 100%)",
+        }}
+      >
       {/* Our Unified Solution Section */}
-      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 bg-white">
+      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 bg-transparent">
         <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-6 sm:mb-8 md:mb-12">
             <h2 className="text-[30px] sm:text-[35px] md:text-[40px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-2 tracking-tight sm:tracking-[-1.6px]">Our Unified Solution</h2>
@@ -938,8 +950,8 @@ export const WebsiteHomepage = (): JSX.Element => {
                     </svg>
                   </div>
                   <div className="flex flex-col gap-[6px] sm:gap-[7px] md:gap-[8px] mt-8 sm:mt-0">
-                    <h3 className="text-[22px] sm:text-[20px] md:text-[24px] lg:text-[27px] xl:text-[30px] font-bold text-black font-['Urbanist'] leading-tight md:leading-8 lg:leading-9 drop-shadow-lg">Solar Solutions</h3>
-                    <p className="text-black text-[15px] sm:text-[12px] md:text-[13px] lg:text-[13.5px] xl:text-[14px] font-['Poppins'] leading-4 sm:leading-5 opacity-95 drop-shadow-md">Total control. Zero worries.</p>
+                    <h3 className="text-[20px] sm:text-[22px] md:text-[24px] lg:text-[27px] xl:text-[30px] font-bold text-black font-['Urbanist'] leading-tight md:leading-8 lg:leading-9 drop-shadow-lg">Solar Solutions</h3>
+                    <p className="text-black text-[14px] sm:text-[15px] md:text-[16px] lg:text-[16.5px] xl:text-[17px] font-['Poppins'] leading-4 sm:leading-5 opacity-95 drop-shadow-md">Total control. Zero worries.</p>
                   </div>
                 </div>
               </div>
@@ -960,8 +972,8 @@ export const WebsiteHomepage = (): JSX.Element => {
                 <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 lg:gap-[19px] pt-3 sm:pt-4 md:pt-6 lg:pt-[24px]">
                   <img src={APP_IMAGES.iconSmartHome} alt="" className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
                   <div className="flex flex-col gap-[6px] sm:gap-[7px] md:gap-[8px] mt-8 sm:mt-0">
-                    <h3 className="text-[22px] sm:text-[20px] md:text-[22px] lg:text-[25px] xl:text-[28px] font-bold text-black font-['Urbanist'] leading-tight md:leading-8 lg:leading-9 drop-shadow-lg">Smart Home Solutions</h3>
-                    <p className="text-black text-[15px] sm:text-[13px] md:text-[12px] lg:text-[12.5px] xl:text-[13px] font-['Poppins'] leading-4 sm:leading-5 drop-shadow-md">The future of living, powered by intelligence.</p>
+                    <h3 className="text-[20px] sm:text-[22px] md:text-[24px] lg:text-[26px] xl:text-[28px] font-bold text-black font-['Urbanist'] leading-tight md:leading-8 lg:leading-9 drop-shadow-lg">Smart Home Solutions</h3>
+                    <p className="text-black text-[14px] sm:text-[15px] md:text-[16px] lg:text-[16.5px] xl:text-[17px] font-['Poppins'] leading-4 sm:leading-5 drop-shadow-md">The future of living, powered by intelligence.</p>
                   </div>
                 </div>
               </div>
@@ -981,7 +993,7 @@ export const WebsiteHomepage = (): JSX.Element => {
       </section>
 
       {/* Why 360watts Section */}
-      <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-white">
+      <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-transparent">
         <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-12 sm:mb-16 md:mb-20">
             <h2 className="text-[32px] sm:text-[38px] md:text-[44px] lg:text-[48px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-3 md:mb-4 tracking-[-1.5px]">Why 360watts?</h2>
@@ -1006,7 +1018,7 @@ export const WebsiteHomepage = (): JSX.Element => {
       </section>
 
       {/* How Does It Work Section */}
-      <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-gradient-to-br from-[#f7fff9] via-[#f0fdf4] to-[#f7fff9] relative overflow-hidden">
+      <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative overflow-hidden bg-transparent">
         {/* Decorative background elements */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
           <div className="absolute top-20 left-10 w-72 h-72 bg-[#00a63e] rounded-full blur-3xl"></div>
@@ -1137,12 +1149,13 @@ export const WebsiteHomepage = (): JSX.Element => {
           </div>
         </div>
       </section>
+      </div>
 
       {/* App Section */}
       <section ref={appShowcaseRef} className="py-20 px-4 sm:px-6 bg-gradient-to-r from-[#00a63e] to-[#017c54]">
         <div className="w-full max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-white">
+            <div className="text-white min-w-0">
               <h2 className="text-4xl md:text-5xl font-bold font-['Urbanist'] mb-6">One App. For Everything.</h2>
               <div className="space-y-6">
                 {appFeatures.map((feature, index) => (
@@ -1159,108 +1172,168 @@ export const WebsiteHomepage = (): JSX.Element => {
               </div>
 
             </div>
-            <div className="flex justify-center order-first lg:order-last">
+            <div className="flex justify-center order-first lg:order-last min-w-0">
               {/* Phone Showcase - Desktop */}
-              <div className="relative w-[500px] h-[600px] hidden lg:block">
+              <div className="relative hidden lg:block w-full max-w-[620px] aspect-[5/6] overflow-hidden">
                 {/* App screens with sliding animation */}
-                <div className={`absolute transition-all duration-[3000ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
-                  currentAppSlide === 0 ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-95 -translate-x-full'
+                <div className={`${appSlideMotionClass} ${
+                  currentAppSlide === 0 ? 'scale-100 translate-x-0' : 'scale-95 -translate-x-full'
                 }`}>
-                  <div className="absolute h-[437px] left-[5px] rounded-[30px] top-[83px] w-[218px]">
+                  <div
+                    className="absolute rounded-[30px]"
+                    style={{ left: "1%", top: "13.83%", width: "43.6%", height: "72.83%" }}
+                  >
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
                       <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image7} />
                     </div>
                   </div>
-                  <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[443px] left-[275px] rounded-[20px] top-[83px] w-[216px]">
+                  <div
+                    className="absolute border border-[rgba(0,0,0,0.3)] border-solid rounded-[20px]"
+                    style={{ left: "55%", top: "13.83%", width: "43.2%", height: "73.83%" }}
+                  >
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[20px]">
                       <img alt="" loading="lazy" decoding="async" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image8} />
                     </div>
                   </div>
-                  <div className="absolute h-[486px] left-[55px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
+                  <div
+                    className="absolute rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)]"
+                    style={{ left: "11%", top: "7.83%", width: "46.8%", height: "81%" }}
+                  >
                     <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image5} />
                   </div>
-                  <div className="absolute h-[486px] left-[200px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
+                  <div
+                    className="absolute rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)]"
+                    style={{ left: "40%", top: "7.83%", width: "46.8%", height: "81%" }}
+                  >
                     <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image6} />
                   </div>
-                  <div className="absolute h-[500px] left-[125px] rounded-[30px] top-[26px] w-[245px]">
+                  <div
+                    className="absolute rounded-[30px]"
+                    style={{ left: "25%", top: "4.33%", width: "49%", height: "83.33%" }}
+                  >
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
                       <img alt="" loading="lazy" decoding="async" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image4} />
                     </div>
                   </div>
                 </div>
 
-                <div className={`absolute transition-all duration-[3000ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
-                  currentAppSlide === 1 ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-95 -translate-x-full'
+                <div className={`${appSlideMotionClass} ${
+                  currentAppSlide === 1 ? 'scale-100 translate-x-0' : 'scale-95 -translate-x-full'
                 }`}>
-                  <div className="absolute h-[437px] left-[5px] rounded-[30px] top-[83px] w-[218px]">
+                  <div
+                    className="absolute rounded-[30px]"
+                    style={{ left: "1%", top: "13.83%", width: "43.6%", height: "72.83%" }}
+                  >
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
                       <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image8} />
                     </div>
                   </div>
-                  <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[443px] left-[275px] rounded-[20px] top-[83px] w-[216px]">
+                  <div
+                    className="absolute border border-[rgba(0,0,0,0.3)] border-solid rounded-[20px]"
+                    style={{ left: "55%", top: "13.83%", width: "43.2%", height: "73.83%" }}
+                  >
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[20px]">
                       <img alt="" loading="lazy" decoding="async" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image5} />
                     </div>
                   </div>
-                  <div className="absolute h-[486px] left-[55px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
+                  <div
+                    className="absolute rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)]"
+                    style={{ left: "11%", top: "7.83%", width: "46.8%", height: "81%" }}
+                  >
                     <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image6} />
                   </div>
-                  <div className="absolute h-[486px] left-[200px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
+                  <div
+                    className="absolute rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)]"
+                    style={{ left: "40%", top: "7.83%", width: "46.8%", height: "81%" }}
+                  >
                     <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image4} />
                   </div>
-                  <div className="absolute h-[500px] left-[125px] rounded-[30px] top-[26px] w-[245px]">
+                  <div
+                    className="absolute rounded-[30px]"
+                    style={{ left: "25%", top: "4.33%", width: "49%", height: "83.33%" }}
+                  >
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
                       <img alt="" loading="lazy" decoding="async" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image7} />
                     </div>
                   </div>
                 </div>
 
-                <div className={`absolute transition-all duration-[3000ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
-                  currentAppSlide === 2 ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-95 -translate-x-full'
+                <div className={`${appSlideMotionClass} ${
+                  currentAppSlide === 2 ? 'scale-100 translate-x-0' : 'scale-95 -translate-x-full'
                 }`}>
-                  <div className="absolute h-[437px] left-[5px] rounded-[30px] top-[83px] w-[218px]">
+                  <div
+                    className="absolute rounded-[30px]"
+                    style={{ left: "1%", top: "13.83%", width: "43.6%", height: "72.83%" }}
+                  >
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
                       <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image5} />
                     </div>
                   </div>
-                  <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[443px] left-[275px] rounded-[20px] top-[83px] w-[216px]">
+                  <div
+                    className="absolute border border-[rgba(0,0,0,0.3)] border-solid rounded-[20px]"
+                    style={{ left: "55%", top: "13.83%", width: "43.2%", height: "73.83%" }}
+                  >
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[20px]">
                       <img alt="" loading="lazy" decoding="async" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image6} />
                     </div>
                   </div>
-                  <div className="absolute h-[486px] left-[55px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
+                  <div
+                    className="absolute rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)]"
+                    style={{ left: "11%", top: "7.83%", width: "46.8%", height: "81%" }}
+                  >
                     <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image4} />
                   </div>
-                  <div className="absolute h-[486px] left-[200px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
+                  <div
+                    className="absolute rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)]"
+                    style={{ left: "40%", top: "7.83%", width: "46.8%", height: "81%" }}
+                  >
                     <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image7} />
                   </div>
-                  <div className="absolute h-[500px] left-[125px] rounded-[30px] top-[26px] w-[245px]">
+                  <div
+                    className="absolute rounded-[30px]"
+                    style={{ left: "25%", top: "4.33%", width: "49%", height: "83.33%" }}
+                  >
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
                       <img alt="" loading="lazy" decoding="async" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image8} />
                     </div>
                   </div>
                 </div>
 
-                <div className={`absolute transition-all duration-[3000ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
-                  currentAppSlide === 3 ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-95 -translate-x-full'
+                <div className={`${appSlideMotionClass} ${
+                  currentAppSlide === 3 ? 'scale-100 translate-x-0' : 'scale-95 -translate-x-full'
                 }`}>
-                  <div className="absolute h-[437px] left-[5px] rounded-[30px] top-[83px] w-[218px]">
+                  <div
+                    className="absolute rounded-[30px]"
+                    style={{ left: "1%", top: "13.83%", width: "43.6%", height: "72.83%" }}
+                  >
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
                     <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image4} />
                     </div>
                   </div>
-                  <div className="absolute border border-[rgba(0,0,0,0.3)] border-solid h-[443px] left-[275px] rounded-[20px] top-[83px] w-[216px]">
+                  <div
+                    className="absolute border border-[rgba(0,0,0,0.3)] border-solid rounded-[20px]"
+                    style={{ left: "55%", top: "13.83%", width: "43.2%", height: "73.83%" }}
+                  >
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[20px]">
                     <img alt="" loading="lazy" decoding="async" className="absolute h-[101.64%] left-0 max-w-none top-0 w-full" src={APP_IMAGES.image7} />
                     </div>
                   </div>
-                  <div className="absolute h-[486px] left-[55px] rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
+                  <div
+                    className="absolute rounded-[30px] shadow-[-4px_4px_4px_0px_rgba(0,0,0,0.25)]"
+                    style={{ left: "11%", top: "7.83%", width: "46.8%", height: "81%" }}
+                  >
                     <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image8} />
                   </div>
-                  <div className="absolute h-[486px] left-[200px] rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)] top-[47px] w-[234px]">
+                  <div
+                    className="absolute rounded-[30px] shadow-[4px_4px_4px_0px_rgba(0,0,0,0.25)]"
+                    style={{ left: "40%", top: "7.83%", width: "46.8%", height: "81%" }}
+                  >
                     <img alt="" loading="lazy" decoding="async" className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[30px] size-full" src={APP_IMAGES.image5} />
                   </div>
-                  <div className="absolute h-[500px] left-[125px] rounded-[30px] top-[26px] w-[245px]">
+                  <div
+                    className="absolute rounded-[30px]"
+                    style={{ left: "25%", top: "4.33%", width: "49%", height: "83.33%" }}
+                  >
                     <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[30px]">
                       <img alt="" loading="lazy" decoding="async" className="absolute h-[102.02%] left-[-0.09%] max-w-none top-0 w-[100.19%]" src={APP_IMAGES.image6} />
                     </div>
@@ -1268,7 +1341,10 @@ export const WebsiteHomepage = (): JSX.Element => {
                 </div>
 
                 {/* Phone frame - always visible */}
-                <div className="absolute h-[535px] left-[108px] top-[3px] w-[283px]">
+                <div
+                  className="absolute"
+                  style={{ left: "21.6%", top: "0.5%", width: "56.6%", height: "89.17%" }}
+                >
                   <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <img alt="" loading="lazy" decoding="async" className="absolute h-[113.24%] left-[-59.94%] max-w-none top-[-4.9%] w-[218.98%]" src={APP_IMAGES.phone1401} />
                   </div>
@@ -1306,13 +1382,9 @@ export const WebsiteHomepage = (): JSX.Element => {
           ref={calculatorRef}
           className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0f2418] via-[#0c1e14] to-[#0f2f1e] text-white shadow-[0_24px_70px_rgba(0,0,0,0.22)] border border-white/10"
           style={{
-            opacity: isCalcVisible ? 1 : 0,
-            transform: isCalcVisible ? "translateY(0)" : "translateY(40px)",
-            transition: "opacity 0.9s ease-out, transform 0.9s ease-out"
+            opacity: 1,
+            transform: "none",
           }}
-          onMouseMove={handleCalcMouseMove}
-          onMouseEnter={() => setIsCalcHovering(true)}
-          onMouseLeave={() => setIsCalcHovering(false)}
         >
           <div className="absolute -left-20 -top-24 h-64 w-64 rounded-full bg-[#00a63e]/20 blur-3xl" aria-hidden="true" />
           <div className="absolute right-[-120px] bottom-[-80px] h-64 w-64 rounded-full bg-[#3b82f6]/15 blur-3xl" aria-hidden="true" />
@@ -1363,14 +1435,14 @@ export const WebsiteHomepage = (): JSX.Element => {
                 <div className="flex flex-col gap-2 md:col-span-2">
                   <label className="font-['Poppins'] text-sm sm:text-base text-[#0a0a0a]">Bi-Monthly Bill Amount (₹)</label>
                   <div className="bg-[#f7fff9] border border-[#d7eadd] rounded-xl px-4 py-3 shadow-[0_6px_20px_rgba(0,0,0,0.03)]">
-                    <input type="number" className="w-full bg-transparent outline-none text-[15px]" placeholder="Enter bill amount (e.g., 2500)" value={billAmount} onChange={handleBillAmountChange} min="1" />
+                    <input type="number" className="w-full bg-transparent outline-none text-[15px]" placeholder="Enter bill amount (e.g., 2500)" value={billAmount} onChange={handleBillAmountChange} onKeyDown={handleKeyDown} min="1" inputMode="numeric" pattern="[0-9]*" />
                   </div>
                   <span className="text-[12px] text-[#4a5565]">Enter the total amount on your latest TANGEDCO bill (bottom of the paper). Choose this OR estimated units below.</span>
                 </div>
                 <div className="flex flex-col gap-2 md:col-span-2">
                   <label className="font-['Poppins'] text-sm sm:text-base text-[#0a0a0a]">OR Estimated Bi-Monthly Units (kWh)</label>
                   <div className="bg-[#f7fff9] border border-[#d7eadd] rounded-xl px-4 py-3 shadow-[0_6px_20px_rgba(0,0,0,0.03)]">
-                    <input type="number" className="w-full bg-transparent outline-none text-[15px]" placeholder="Enter Billing Units (e.g., 400)" value={estimatedUnits || ''} onChange={handleEstimatedUnitsChange} min="1" />
+                    <input type="number" className="w-full bg-transparent outline-none text-[15px]" placeholder="Enter Billing Units (e.g., 400)" value={estimatedUnits || ''} onChange={handleEstimatedUnitsChange} onKeyDown={handleKeyDown} min="1" inputMode="numeric" pattern="[0-9]*" />
                   </div>
                   <span className="text-[12px] text-[#4a5565]">If you know your bi-monthly electricity consumption in kWh. Choose this OR bill amount above.</span>
                 </div>
@@ -1398,23 +1470,14 @@ export const WebsiteHomepage = (): JSX.Element => {
           ref={resultRef}
           className="relative overflow-hidden rounded-[28px] border border-[#d7eadd] bg-white shadow-[0_18px_60px_rgba(0,0,0,0.08)]"
           style={{
-            opacity: isResultVisible ? 1 : 0,
-            transform: isResultVisible ? "translateY(0)" : "translateY(40px)",
-            transition: "opacity 0.95s ease-out, transform 0.95s ease-out",
-            transitionDelay: "0.12s"
+            opacity: 1,
+            transform: "none",
           }}
-          onMouseMove={handleResultMouseMove}
-          onMouseEnter={() => setIsResultHovering(true)}
-          onMouseLeave={() => setIsResultHovering(false)}
         >
           <div className="absolute -top-10 left-6 h-32 w-32 rounded-full bg-[#dcfce7] blur-3xl" aria-hidden="true" />
           <div className="absolute bottom-[-80px] right-[-40px] h-48 w-48 rounded-full bg-[#e0f2fe] blur-3xl" aria-hidden="true" />
           <div
-            className="pointer-events-none absolute inset-0 transition-opacity duration-300"
-            style={{
-              opacity: isResultHovering ? 1 : 0,
-              background: `radial-gradient(210px circle at ${resultGlow.x}% ${resultGlow.y}%, rgba(0,122,85,0.12), transparent 55%)`
-            }}
+            className="pointer-events-none absolute inset-0"
             aria-hidden="true"
           />
           <div className="relative p-6 md:p-10 flex flex-col gap-6">
@@ -1594,17 +1657,20 @@ export const WebsiteHomepage = (): JSX.Element => {
 
       {/* Solutions Section */}
       <section id="solutions-section" className="scroll-mt-20">
-        <div className="bg-[#f7fff9] min-h-screen text-[#0a0a0a]">
+        <div
+          className="min-h-screen text-[#0a0a0a]"
+          style={{
+            background:
+              "radial-gradient(1200px 520px at 50% -18%, rgba(15,23,42,0.06), transparent 60%), radial-gradient(900px 520px at 110% 12%, rgba(59,130,246,0.10), transparent 66%), linear-gradient(180deg, #f7fff9 0%, #f6fdf8 36%, #eef9f3 72%, #e3f3ea 100%)",
+          }}
+        >
           {/* Video Hero */}
           <section ref={solutionsVideoRef} className="relative w-full flex justify-center items-center h-[280px] sm:h-[400px] md:h-[500px] lg:h-auto py-0 lg:py-12">
-            {/* Modern gradient background for desktop */}
-            <div className="hidden lg:block absolute inset-0 w-full h-full z-0" aria-hidden="true"
-              style={{background: 'linear-gradient(120deg, #e0e7ff 0%, #f7fff9 60%, #d1fae5 100%)'}} />
-            <div className="relative w-full lg:w-[700px] xl:w-[850px] 2xl:w-[1000px] aspect-video overflow-hidden shadow-xl border border-black/10 bg-[#222] z-10">
+            <div className="relative w-full lg:w-[700px] xl:w-[850px] 2xl:w-[1000px] aspect-video overflow-hidden shadow-xl border border-black/10 bg-transparent z-10">
               <video
                 ref={videoRef}
                 className="absolute inset-0 w-full h-full object-cover"
-                autoPlay={solutionsVideoInView && !reduceMotion}
+                autoPlay={solutionsVideoInView}
                 muted={isMuted}
                 loop
                 playsInline
@@ -1625,7 +1691,7 @@ export const WebsiteHomepage = (): JSX.Element => {
           </section>
 
           {/* Solution selector below video */}
-          <section className="bg-[#f7fff9] px-6 py-10">
+          <section className="px-6 py-10">
             <div className="w-full max-w-4xl mx-auto flex justify-center gap-4 flex-wrap">
               {[
                 { key: "solar", label: "Smart Solar", target: "solar" },
@@ -1648,7 +1714,7 @@ export const WebsiteHomepage = (): JSX.Element => {
           </section>
 
           {/* Smart solar solutions */}
-          <motion.section id="solar" className="bg-gradient-to-b from-[#f7fff9] via-[#f7fff9] to-white px-6 pt-14 pb-16 border-b border-black/5" {...sectionMotionProps}>
+          <motion.section id="solar" className="px-6 pt-14 pb-16 border-b border-black/5" {...sectionMotionProps}>
             <motion.div className="w-full max-w-6xl mx-auto text-center space-y-4" variants={revealVariant}>
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm border border-black/5 text-[24px] font-['Poppins'] text-[#0a0a0a">
                 <b>Smart Solar Solutions</b>
@@ -1731,7 +1797,7 @@ export const WebsiteHomepage = (): JSX.Element => {
           </motion.section>
 
           {/* Journey */}
-          <motion.section className="px-6 pb-20 bg-gradient-to-b from-white via-[#f2fbff] to-[#e8f5ff]" {...sectionMotionProps}>
+          <motion.section className="px-6 pb-20" {...sectionMotionProps}>
             <motion.div className="w-full max-w-6xl mx-auto text-center mb-12" variants={revealVariant}>
               <h2 className="text-[32px] sm:text-[38px] md:text-[44px] lg:text-[48px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-3 md:mb-4 tracking-[-1.5px]">Your journey to smarter solar</h2>
               <p className="text-[18px] text-[#4a5565] font-['Poppins']">
@@ -1762,7 +1828,7 @@ export const WebsiteHomepage = (): JSX.Element => {
           </motion.section>
 
           {/* Smart home solutions */}
-          <motion.section id="smart-home" className="px-4 sm:px-6 py-12 sm:py-14 md:py-16 bg-gradient-to-b from-[#f7fff9] via-[#eef8ff] to-white" {...sectionMotionProps}>
+          <motion.section id="smart-home" className="px-4 sm:px-6 py-12 sm:py-14 md:py-16" {...sectionMotionProps}>
             <motion.div className="w-full max-w-6xl mx-auto text-center space-y-2 sm:space-y-3 mb-8 sm:mb-10" variants={revealVariant}>
               <p className="text-[32px] sm:text-[40px] md:text-[50px] font-['Urbanist'] text-[#0a0a0a] font-bold">Smart home solutions</p>
               <p className="text-[14px] sm:text-[15px] md:text-[17px] font-['Poppins'] text-[#4a5565]">
@@ -1828,7 +1894,7 @@ export const WebsiteHomepage = (): JSX.Element => {
           </motion.section>
 
           {/* Smarter Living */}
-          <motion.section className="px-4 sm:px-6 py-12 sm:py-16 md:py-20 bg-gradient-to-b from-white via-[#f4faff] to-[#e4f0ff]" {...sectionMotionProps}>
+          <motion.section className="px-4 sm:px-6 py-12 sm:py-16 md:py-20" {...sectionMotionProps}>
             <motion.div className="w-full max-w-6xl mx-auto text-center mb-10 sm:mb-12 md:mb-16" variants={revealVariant}>
               <h2 className="text-[30px] sm:text-[40px] md:text-[50px] lg:text-[54px] font-['Urbanist'] font-bold tracking-[-1px] sm:tracking-[-2px] text-[#0a0a0a] mb-3 sm:mb-4">
                 Smarter Living, Simplified
@@ -1865,10 +1931,10 @@ export const WebsiteHomepage = (): JSX.Element => {
           </motion.section>
 
           {/* 360watts App */}
-          <section id="app" className="px-3 sm:px-4 md:px-6 py-16 sm:py-20 md:py-24 lg:py-28 bg-gradient-to-b from-[#e4f0ff] via-white to-[#f7fff9]">
+          <section id="app" className="px-3 sm:px-4 md:px-6 py-12 sm:py-16 md:py-20 lg:py-24">
             <div className="w-full max-w-7xl mx-auto">
               {/* Header */}
-              <motion.div className="text-center mb-8 sm:mb-12 md:mb-16 lg:mb-20" {...sectionMotionProps}>
+              <motion.div className="text-center mb-6 sm:mb-10 md:mb-12 lg:mb-16" {...sectionMotionProps}>
                 <h2 className="text-[60px] sm:text-[80px] md:text-[99px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-3.96px] mb-2 sm:mb-4">360watts App</h2>
                 <p className="text-[23px] text-[#0a0a0a]/50 font-['Poppins'] tracking-[-0.92px] mb-6 sm:mb-8">Our Unified App Ecosystem</p>
                 <div className="max-w-2xl mx-auto">
@@ -1879,9 +1945,9 @@ export const WebsiteHomepage = (): JSX.Element => {
               </motion.div>
 
               {/* Phone Grid Layout */}
-              <div className="space-y-8 sm:space-y-12 md:space-y-16 lg:space-y-20">
+              <div className="space-y-0">
                 {/* Real-time Insights - First row */}
-                <motion.div className="flex flex-row items-center gap-12" {...sectionMotionProps}>
+                <motion.div className="flex flex-row items-center gap-8 lg:gap-10" {...sectionMotionProps}>
                   <div className="flex-1 text-center px-2 sm:text-center sm:px-6">
                     <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-4">
                       Real-time Insights
@@ -1898,7 +1964,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                   </div>
                 </motion.div>
                 {/* Smart Scheduling - Second row */}
-                <motion.div className="flex flex-row-reverse items-center gap-12" {...sectionMotionProps}>
+                <motion.div className="flex flex-row-reverse items-center gap-8 lg:gap-10" {...sectionMotionProps}>
                   <div className="flex-1 text-center px-1 sm:text-center sm:px-6">
                     <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-2">Smart Scheduling</h3>
                     <p className="text-[14px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
@@ -1914,7 +1980,7 @@ export const WebsiteHomepage = (): JSX.Element => {
                 </motion.div>
 
                 {/* Routines and Modes - Third row (zig-zag) */}
-                <motion.div className="flex flex-row items-center gap-12" {...sectionMotionProps}>
+                <motion.div className="flex flex-row items-center gap-8 lg:gap-10" {...sectionMotionProps}>
                   <div className="flex-1 text-center px-2 sm:text-center sm:px-6">
                     <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-4">Routines and Modes</h3>
                     <p className="text-[14px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
@@ -1923,14 +1989,14 @@ export const WebsiteHomepage = (): JSX.Element => {
                   </div>
                   <div className="flex-shrink-0 relative w-[200px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
                     {/* App Screenshot */}
-                    <img src={APP_IMAGES.solutionsAppPhoneModes} alt="Routines and Modes" className="absolute inset-[11.5%] top-[10%] w-[77%] h-[83%] object-cover rounded-[20px]" loading="lazy" decoding="async" />
+                    <img src={APP_IMAGES.solutionsAppPhoneModes} alt="Routines and Modes" className="absolute inset-[11.5%] top-[8.5%] w-[77%] h-[83%] object-cover rounded-[20px]" loading="lazy" decoding="async" />
                     {/* Phone Frame Overlay */}
                     <img src={APP_IMAGES.phone1401} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" loading="lazy" decoding="async" />
                   </div>
                 </motion.div>
 
                 {/* Maintenance and Care - Fourth row (zig-zag) */}
-                <motion.div className="flex flex-row-reverse items-center gap-12" {...sectionMotionProps}>
+                <motion.div className="flex flex-row-reverse items-center gap-8 lg:gap-10" {...sectionMotionProps}>
                   <div className="flex-1 text-center px-2 sm:text-center sm:px-6">
                     <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-4">Maintenance and Care</h3>
                     <p className="text-[14px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
@@ -1950,7 +2016,7 @@ export const WebsiteHomepage = (): JSX.Element => {
           </section>
 
           {/* CTA Section */}
-          <motion.section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-white" {...sectionMotionProps}>
+          <motion.section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6" {...sectionMotionProps}>
             <motion.div className="w-full max-w-4xl mx-auto text-center" variants={revealVariant}>
               <h2 className="text-[28px] sm:text-[36px] md:text-[40px] lg:text-5xl font-bold text-[#0a0a0a] font-['Urbanist'] mb-4 sm:mb-6">
                 Want to explore the future?
@@ -2101,9 +2167,9 @@ export const WebsiteHomepage = (): JSX.Element => {
       {/* FAQ Section */}
       <motion.section id="faq-section" className="scroll-mt-20 bg-[#f7fff9]" {...sectionMotionProps}>
         {/* Top gradient header */}
-        <div className="relative isolate">
-          <div className="absolute inset-x-0 top-0 h-[280px] sm:h-[320px] md:h-[380px] bg-gradient-to-r from-[rgba(0,166,62,0.09)] to-[rgba(0,122,85,0.09)] rounded-b-[50px] sm:rounded-b-[60px] md:rounded-b-[80px]" />
-          <header className="relative h-[280px] sm:h-[320px] md:h-[380px] flex items-center justify-center px-4 sm:px-6">
+        <div className="relative isolate overflow-hidden rounded-[50px] sm:rounded-[60px] md:rounded-[80px] px-4 sm:px-6">
+          <div className="absolute inset-0 bg-gradient-to-r from-[rgba(0,166,62,0.09)] to-[rgba(0,122,85,0.09)] rounded-[50px] sm:rounded-[60px] md:rounded-[80px]" />
+          <header className="relative h-[280px] sm:h-[320px] md:h-[380px] flex items-center justify-center px-0">
             <motion.div className="max-w-[960px] mx-auto text-center space-y-2" variants={revealVariant}>
               <h1 className="text-[26px] sm:text-[30px] md:text-[36px] font-bold tracking-[-0.04em] font-['Urbanist']">
                 Frequently Asked Questions
@@ -2736,4 +2802,3 @@ export const WebsiteHomepage = (): JSX.Element => {
     </div>
   );
 };
-

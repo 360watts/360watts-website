@@ -52,8 +52,8 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         showTransparent
-          ? "bg-black/20 backdrop-blur-sm py-4"
-          : "bg-white/95 backdrop-blur-md shadow-lg py-3"
+          ? "bg-black/20 backdrop-blur-sm py-3 lg:py-4"
+          : "bg-white/95 backdrop-blur-md shadow-lg py-2 lg:py-3"
       }`}
     >
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
@@ -65,11 +65,11 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
           <img
             src="/final-logo-png-4x-2.png"
             alt="360watts"
-            className="h-10 sm:h-12 w-auto object-contain"
+            className="h-8 sm:h-10 lg:h-12 w-auto object-contain"
           />
           <div className="flex flex-col">
             <span
-              className={`font-extrabold text-base sm:text-lg font-['Biryani'] tracking-tight select-none`}
+              className={`font-extrabold text-sm sm:text-base lg:text-lg font-['Biryani'] tracking-tight select-none`}
               style={{ fontFamily: 'Biryani, sans-serif', fontWeight: 800 }}
             >
               <span style={{ color: '#254D65' }}>360</span><span style={{ color: '#F07522' }}>watts</span>
@@ -101,7 +101,7 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
         <a
           href="#solar-calculator"
           onClick={(e: React.MouseEvent) => handleNavClick(e, "solar-calculator")}
-          className="hidden lg:inline-flex items-center gap-2 px-4 xl:px-5 py-2 xl:py-2.5 bg-gradient-to-r from-[#00a63e] to-[#017c54] text-white font-medium rounded-lg hover:opacity-90 transition-all font-['Poppins'] text-sm xl:text-base cursor-pointer"
+          className="hidden lg:inline-flex items-center gap-2 px-3 lg:px-4 xl:px-5 py-1.5 lg:py-2 xl:py-2.5 bg-gradient-to-r from-[#00a63e] to-[#017c54] text-white font-medium rounded-lg hover:opacity-90 transition-all font-['Poppins'] text-sm xl:text-base cursor-pointer"
           aria-label="Calculate your solar savings"
         >
           Calculate Savings <ArrowRight className="w-4 h-4" />
@@ -110,13 +110,13 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
         {/* Mobile Menu Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="lg:hidden p-2 rounded-lg hover:bg-black/10 transition-colors"
+          className="lg:hidden p-1.5 rounded-lg hover:bg-black/10 transition-colors"
           aria-label="Toggle menu"
         >
           {mobileMenuOpen ? (
-            <X className={`w-6 h-6 ${showTransparent ? "text-white" : "text-neutral-950"}`} />
+            <X className={`w-5 h-5 ${showTransparent ? "text-white" : "text-neutral-950"}`} />
           ) : (
-            <Menu className={`w-6 h-6 ${showTransparent ? "text-white" : "text-neutral-950"}`} />
+            <Menu className={`w-5 h-5 ${showTransparent ? "text-white" : "text-neutral-950"}`} />
           )}
         </button>
       </div>
