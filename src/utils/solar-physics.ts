@@ -32,6 +32,7 @@ export const PHYSICS = {
     FIXED_CHARGE_DEDUCTION: 60, // Reduced from 120 (Service charge only, No Tax)
     TARIFF_ESCALATION: 0.05, // 5% annual rise in utility rates
     PANEL_DEGRADATION: 0.006, // 0.6% annual decay in output
+    DISCOUNT_RATE: 0.08, // 8% discount rate for NPV
     AVG_TARIFF: 7.0, // INR/kWh (Conservative weighted average)
     COST_PER_KW: 65000, // INR (Tier 1 components)
     LIFESPAN_YEARS: 25,
@@ -63,6 +64,10 @@ export function estimateEnergyCharge(bill: BillInputs): number {
 export function estimateUnitsFromEnergyCharge(energyCharge: number): number {
     let units = 0;
     let remainingBill = energyCharge;
+
+    if (remainingBill <= 0) {
+        return 0;
+    }
 
     // Always include free units (first 100)
     units += SLABS[0].limit;
@@ -141,7 +146,8 @@ export function calculateSolarRequirementsFromBill(
     const actualDcCapacityKw = (panelCount * PHYSICS.PANEL_WATTAGE) / 1000;
 
     // 5. Projections (Year 1)
-    const dailyGen = actualDcCapacityKw * PHYSICS.SUN_HOURS_ANNUAL_AVG;
+    // Apply loss factor to convert DC capacity into realistic AC generation
+    const dailyGen = actualDcCapacityKw * PHYSICS.SUN_HOURS_ANNUAL_AVG * PHYSICS.SYSTEM_LOSS_FACTOR;
     const annualGen = dailyGen * 365;
     const systemCost = actualDcCapacityKw * PHYSICS.COST_PER_KW;
     const annualSavings = annualGen * PHYSICS.AVG_TARIFF;
@@ -160,7 +166,7 @@ export function calculateSolarRequirementsFromBill(
     
     for (let t = 1; t <= PHYSICS.LIFESPAN_YEARS; t++) {
         // Discount the cash flow back to present value
-        npv += currentYearSavings   ;
+        npv += currentYearSavings / Math.pow(1 + PHYSICS.DISCOUNT_RATE, t);
         
         // Prepare next year's savings:
         // Tariff goes UP, Panel Output goes DOWN

@@ -234,7 +234,9 @@ const contactMethods = [
 ];
 
 const FAQSectionComponent = ({ section }: { section: FaqSection }) => {
-  const [openIds, setOpenIds] = useState<string[]>([]);
+  const [openIds, setOpenIds] = useState<string[]>(
+    () => section.items.map((item) => `${section.id}-${item.id}`)
+  );
 
   const toggleItem = (itemId: string) => {
     const compositeId = `${section.id}-${itemId}`;
@@ -1018,7 +1020,7 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
       </section>
 
       {/* How Does It Work Section */}
-      <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 relative overflow-hidden bg-transparent">
+      <section className="py-8 sm:py-20 md:py-24 px-4 sm:px-6 relative overflow-hidden bg-transparent">
         {/* Decorative background elements */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
           <div className="absolute top-20 left-10 w-72 h-72 bg-[#00a63e] rounded-full blur-3xl"></div>
@@ -1026,55 +1028,55 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
         </div>
 
         <div className="w-full max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-12 sm:mb-16 md:mb-20">
-            <div className="inline-block px-4 sm:px-6 py-2 bg-gradient-to-r from-[#dcfce7] to-[#ddefff] rounded-full mb-4 sm:mb-6">
-              <span className="text-[13px] sm:text-[14px] md:text-[16px] font-semibold text-[#0a0a0a] font-['Urbanist']">Simple & Effective</span>
+          <div className="text-center mb-6 sm:mb-16 md:mb-20">
+            <div className="inline-block px-3 sm:px-6 py-1 sm:py-2 bg-gradient-to-r from-[#dcfce7] to-[#ddefff] rounded-full mb-3 sm:mb-6">
+              <span className="text-[11px] sm:text-[14px] md:text-[16px] font-semibold text-[#0a0a0a] font-['Urbanist']">Simple & Effective</span>
             </div>
-            <h2 className="text-[34px] sm:text-[44px] md:text-[56px] font-bold text-[#0a0a0a] font-['Urbanist'] tracking-[-1.5px] mb-4 bg-gradient-to-r from-[#0a0a0a] to-[#4a5565] bg-clip-text text-transparent">How Does It Work?</h2>
-            <p className="text-[16px] sm:text-[18px] md:text-[20px] text-[#4a5565] font-['Poppins'] max-w-2xl mx-auto">Simple steps to transform your home into a Smart Home, sustainable powerhouse</p>
+            <h2 className="text-[18px] sm:text-[44px] md:text-[56px] font-bold text-[#0a0a0a] font-['Urbanist'] tracking-[-1.5px] mb-2 sm:mb-4 bg-gradient-to-r from-[#0a0a0a] to-[#4a5565] bg-clip-text text-transparent">How Does It Work?</h2>
+            <p className="text-[10px] sm:text-[18px] md:text-[20px] text-[#4a5565] font-['Poppins'] max-w-2xl mx-auto">Simple steps to transform your home into a Smart Home, sustainable powerhouse</p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 md:gap-8 lg:gap-12">
             {/* Solar Steps */}
             <div 
-              className={`bg-white/80 backdrop-blur-sm rounded-[24px] sm:rounded-[28px] md:rounded-[32px] p-5 sm:p-7 md:p-10 shadow-[0_8px_40px_rgba(0,0,0,0.06)] border-2 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,166,62,0.15)] hover:-translate-y-2 cursor-pointer ${
+              className={`bg-white/80 backdrop-blur-sm rounded-[20px] sm:rounded-[28px] md:rounded-[32px] p-3 sm:p-7 md:p-10 shadow-[0_8px_40px_rgba(0,0,0,0.06)] border-2 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(0,166,62,0.15)] hover:-translate-y-2 cursor-pointer ${
                 activeCard === 'solar' ? 'border-[#00a63e] shadow-[0_20px_60px_rgba(0,166,62,0.2)]' : 'border-transparent'
               }`}
               onMouseEnter={() => setActiveCard('solar')}
               onMouseLeave={() => setActiveCard(null)}
             >
-              <div className="flex items-center gap-3 sm:gap-4 mb-8 sm:mb-10">
-                <div className="w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] md:w-[90px] md:h-[90px] bg-gradient-to-br from-[#dcfce7] to-[#bbf7d0] rounded-[16px] sm:rounded-[20px] flex items-center justify-center shadow-lg transform transition-transform hover:scale-110">
-                  <img src={APP_IMAGES.sun21} alt="Solar" className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] md:w-[60px] md:h-[60px] object-contain" />
+              <div className="flex items-center gap-2 sm:gap-4 mb-4 sm:mb-10">
+                <div className="w-[36px] h-[36px] sm:w-[80px] sm:h-[80px] md:w-[90px] md:h-[90px] bg-gradient-to-br from-[#dcfce7] to-[#bbf7d0] rounded-[12px] sm:rounded-[20px] flex items-center justify-center shadow-lg transform transition-transform hover:scale-110">
+                  <img src={APP_IMAGES.sun21} alt="Solar" className="w-[20px] h-[20px] sm:w-[50px] sm:h-[50px] md:w-[60px] md:h-[60px] object-contain" />
                 </div>
                 <div>
-                  <h3 className="text-[26px] sm:text-[29px] md:text-[32px] font-bold text-[#0a0a0a] font-['Urbanist'] tracking-[-0.8px]">Solar</h3>
-                  <p className="text-[12px] sm:text-[13px] md:text-[14px] text-[#4a5565] font-['Poppins'] leading-4 sm:leading-5 opacity-95 drop-shadow-md">Clean energy generation</p>
+                  <h3 className="text-[14px] sm:text-[29px] md:text-[32px] font-bold text-[#0a0a0a] font-['Urbanist'] tracking-[-0.8px]">Solar</h3>
+                  <p className="text-[9px] sm:text-[13px] md:text-[14px] text-[#4a5565] font-['Poppins'] leading-4 sm:leading-5 opacity-95 drop-shadow-md">Clean energy generation</p>
                 </div>
               </div>
 
               {/* Progress bar */}
-              <div className="h-1 bg-gradient-to-r from-[#dcfce7] to-[#bbf7d0] rounded-full mb-8 overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-[#dcfce7] to-[#bbf7d0] rounded-full mb-4 sm:mb-8 overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-[#00a63e] to-[#007a55] w-full transform origin-left transition-transform duration-1000 ease-out" />
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {processSteps.solar.map((step, index) => {
                   return (
                     <div 
                       key={index} 
-                      className="group relative bg-gradient-to-r from-white to-[#f7fff9] rounded-[20px] p-5 border-2 border-transparent hover:border-[#dcfce7] hover:shadow-md transition-all duration-300"
+                      className="group relative bg-gradient-to-r from-white to-[#f7fff9] rounded-[16px] sm:rounded-[20px] p-3 sm:p-5 border-2 border-transparent hover:border-[#dcfce7] hover:shadow-md transition-all duration-300"
                     >
-                      <div className="flex items-start gap-3 sm:gap-4">
-                        <div className="w-[44px] h-[44px] sm:w-[48px] sm:h-[48px] md:w-[50px] md:h-[50px] rounded-full flex items-center justify-center text-[17px] sm:text-[19px] md:text-[20px] font-bold font-['Urbanist'] flex-shrink-0 bg-gradient-to-br from-[#dcfce7] to-[#bbf7d0] text-[#0a0a0a] group-hover:scale-110 transition-all duration-300">
+                      <div className="flex items-start gap-2 sm:gap-4">
+                        <div className="w-[22px] h-[22px] sm:w-[48px] sm:h-[48px] md:w-[50px] md:h-[50px] rounded-full flex items-center justify-center text-[10px] sm:text-[19px] md:text-[20px] font-bold font-['Urbanist'] flex-shrink-0 bg-gradient-to-br from-[#dcfce7] to-[#bbf7d0] text-[#0a0a0a] group-hover:scale-110 transition-all duration-300">
                           {step.number}
                         </div>
                         <div className="flex-1">
-                          <h4 className="text-[17px] sm:text-[19px] md:text-[22px] text-[#0a0a0a] font-bold font-['Urbanist'] tracking-[-0.5px] leading-tight sm:leading-7">
+                          <h4 className="text-[12px] sm:text-[19px] md:text-[22px] text-[#0a0a0a] font-bold font-['Urbanist'] tracking-[-0.5px] leading-tight sm:leading-7">
                             {step.title}
                           </h4>
-                          <div className="mt-3">
-                            <p className="text-[14px] sm:text-[15px] md:text-[16px] text-[#4a5565] font-['Poppins'] leading-relaxed">
+                          <div className="mt-2 sm:mt-3">
+                            <p className="text-[10px] sm:text-[15px] md:text-[16px] text-[#4a5565] font-['Poppins'] leading-relaxed">
                               {step.description}
                             </p>
                           </div>
@@ -1088,44 +1090,44 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
 
             {/* Smart Home Steps */}
             <div 
-              className={`bg-white/80 backdrop-blur-sm rounded-[24px] sm:rounded-[28px] md:rounded-[32px] p-5 sm:p-7 md:p-10 shadow-[0_8px_40px_rgba(0,0,0,0.06)] border-2 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(59,130,246,0.15)] hover:-translate-y-2 cursor-pointer ${
+              className={`bg-white/80 backdrop-blur-sm rounded-[20px] sm:rounded-[28px] md:rounded-[32px] p-3 sm:p-7 md:p-10 shadow-[0_8px_40px_rgba(0,0,0,0.06)] border-2 transition-all duration-500 hover:shadow-[0_20px_60px_rgba(59,130,246,0.15)] hover:-translate-y-2 cursor-pointer ${
                 activeCard === 'smartHome' ? 'border-[#3b82f6] shadow-[0_20px_60px_rgba(59,130,246,0.2)]' : 'border-transparent'
               }`}
               onMouseEnter={() => setActiveCard('smartHome')}
               onMouseLeave={() => setActiveCard(null)}
             >
-              <div className="flex items-center gap-3 sm:gap-4 mb-8 sm:mb-10">
-                <div className="w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] md:w-[90px] md:h-[90px] bg-gradient-to-br from-[#ddefff] to-[#bfdbfe] rounded-[16px] sm:rounded-[20px] flex items-center justify-center shadow-lg transform transition-transform hover:scale-110">
-                  <img src={APP_IMAGES.smartHouse1} alt="Smart Home" className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] md:w-[60px] md:h-[60px] object-contain" />
+              <div className="flex items-center gap-2 sm:gap-4 mb-4 sm:mb-10">
+                <div className="w-[36px] h-[36px] sm:w-[80px] sm:h-[80px] md:w-[90px] md:h-[90px] bg-gradient-to-br from-[#ddefff] to-[#bfdbfe] rounded-[12px] sm:rounded-[20px] flex items-center justify-center shadow-lg transform transition-transform hover:scale-110">
+                  <img src={APP_IMAGES.smartHouse1} alt="Smart Home" className="w-[20px] h-[20px] sm:w-[50px] sm:h-[50px] md:w-[60px] md:h-[60px] object-contain" />
                 </div>
                 <div>
-                  <h3 className="text-[26px] sm:text-[29px] md:text-[32px] font-bold text-[#0a0a0a] font-['Urbanist'] tracking-[-0.8px]">Smart Home</h3>
-                  <p className="text-[12px] sm:text-[13px] md:text-[14px] text-[#4a5565] font-['Poppins'] leading-4 sm:leading-5 drop-shadow-md">Intelligent automation</p>
+                  <h3 className="text-[14px] sm:text-[29px] md:text-[32px] font-bold text-[#0a0a0a] font-['Urbanist'] tracking-[-0.8px]">Smart Home</h3>
+                  <p className="text-[9px] sm:text-[13px] md:text-[14px] text-[#4a5565] font-['Poppins'] leading-4 sm:leading-5 drop-shadow-md">Intelligent automation</p>
                 </div>
               </div>
 
               {/* Progress bar */}
-              <div className="h-1 bg-gradient-to-r from-[#ddefff] to-[#bfdbfe] rounded-full mb-8 overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-[#ddefff] to-[#bfdbfe] rounded-full mb-4 sm:mb-8 overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-[#3b82f6] to-[#2563eb] w-full transform origin-left transition-transform duration-1000 ease-out" />
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {processSteps.smartHome.map((step, index) => {
                   return (
                     <div 
                       key={index} 
-                      className="group relative bg-gradient-to-r from-white to-[#f7fff9] rounded-[20px] p-5 border-2 border-transparent hover:border-[#ddefff] hover:shadow-md transition-all duration-300"
+                      className="group relative bg-gradient-to-r from-white to-[#f7fff9] rounded-[16px] sm:rounded-[20px] p-3 sm:p-5 border-2 border-transparent hover:border-[#ddefff] hover:shadow-md transition-all duration-300"
                     >
-                      <div className="flex items-start gap-3 sm:gap-4">
-                        <div className="w-[44px] h-[44px] sm:w-[48px] sm:h-[48px] md:w-[50px] md:h-[50px] rounded-full flex items-center justify-center text-[17px] sm:text-[19px] md:text-[20px] font-bold font-['Urbanist'] flex-shrink-0 bg-gradient-to-br from-[#ddefff] to-[#bfdbfe] text-[#0a0a0a] group-hover:scale-110 transition-all duration-300">
+                      <div className="flex items-start gap-2 sm:gap-4">
+                        <div className="w-[22px] h-[22px] sm:w-[48px] sm:h-[48px] md:w-[50px] md:h-[50px] rounded-full flex items-center justify-center text-[10px] sm:text-[19px] md:text-[20px] font-bold font-['Urbanist'] flex-shrink-0 bg-gradient-to-br from-[#ddefff] to-[#bfdbfe] text-[#0a0a0a] group-hover:scale-110 transition-all duration-300">
                           {step.number}
                         </div>
                         <div className="flex-1">
-                          <h4 className="text-[17px] sm:text-[19px] md:text-[22px] text-[#0a0a0a] font-bold font-['Urbanist'] tracking-[-0.5px] leading-tight sm:leading-7">
+                          <h4 className="text-[12px] sm:text-[19px] md:text-[22px] text-[#0a0a0a] font-bold font-['Urbanist'] tracking-[-0.5px] leading-tight sm:leading-7">
                             {step.title}
                           </h4>
-                          <div className="mt-3">
-                            <p className="text-[14px] sm:text-[15px] md:text-[16px] text-[#4a5565] font-['Poppins'] leading-relaxed">
+                          <div className="mt-2 sm:mt-3">
+                            <p className="text-[10px] sm:text-[15px] md:text-[16px] text-[#4a5565] font-['Poppins'] leading-relaxed">
                               {step.description}
                             </p>
                           </div>
@@ -1138,13 +1140,13 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
             </div>
           </div>
 
-          <div className="text-center mt-10 sm:mt-12 md:mt-16">
+          <div className="text-center mt-6 sm:mt-12 md:mt-16">
             <a 
               href="#solutions-section" 
-              className="inline-flex items-center gap-2 px-6 py-4 border border-[rgba(74,85,101,0.75)] rounded-[10px] text-[#4a5565] hover:bg-gray-50 transition-colors text-[19px] tracking-[-0.76px]"
+              className="inline-flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-4 border border-[rgba(74,85,101,0.75)] rounded-[8px] sm:rounded-[10px] text-[#4a5565] hover:bg-gray-50 transition-colors text-[10px] sm:text-[19px] tracking-[-0.76px]"
             >
               Explore Full Process
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-3 h-3 sm:w-5 sm:h-5" />
             </a>
           </div>
         </div>
@@ -1377,7 +1379,7 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
       </section>
 
       {/* Solar Calculator Section */}
-      <section id="solar-calculator" className="w-full max-w-7xl mx-auto px-4 py-12 sm:py-16 md:py-20">
+      <section id="solar-calculator" className="w-full max-w-7xl mx-auto px-4 py-6 sm:py-16 md:py-20">
         <div
           ref={calculatorRef}
           className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0f2418] via-[#0c1e14] to-[#0f2f1e] text-white shadow-[0_24px_70px_rgba(0,0,0,0.22)] border border-white/10"
@@ -1397,60 +1399,60 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
             aria-hidden="true"
           />
           <div className="relative grid lg:grid-cols-[1.05fr_1fr]">
-            <div className="p-7 md:p-10 lg:p-12 flex flex-col gap-6">
-              <span className="inline-flex items-center gap-2 w-fit px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs sm:text-sm font-semibold tracking-[0.12em] uppercase">
-                <Calculator className="w-4 h-4" />
+            <div className="p-4 md:p-10 lg:p-12 flex flex-col gap-4 sm:gap-6">
+              <span className="inline-flex items-center gap-2 w-fit px-2 sm:px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[10px] sm:text-sm font-semibold tracking-[0.12em] uppercase">
+                <Calculator className="w-3 h-3 sm:w-4 sm:h-4" />
                 Solar Calculator
               </span>
-              <div className="space-y-3">
-                <h2 className="font-['Urbanist'] font-bold text-2xl sm:text-3xl md:text-[34px] leading-tight text-white">
+              <div className="space-y-2 sm:space-y-3">
+                <h2 className="font-['Urbanist'] font-bold text-lg sm:text-3xl md:text-[34px] leading-tight text-white">
                   Curious? Calculate your home's solar potential
                 </h2>
-                <p className="font-['Poppins'] text-base sm:text-lg text-white/80 max-w-xl">
+                <p className="font-['Poppins'] text-[12px] sm:text-lg text-white/80 max-w-xl">
                   Drop in a few details to preview system size, energy generation, and savings before a site survey.
                 </p>
               </div>
-              <div className="grid sm:grid-cols-2 gap-3">
-                <div className="flex items-start gap-3  px-4 py-3">
+              <div className="grid sm:grid-cols-2 gap-2 sm:gap-3">
+                <div className="flex items-start gap-2 sm:gap-3 px-3 py-2 sm:px-4 sm:py-3">
                 </div>
-                <div className="flex items-start gap-3  px-4 py-3">
+                <div className="flex items-start gap-2 sm:gap-3 px-3 py-2 sm:px-4 sm:py-3">
                 </div>
-                <div className="flex items-start gap-3  px-4 py-3 sm:col-span-2">
+                <div className="flex items-start gap-2 sm:gap-3 px-3 py-2 sm:px-4 sm:py-3 sm:col-span-2">
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-sm sm:text-base text-white/90">
-                <MessageCircle className="w-4 h-4" />
+              <div className="flex items-center gap-2 text-[10px] sm:text-base text-white/90">
+                <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>We respond with a refined quote within one business day.</span>
               </div>
             </div>
 
-            <form onSubmit={handleCalculatorSubmit} className="bg-white text-[#0a0a0a] rounded-[24px] m-3 shadow-[0_20px_60px_rgba(0,0,0,0.12)] p-6 md:p-8 lg:p-10 flex flex-col gap-6">
+            <form onSubmit={handleCalculatorSubmit} className="bg-white text-[#0a0a0a] rounded-[20px] sm:rounded-[24px] m-2 sm:m-3 shadow-[0_20px_60px_rgba(0,0,0,0.12)] p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col gap-4 sm:gap-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2 md:col-span-2">
-                  <label className="font-['Poppins'] text-sm sm:text-base text-[#0a0a0a]">Bi-Monthly Bill Amount (₹)</label>
-                  <div className="bg-[#f7fff9] border border-[#d7eadd] rounded-xl px-4 py-3 shadow-[0_6px_20px_rgba(0,0,0,0.03)]">
-                    <input type="number" className="w-full bg-transparent outline-none text-[15px]" placeholder="Enter bill amount (e.g., 2500)" value={billAmount} onChange={handleBillAmountChange} onKeyDown={handleKeyDown} min="1" inputMode="numeric" pattern="[0-9]*" />
+                  <label className="font-['Poppins'] text-[11px] sm:text-base text-[#0a0a0a]">Bi-Monthly Bill Amount (₹)</label>
+                  <div className="bg-[#f7fff9] border border-[#d7eadd] rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 shadow-[0_6px_20px_rgba(0,0,0,0.03)]">
+                    <input type="number" className="w-full bg-transparent outline-none text-[12px] sm:text-[15px]" placeholder="Enter bill amount (e.g., 2500)" value={billAmount} onChange={handleBillAmountChange} onKeyDown={handleKeyDown} min="1" inputMode="numeric" pattern="[0-9]*" />
                   </div>
-                  <span className="text-[12px] text-[#4a5565]">Enter the total amount on your latest TANGEDCO bill (bottom of the paper). Choose this OR estimated units below.</span>
+                  <span className="text-[10px] sm:text-[12px] text-[#4a5565]">Enter the total amount on your latest TANGEDCO bill (bottom of the paper). Choose this OR estimated units below.</span>
                 </div>
                 <div className="flex flex-col gap-2 md:col-span-2">
-                  <label className="font-['Poppins'] text-sm sm:text-base text-[#0a0a0a]">OR Estimated Bi-Monthly Units (kWh)</label>
-                  <div className="bg-[#f7fff9] border border-[#d7eadd] rounded-xl px-4 py-3 shadow-[0_6px_20px_rgba(0,0,0,0.03)]">
-                    <input type="number" className="w-full bg-transparent outline-none text-[15px]" placeholder="Enter Billing Units (e.g., 400)" value={estimatedUnits || ''} onChange={handleEstimatedUnitsChange} onKeyDown={handleKeyDown} min="1" inputMode="numeric" pattern="[0-9]*" />
+                  <label className="font-['Poppins'] text-[11px] sm:text-base text-[#0a0a0a]">OR Estimated Bi-Monthly Units (kWh)</label>
+                  <div className="bg-[#f7fff9] border border-[#d7eadd] rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 shadow-[0_6px_20px_rgba(0,0,0,0.03)]">
+                    <input type="number" className="w-full bg-transparent outline-none text-[12px] sm:text-[15px]" placeholder="Enter Billing Units (e.g., 400)" value={estimatedUnits || ''} onChange={handleEstimatedUnitsChange} onKeyDown={handleKeyDown} min="1" inputMode="numeric" pattern="[0-9]*" />
                   </div>
-                  <span className="text-[12px] text-[#4a5565]">If you know your bi-monthly electricity consumption in kWh. Choose this OR bill amount above.</span>
+                  <span className="text-[10px] sm:text-[12px] text-[#4a5565]">If you know your bi-monthly electricity consumption in kWh. Choose this OR bill amount above.</span>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                 <div className="flex flex-wrap gap-3">
-                  <button type="submit" className="bg-gradient-to-r from-[#ffd166] via-[#ffb347] to-[#ff6b00] text-white font-semibold px-6 sm:px-8 py-3 rounded-xl shadow-[0_10px_30px_rgba(255,107,0,0.25)] hover:opacity-95 active:scale-95 transition">
+                  <button type="submit" className="bg-gradient-to-r from-[#ffd166] via-[#ffb347] to-[#ff6b00] text-white font-semibold text-[12px] sm:text-base px-4 sm:px-8 py-2 sm:py-3 rounded-lg sm:rounded-xl shadow-[0_10px_30px_rgba(255,107,0,0.25)] hover:opacity-95 active:scale-95 transition">
                     Calculate
                   </button>
                   {/* <button type="button" className="border border-[#ffd166] text-[#8b5b00] font-semibold px-6 sm:px-8 py-3 rounded-xl bg-[#fff9ed] hover:bg-[#ffefcf] transition">
                     Upload your electricity bill
                   </button> */}
                 </div>
-                <p className="text-[13px] sm:text-[14px] text-[#4a5565] font-['Poppins']">Instant preview—no OTP or payment needed.</p>
+                <p className="text-[10px] sm:text-[14px] text-[#4a5565] font-['Poppins']">Instant preview—no OTP or payment needed.</p>
               </div>
             </form>
           </div>
@@ -1459,7 +1461,7 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
 
       {/* Solar Calculator Result Section */}
       {showResults && (
-        <section id="solar-calculator-result" className="w-full max-w-7xl mx-auto px-4 py-8">
+        <section id="solar-calculator-result" className="w-full max-w-7xl mx-auto px-4 py-4 sm:py-8">
         <div
           ref={resultRef}
           className="relative overflow-hidden rounded-[28px] border border-[#d7eadd] bg-white shadow-[0_18px_60px_rgba(0,0,0,0.08)]"
@@ -1474,30 +1476,30 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
             className="pointer-events-none absolute inset-0"
             aria-hidden="true"
           />
-          <div className="relative p-6 md:p-10 flex flex-col gap-6">
+          <div className="relative p-4 sm:p-6 md:p-10 flex flex-col gap-4 sm:gap-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="space-y-2">
-                <p className="uppercase tracking-[0.18em] text-xs font-semibold text-[#0a0a0a]/70">Results preview</p>
-                <h3 className="font-['Urbanist'] font-bold text-[24px] sm:text-[28px] md:text-[32px] text-[#0a0a0a] leading-tight">
+                <p className="uppercase tracking-[0.18em] text-[10px] sm:text-xs font-semibold text-[#0a0a0a]/70">Results preview</p>
+                <h3 className="font-['Urbanist'] font-bold text-[16px] sm:text-[28px] md:text-[32px] text-[#0a0a0a] leading-tight">
                   Your instant solar estimate
                 </h3>
-                <p className="text-sm sm:text-base text-[#4a5565] max-w-2xl">
+                <p className="text-[11px] sm:text-base text-[#4a5565] max-w-2xl">
                   These numbers are calculated based on your inputs. Final proposal is validated after our on-site survey.
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="px-3 py-2 rounded-full bg-[#f0fdf4] border border-[#d7eadd] text-sm font-semibold text-[#0a0a0a]">Results preview</span>
+                <span className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-full bg-[#f0fdf4] border border-[#d7eadd] text-[10px] sm:text-sm font-semibold text-[#0a0a0a]">Results preview</span>
                 <div className="relative">
                   <button
                     onClick={() => setShowShareOptions(!showShareOptions)}
                     disabled={!calcResult}
-                    className={`px-3 py-2 rounded-full border text-sm font-semibold transition-all flex items-center gap-2 ${
+                    className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-full border text-[10px] sm:text-sm font-semibold transition-all flex items-center gap-2 ${
                       calcResult
                         ? 'bg-[#eef2ff] border-[#dcdafc] text-[#312e81] hover:bg-[#e0e7ff] cursor-pointer'
                         : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
                     }`}
                   >
-                    <Share2 className="w-4 h-4" />
+                    <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
                     Share result
                   </button>
                   
@@ -1897,7 +1899,7 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                 Transform your home into an intelligent, energy-efficient haven
               </p>
             </motion.div>
-            <motion.div className="w-full max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6 justify-items-center" {...staggerMotionProps}>
+            <motion.div className="w-full max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-5 md:gap-6" {...staggerMotionProps}>
               {[
                 { title: "Smart-Home Planning", desc: "We understand your lifestyle and automation needs - from high-load appliances up to a full home." },
                 { title: "Smart devices", desc: "We suggest a list of smart devices for your automation. You can expand to new devices as you wish." },
@@ -1908,17 +1910,13 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                 <motion.div
                   key={item.title}
                   variants={revealVariant}
-                  className={`bg-white rounded-[16px] md:rounded-[20px] shadow-[0_5px_15px_rgba(0,0,0,0.15)] p-3 sm:p-4 md:p-5 flex flex-col items-center text-center ${
-                    i === 3 ? 'md:col-start-2 lg:col-start-1' : i === 4 ? 'md:col-start-3 lg:col-span-0' : ''
-                  }`}
+                  className="bg-white rounded-[16px] md:rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.08)] border border-black/5 px-3 sm:px-4 py-4 sm:py-5 flex flex-col items-center text-center gap-2 sm:gap-3"
                 >
                   <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-[#51a2ff] to-[#615fff] flex items-center justify-center text-white font-bold text-base sm:text-lg md:text-xl">
                     {String(i + 1).padStart(2, "0")}
                   </div>
-                  <div className="mt-3 md:mt-4 flex flex-col gap-1">
-                    <p className="font-['Urbanist'] font-bold text-[13px] sm:text-[14px] md:text-[16px] text-[#0a0a0a]">{item.title}</p>
-                    <p className="font-['Poppins'] text-[10px] sm:text-[11px] md:text-[12px] text-[#4a5565] leading-[1.4]">{item.desc}</p>
-                  </div>
+                  <p className="font-['Urbanist'] font-bold text-[13px] sm:text-[14px] md:text-[16px] text-[#0a0a0a]">{item.title}</p>
+                  <p className="font-['Poppins'] text-[10px] sm:text-[11px] md:text-[12px] text-[#4a5565] leading-[1.4]">{item.desc}</p>
                 </motion.div>
               ))}
             </motion.div>
@@ -1929,10 +1927,10 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
             <div className="w-full max-w-7xl mx-auto">
               {/* Header */}
               <motion.div className="text-center mb-6 sm:mb-10 md:mb-12 lg:mb-16" {...sectionMotionProps}>
-                <h2 className="text-[60px] sm:text-[80px] md:text-[99px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-3.96px] mb-2 sm:mb-4">360watts App</h2>
-                <p className="text-[23px] text-[#0a0a0a]/50 font-['Poppins'] tracking-[-0.92px] mb-6 sm:mb-8">Our Unified App Ecosystem</p>
+                <h2 className="text-[42px] sm:text-[80px] md:text-[99px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-3.96px] mb-2 sm:mb-4">360watts App</h2>
+                <p className="text-[16px] sm:text-[23px] text-[#0a0a0a]/50 font-['Poppins'] tracking-[-0.92px] mb-4 sm:mb-6">Our Unified App Ecosystem</p>
                 <div className="max-w-2xl mx-auto">
-                  <p className="text-[23px] text-[#0a0a0a]/60 font-['Poppins'] tracking-[-0.92px] leading-relaxed">
+                  <p className="text-[16px] sm:text-[23px] text-[#0a0a0a]/60 font-['Poppins'] tracking-[-0.92px] leading-relaxed">
                     The 360watts app bridges solar and smart living. View real-time energy flows, control devices, and get actionable insights - all in one dashboard.
                   </p>
                 </div>
@@ -1946,11 +1944,11 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                     <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-4">
                       Real-time Insights
                     </h3>
-                    <p className="text-[14px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
+                    <p className="text-[10px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
                       Monitor your energy generation, consumption, and savings live, all in one intuitive dashboard.
                     </p>
                   </div>
-                  <div className="flex-shrink-0 relative w-[220px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
+                  <div className="flex-shrink-0 relative w-[176px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
                     {/* App Screenshot */}
                     <img src={APP_IMAGES.solutionsAppPhoneInsights} alt="Real-time Insights" className="absolute inset-[10%] w-[80%] h-[80%] object-cover rounded-[20px]" loading="lazy" decoding="async" />
                     {/* Phone Frame Overlay */}
@@ -1961,11 +1959,11 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                 <motion.div className="flex flex-row-reverse items-center gap-8 lg:gap-10" {...sectionMotionProps}>
                   <div className="flex-1 text-center px-1 sm:text-center sm:px-6">
                     <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-2">Smart Scheduling</h3>
-                    <p className="text-[14px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
+                    <p className="text-[10px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
                       Automatically run high-load devices when solar power is abundant to maximize efficiency and reduce costs.
                     </p>
                   </div>
-                  <div className="flex-shrink-0 relative w-[220px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
+                  <div className="flex-shrink-0 relative w-[176px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
                     {/* App Screenshot */}
                     <img src={APP_IMAGES.solutionsAppPhoneMonitor} alt="Smart Scheduling" className="absolute inset-[14%] top-[10%] w-[75%] h-[80%] object-cover rounded-[10px]" loading="lazy" decoding="async" />
                     {/* Phone Frame Overlay */}
@@ -1977,11 +1975,11 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                 <motion.div className="flex flex-row items-center gap-8 lg:gap-10" {...sectionMotionProps}>
                   <div className="flex-1 text-center px-2 sm:text-center sm:px-6">
                     <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-4">Routines and Modes</h3>
-                    <p className="text-[14px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
+                    <p className="text-[10px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
                       Set your home to match your daily life. Lights, fans, and devices adjust automatically to your routine.
                     </p>
                   </div>
-                  <div className="flex-shrink-0 relative w-[200px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
+                  <div className="flex-shrink-0 relative w-[160px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
                     {/* App Screenshot */}
                     <img src={APP_IMAGES.solutionsAppPhoneModes} alt="Routines and Modes" className="absolute inset-[11.5%] top-[8.5%] w-[77%] h-[83%] object-cover rounded-[20px]" loading="lazy" decoding="async" />
                     {/* Phone Frame Overlay */}
@@ -1993,11 +1991,11 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                 <motion.div className="flex flex-row-reverse items-center gap-8 lg:gap-10" {...sectionMotionProps}>
                   <div className="flex-1 text-center px-2 sm:text-center sm:px-6">
                     <h3 className="text-[18px] sm:text-[28px] lg:text-[30px] font-['Urbanist'] font-bold text-[#0a0a0a] tracking-[-1.2px] mb-4">Maintenance and Care</h3>
-                    <p className="text-[14px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
+                    <p className="text-[10px] sm:text-[20px] lg:text-[24px] font-['Poppins'] text-[#4a5565] tracking-[-0.96px] leading-relaxed">
                       Easily book service appointments and keep your solar and smart systems performing at their best.
                     </p>
                   </div>
-                  <div className="flex-shrink-0 relative w-[220px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
+                  <div className="flex-shrink-0 relative w-[176px] sm:w-[380px] lg:w-[370px] aspect-[329/636]">
                     {/* App Screenshot */}
                     <img src={APP_IMAGES.solutionsAppPhoneHero} alt="Maintenance and Care" className="absolute inset-[14.5%] top-[9%] bottom-[6%] w-[75%] object-cover rounded-[20px]" loading="lazy" decoding="async" />
                     {/* Phone Frame Overlay */}
@@ -2075,7 +2073,7 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
             </motion.div>
 
             <div className="relative">
-              <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-gradient-to-b from-[#9ee2b4] via-[#9ee2b4]/60 to-transparent z-0" />
+              <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-gradient-to-b from-[#3fa66b] via-[#3fa66b]/95 to-transparent z-0 hidden md:block" />
 
               <motion.div className="space-y-10 sm:space-y-12 md:space-y-16 relative z-10" {...staggerMotionProps}>
                 {storySteps.map((step, idx) => (
@@ -2085,7 +2083,7 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                     className={`flex flex-col ${step.align === "left" ? "md:flex-row" : "md:flex-row-reverse"} items-center gap-6 sm:gap-8 md:gap-12 relative`}
                   >
                     <div className="w-full md:w-1/2">
-                      <div className="shadow-sm border border-[#e5f3e9] rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 bg-white relative z-10">
+                      <div className="shadow-sm border border-[#e5f3e9] rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 bg-transparent relative z-10">
                         <h3 className="text-lg sm:text-xl md:text-2xl font-bold font-['Urbanist'] mb-2 sm:mb-3 leading-snug">{step.title}</h3>
                         {step.body && <p className="text-[#4a5565] font-['Poppins'] text-sm sm:text-base md:text-lg leading-relaxed">{step.body}</p>}
                       </div>
