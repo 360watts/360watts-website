@@ -837,7 +837,7 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
             <img 
               src={slide.bg} 
               alt="" 
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-cover object-[70%_50%] sm:object-center"
             />
           </div>
         ))}
@@ -847,7 +847,7 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
         
         {/* Hero Content */}
         <div className="relative z-10 h-full flex items-center">
-          <div className="w-full max-w-7xl mx-auto px-2 sm:px-6">
+          <div className="w-full max-w-7xl mx-auto px-2 sm:px-6 text-left">
             {heroSlides.map((slide, index) => (
               <div
                 key={index}
@@ -860,7 +860,7 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                     initial={reduceMotion ? undefined : { y: 22 }}
                     animate={{ y: 0 }}
                     transition={{ duration: 0.75, ease: "easeOut" }}
-                    className="max-w-3xl px-2 sm:px-0"
+                    className="max-w-3xl px-2 sm:px-0 mr-auto text-left"
                   >
                     <h1 className="text-[16px] sm:text-5xl md:text-7xl lg:text-[99px] font-bold text-[rgba(247,255,249,0.8)] font-['Urbanist'] mb-1.5 sm:mb-6 leading-[1.1] tracking-tight sm:tracking-[-3.96px] whitespace-pre-line">
                       {slide.title}
@@ -925,33 +925,33 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
         }}
       >
       {/* Our Unified Solution Section */}
-      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 bg-transparent">
+      <section className="py-8 sm:py-16 md:py-20 px-4 sm:px-6 bg-transparent">
         <div className="w-full max-w-7xl mx-auto">
-          <div className="text-center mb-6 sm:mb-8 md:mb-12">
-            <h2 className="text-[30px] sm:text-[35px] md:text-[40px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-2 tracking-tight sm:tracking-[-1.6px]">Our Unified Solution</h2>
-            <p className="text-[20px] sm:text-[24px] md:text-[27px] text-[#4a5565] font-['Poppins'] tracking-tight sm:tracking-[-1.08px]">Two products. One platform for all your energy needs.</p>
+          <div className="text-center mb-4 sm:mb-8 md:mb-12">
+            <h2 className="text-[22px] sm:text-[35px] md:text-[40px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-1.5 sm:mb-2 tracking-tight sm:tracking-[-1.6px]">Our Unified Solution</h2>
+            <p className="text-[14px] sm:text-[24px] md:text-[27px] text-[#4a5565] font-['Poppins'] tracking-tight sm:tracking-[-1.08px]">Two products. One platform for all your energy needs.</p>
           </div>
           
-          <div className="flex flex-col md:flex-row gap-6 md:gap-8 lg:gap-[113px] justify-center items-stretch mb-8">
+          <div className="flex flex-col md:flex-row gap-4 sm:gap-6 md:gap-8 lg:gap-[113px] justify-center items-stretch mb-6 sm:mb-8">
             {/* Solar Solutions Card */}
-            <div className="relative rounded-[20px] overflow-hidden w-full md:flex-1 lg:w-[567px] h-[280px] sm:h-[300px] md:h-[320px] lg:h-[342px] transition-transform duration-300 hover:-translate-y-2 hover:scale-[1.01]">
+            <div className="relative rounded-[16px] sm:rounded-[20px] overflow-hidden w-full md:flex-1 lg:w-[567px] h-[220px] sm:h-[300px] md:h-[320px] lg:h-[342px] transition-transform duration-300 hover:-translate-y-2 hover:scale-[1.01]">
               <img 
                 src="/solar-panels-house-roof.jpg" 
                 alt="Solar Solutions" 
                 className="absolute inset-0 w-full h-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(204,204,204,0.3)] to-transparent rounded-[20px]" />
-              <div className="absolute inset-0 p-3 sm:p-4 md:p-6 lg:p-[30px] flex flex-col justify-start text-left">
-                <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 lg:gap-[19px] pt-3 sm:pt-4 md:pt-6 lg:pt-[24px]">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14">
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(204,204,204,0.3)] to-transparent rounded-[16px] sm:rounded-[20px]" />
+              <div className="absolute inset-0 p-2.5 sm:p-4 md:p-6 lg:p-[30px] flex flex-col justify-start text-left">
+                <div className="flex flex-col gap-1.5 sm:gap-3 md:gap-4 lg:gap-[19px] pt-2 sm:pt-4 md:pt-6 lg:pt-[24px]">
+                  <div className="w-7 h-7 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14">
                     <svg viewBox="0 0 56 56" fill="none" className="w-full h-full">
                       <circle cx="28" cy="28" r="12" fill="#FFA500"/>
                       <path d="M28 8V2M28 54V48M48 28H54M2 28H8M43 13L47 9M9 47L13 43M43 43L47 47M9 9L13 13" stroke="#FFA500" strokeWidth="4" strokeLinecap="round"/>
                     </svg>
                   </div>
-                  <div className="flex flex-col gap-[6px] sm:gap-[7px] md:gap-[8px] mt-8 sm:mt-0">
-                    <h3 className="text-[20px] sm:text-[22px] md:text-[24px] lg:text-[27px] xl:text-[30px] font-bold text-black font-['Urbanist'] leading-tight md:leading-8 lg:leading-9 drop-shadow-lg">Solar Solutions</h3>
-                    <p className="text-black text-[14px] sm:text-[15px] md:text-[16px] lg:text-[16.5px] xl:text-[17px] font-['Poppins'] leading-4 sm:leading-5 opacity-95 drop-shadow-md">Total control. Zero worries.</p>
+                  <div className="flex flex-col gap-1 sm:gap-[7px] md:gap-[8px] mt-4 sm:mt-0">
+                    <h3 className="text-[16px] sm:text-[22px] md:text-[24px] lg:text-[27px] xl:text-[30px] font-bold text-black font-['Urbanist'] leading-tight md:leading-8 lg:leading-9 drop-shadow-lg">Solar Solutions</h3>
+                    <p className="text-black text-[12px] sm:text-[15px] md:text-[16px] lg:text-[16.5px] xl:text-[17px] font-['Poppins'] leading-4 sm:leading-5 opacity-95 drop-shadow-md">Total control. Zero worries.</p>
                   </div>
                 </div>
               </div>
@@ -961,19 +961,19 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
             <div className="hidden md:flex items-center justify-center w-8 md:w-12 h-8 md:h-12 text-[#4a5565] text-3xl md:text-5xl font-light mt-20 md:mt-24">+</div>
 
             {/* Smart Home Solutions Card */}
-            <div className="relative rounded-[20px] overflow-hidden w-full md:flex-1 lg:w-[567px] h-[280px] sm:h-[300px] md:h-[320px] lg:h-[342px] transition-transform duration-300 hover:-translate-y-2 hover:scale-[1.01]">
+            <div className="relative rounded-[16px] sm:rounded-[20px] overflow-hidden w-full md:flex-1 lg:w-[567px] h-[220px] sm:h-[300px] md:h-[320px] lg:h-[342px] transition-transform duration-300 hover:-translate-y-2 hover:scale-[1.01]">
               <img 
                 src={APP_IMAGES.digitalTablet} 
                 alt="Smart Home Solutions" 
                 className="absolute inset-0 w-full h-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(204,204,204,0.75)] to-transparent rounded-[20px]" />
-              <div className="absolute inset-0 p-3 sm:p-4 md:p-6 lg:p-[30px] flex flex-col justify-start text-left">
-                <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 lg:gap-[19px] pt-3 sm:pt-4 md:pt-6 lg:pt-[24px]">
-                  <img src={APP_IMAGES.iconSmartHome} alt="" className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
-                  <div className="flex flex-col gap-[6px] sm:gap-[7px] md:gap-[8px] mt-8 sm:mt-0">
-                    <h3 className="text-[20px] sm:text-[22px] md:text-[24px] lg:text-[26px] xl:text-[28px] font-bold text-black font-['Urbanist'] leading-tight md:leading-8 lg:leading-9 drop-shadow-lg">Smart Home Solutions</h3>
-                    <p className="text-black text-[14px] sm:text-[15px] md:text-[16px] lg:text-[16.5px] xl:text-[17px] font-['Poppins'] leading-4 sm:leading-5 drop-shadow-md">The future of living, powered by intelligence.</p>
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(204,204,204,0.75)] to-transparent rounded-[16px] sm:rounded-[20px]" />
+              <div className="absolute inset-0 p-2.5 sm:p-4 md:p-6 lg:p-[30px] flex flex-col justify-start text-left">
+                <div className="flex flex-col gap-1.5 sm:gap-3 md:gap-4 lg:gap-[19px] pt-2 sm:pt-4 md:pt-6 lg:pt-[24px]">
+                  <img src={APP_IMAGES.iconSmartHome} alt="" className="w-7 h-7 sm:w-10 sm:h-10 md:w-12 md:h-12" />
+                  <div className="flex flex-col gap-1 sm:gap-[7px] md:gap-[8px] mt-4 sm:mt-0">
+                    <h3 className="text-[16px] sm:text-[22px] md:text-[24px] lg:text-[26px] xl:text-[28px] font-bold text-black font-['Urbanist'] leading-tight md:leading-8 lg:leading-9 drop-shadow-lg">Smart Home Solutions</h3>
+                    <p className="text-black text-[12px] sm:text-[15px] md:text-[16px] lg:text-[16.5px] xl:text-[17px] font-['Poppins'] leading-4 sm:leading-5 drop-shadow-md">The future of living, powered by intelligence.</p>
                   </div>
                 </div>
               </div>
@@ -983,10 +983,10 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
           <div className="text-center">
             <a 
               href="#solutions-section" 
-              className="inline-flex items-center gap-2 px-6 py-4 border border-[rgba(74,85,101,0.75)] rounded-[10px] text-[#4a5565] hover:bg-gray-50 transition-colors text-[19px] tracking-[-0.76px]"
+              className="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-4 border border-[rgba(74,85,101,0.75)] rounded-[10px] text-[#4a5565] hover:bg-gray-50 transition-colors text-[14px] sm:text-[19px] tracking-[-0.76px]"
             >
               Know more
-              <ArrowRight className="w-6 h-6" />
+              <ArrowRight className="w-4 h-4 sm:w-6 sm:h-6" />
             </a>
           </div>
         </div>
@@ -1116,12 +1116,12 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                       key={index} 
                       className="group relative bg-gradient-to-r from-white to-[#f7fff9] rounded-[20px] p-5 border-2 border-transparent hover:border-[#ddefff] hover:shadow-md transition-all duration-300"
                     >
-                      <div className="flex items-start gap-4">
-                        <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center text-[20px] font-bold font-['Urbanist'] flex-shrink-0 bg-gradient-to-br from-[#ddefff] to-[#bfdbfe] text-[#0a0a0a] group-hover:scale-110 transition-all duration-300">
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        <div className="w-[44px] h-[44px] sm:w-[48px] sm:h-[48px] md:w-[50px] md:h-[50px] rounded-full flex items-center justify-center text-[17px] sm:text-[19px] md:text-[20px] font-bold font-['Urbanist'] flex-shrink-0 bg-gradient-to-br from-[#ddefff] to-[#bfdbfe] text-[#0a0a0a] group-hover:scale-110 transition-all duration-300">
                           {step.number}
                         </div>
                         <div className="flex-1">
-                          <h4 className="text-[22px] text-[#0a0a0a] font-bold font-['Urbanist'] tracking-[-0.5px] leading-7">
+                          <h4 className="text-[17px] sm:text-[19px] md:text-[22px] text-[#0a0a0a] font-bold font-['Urbanist'] tracking-[-0.5px] leading-tight sm:leading-7">
                             {step.title}
                           </h4>
                           <div className="mt-3">
@@ -1411,20 +1411,14 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                 </p>
               </div>
               <div className="grid sm:grid-cols-2 gap-3">
-                <div className="flex items-start gap-3 bg-white/5 border border-white/10 rounded-2xl px-4 py-3">
-                  <CheckCircle className="w-5 h-5 text-[#8ff0b5]" />
-                  <p className="text-sm sm:text-[15px] font-['Poppins'] text-white/85">State-specific sunlight hours baked in.</p>
+                <div className="flex items-start gap-3  px-4 py-3">
                 </div>
-                <div className="flex items-start gap-3 bg-white/5 border border-white/10 rounded-2xl px-4 py-3">
-                  <CheckCircle className="w-5 h-5 text-[#8ff0b5]" />
-                  <p className="text-sm sm:text-[15px] font-['Poppins'] text-white/85">Roof type + usable area drive panel count.</p>
+                <div className="flex items-start gap-3  px-4 py-3">
                 </div>
-                <div className="flex items-start gap-3 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 sm:col-span-2">
-                  <CheckCircle className="w-5 h-5 text-[#8ff0b5]" />
-                  <p className="text-sm sm:text-[15px] font-['Poppins'] text-white/85">Expert consultation validates your estimate.</p>
+                <div className="flex items-start gap-3  px-4 py-3 sm:col-span-2">
                 </div>
               </div>
-              <div className="flex items-center gap-3 text-sm sm:text-base text-white/80">
+              <div className="flex items-center gap-2 text-sm sm:text-base text-white/90">
                 <MessageCircle className="w-4 h-4" />
                 <span>We respond with a refined quote within one business day.</span>
               </div>
