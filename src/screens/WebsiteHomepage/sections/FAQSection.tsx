@@ -14,9 +14,9 @@ export function FAQSection() {
         <div className="absolute inset-0 bg-gradient-to-r from-[rgba(0,166,62,0.09)] to-[rgba(0,122,85,0.09)] rounded-[50px] sm:rounded-[60px] md:rounded-[80px]" />
         <header className="relative h-[280px] sm:h-[320px] md:h-[380px] flex items-center justify-center px-0">
           <motion.div className="w-full max-w-[960px] mx-auto min-w-0 text-center space-y-2" variants={revealVariant}>
-            <h1 className="text-[26px] sm:text-[30px] md:text-[36px] font-bold tracking-[-0.04em] font-['Urbanist']">
+            <h2 className="text-[26px] sm:text-[30px] md:text-[36px] font-bold tracking-[-0.04em] font-['Urbanist']">
               Frequently Asked Questions
-            </h1>
+            </h2>
             <p className="text-[14px] sm:text-[17px] md:text-[20px] text-[#4a5565] font-['Poppins'] leading-snug">
               Find answers to common questions about 360watts solar and smart home solutions
             </p>

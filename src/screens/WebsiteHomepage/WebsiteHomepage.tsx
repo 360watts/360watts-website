@@ -1,18 +1,31 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { Navigation } from "../../components/Navigation";
 import { SeoHead } from "../../components/SeoHead";
-import { FooterSection } from "./sections/FooterSection";
 import { HeroSection } from "./sections/HeroSection";
 import { UnifiedSolutionSection } from "./sections/UnifiedSolutionSection";
 import { Why360wattsSection } from "./sections/Why360wattsSection";
 import { HowItWorksSection } from "./sections/HowItWorksSection";
 import { AppShowcaseSection } from "./sections/AppShowcaseSection";
-import { SolarCalculatorSection } from "./sections/SolarCalculatorSection";
-import { FAQSection } from "./sections/FAQSection";
-import { SolutionsSection } from "./sections/SolutionsSection";
-import { AboutSection } from "./sections/AboutSection";
-import { ContactSection } from "./sections/ContactSection";
 import { staggerMotionProps } from "./lib/motion";
+
+const SolarCalculatorSection = lazy(() =>
+  import("./sections/SolarCalculatorSection").then((m) => ({ default: m.SolarCalculatorSection }))
+);
+const SolutionsSection = lazy(() =>
+  import("./sections/SolutionsSection").then((m) => ({ default: m.SolutionsSection }))
+);
+const AboutSection = lazy(() =>
+  import("./sections/AboutSection").then((m) => ({ default: m.AboutSection }))
+);
+const FAQSection = lazy(() =>
+  import("./sections/FAQSection").then((m) => ({ default: m.FAQSection }))
+);
+const ContactSection = lazy(() =>
+  import("./sections/ContactSection").then((m) => ({ default: m.ContactSection }))
+);
+const FooterSection = lazy(() =>
+  import("./sections/FooterSection").then((m) => ({ default: m.FooterSection }))
+);
 
 export const WebsiteHomepage = (): JSX.Element => {
   // Scroll to contact section if hash is present
@@ -52,17 +65,29 @@ export const WebsiteHomepage = (): JSX.Element => {
           
       <AppShowcaseSection />
 
-      <SolarCalculatorSection />
+      <Suspense fallback={null}>
+        <SolarCalculatorSection />
+      </Suspense>
 
-      <SolutionsSection />
+      <Suspense fallback={null}>
+        <SolutionsSection />
+      </Suspense>
 
-      <AboutSection />
+      <Suspense fallback={null}>
+        <AboutSection />
+      </Suspense>
 
-      <FAQSection />
+      <Suspense fallback={null}>
+        <FAQSection />
+      </Suspense>
 
-      <ContactSection />
+      <Suspense fallback={null}>
+        <ContactSection />
+      </Suspense>
 
-      <FooterSection motionProps={staggerMotionProps} />
+      <Suspense fallback={null}>
+        <FooterSection motionProps={staggerMotionProps} />
+      </Suspense>
     </div>
   );
 };

@@ -91,7 +91,7 @@ export function HeroSection() {
             }
             className="w-full h-full object-cover object-[70%_50%] sm:object-center"
             {...(index === 0
-              ? { fetchPriority: "high" as const }
+              ? ({ fetchpriority: "high" as const } as any)
               : { loading: "lazy" as const, decoding: "async" as const })}
           />
         </div>

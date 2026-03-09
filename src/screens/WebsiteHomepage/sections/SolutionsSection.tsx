@@ -125,6 +125,7 @@ export function SolutionsSection() {
                   onClick={seek}
                   onKeyDown={(e) => e.key === "Enter" && (e.currentTarget as HTMLDivElement).click()}
                   role="progressbar"
+                  aria-label="Video progress"
                   aria-valuenow={progress.duration ? Math.round(progress.current) : 0}
                   aria-valuemin={0}
                   aria-valuemax={progress.duration ? Math.round(progress.duration) : 0}

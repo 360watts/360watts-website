@@ -114,9 +114,9 @@ export function AppShowcaseSection() {
                     <img src={feature.icon} alt="" className="w-7 h-7" />
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-black text-xl font-['Poppins']">
+                    <h3 className="font-extrabold text-black text-xl font-['Poppins']">
                       {feature.title}
-                    </h4>
+                    </h3>
                     <p className="text-white font-['Poppins']">{feature.description}</p>
                   </div>
                 </button>
@@ -213,12 +213,14 @@ export function AppShowcaseSection() {
                   aria-selected={i === currentAppSlide}
                   aria-label={slide.alt}
                   onClick={() => setCurrentAppSlide(i)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    i === currentAppSlide
-                      ? "bg-white w-6"
-                      : "bg-white/40 w-2 hover:bg-white/70"
-                  }`}
-                />
+                  className="group min-w-[44px] min-h-[44px] flex items-center justify-center transition-transform duration-200 hover:scale-110 active:scale-95"
+                >
+                  <span
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      i === currentAppSlide ? "bg-white w-6" : "bg-white/40 w-2 group-hover:bg-white/70"
+                    }`}
+                  />
+                </button>
               ))}
             </div>
           </div>

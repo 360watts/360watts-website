@@ -405,6 +405,7 @@ export function ContactSection() {
           <motion.div className="grid grid-cols-1 md:grid-cols-5 gap-5 sm:gap-6 md:gap-8 mb-6 sm:mb-8 md:mb-10 min-w-0" {...staggerMotionProps}>
             <motion.div className="md:col-span-3 rounded-[16px] sm:rounded-[20px] md:rounded-[24px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.1)] h-[280px] sm:h-[340px] md:h-[400px] min-w-0" variants={revealVariant}>
               <iframe
+                title="360watts office location map (Coimbatore)"
                 width="100%"
                 height="100%"
                 style={{ border: "none" }}

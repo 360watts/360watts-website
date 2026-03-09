@@ -12,8 +12,18 @@ const About = lazy(() => import("./screens/About").then((m) => ({ default: m.Abo
 const Contact = lazy(() => import("./screens/Contact").then((m) => ({ default: m.Contact })));
 const FAQ = lazy(() => import("./screens/FAQ").then((m) => ({ default: m.FAQ })));
 
-// Start preloading images immediately
-preloadAllImages();
+// Defer non-LCP image preloading until after page is interactive to avoid competing with LCP.
+if (typeof window !== "undefined") {
+  const scheduleDeferredPreload = () => {
+    if ("requestIdleCallback" in window) {
+      (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => void }).requestIdleCallback(() => preloadAllImages(), { timeout: 3000 });
+    } else {
+      window.setTimeout(preloadAllImages, 2000);
+    }
+  };
+  if (document.readyState === "complete") scheduleDeferredPreload();
+  else window.addEventListener("load", scheduleDeferredPreload);
+}
 
 function SkipLink() {
   return (
