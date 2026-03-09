@@ -80,8 +80,11 @@
     </style>
     <link href="tailwind.css" rel="stylesheet" />
     <link rel="icon" type="image/png" href="/final-logo-png-4x-1.png" />
-    <!-- Preload LCP hero image -->
-    <link rel="preload" as="image" href="/smartEnergy.png" />
+    <!-- Preload LCP hero image — responsive WebP variants so the browser
+         fetches only the size it needs (mobile 640 w, tablet 1280 w, desktop full). -->
+    <link rel="preload" as="image" href="/smartEnergy.webp"
+          imagesrcset="/smartEnergy-640.webp 640w, /smartEnergy-1280.webp 1280w, /smartEnergy.webp 1920w"
+          imagesizes="100vw" />
   </head>
   <body>
     <div id="app"></div>

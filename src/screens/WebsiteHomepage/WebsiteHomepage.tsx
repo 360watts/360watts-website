@@ -52,7 +52,7 @@ export const WebsiteHomepage = (): JSX.Element => {
       <HeroSection />
 
       <div
-        className="relative w-full min-w-0 overflow-x-hidden"
+        className="relative w-full min-w-0 overflow-hidden"
         style={{
           background:
             "radial-gradient(1200px 520px at 50% -18%, rgba(15,23,42,0.06), transparent 60%), radial-gradient(900px 520px at 110% 12%, rgba(59,130,246,0.10), transparent 66%), linear-gradient(180deg, #f7fff9 0%, #f6fdf8 36%, #eef9f3 72%, #e3f3ea 100%)",

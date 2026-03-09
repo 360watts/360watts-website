@@ -22,9 +22,10 @@ body {
   border-radius: 4px;
 }
 
-/* Smooth scroll for the whole page */
+/* Smooth scroll for the whole page; reserve space for scrollbar so it doesn't cover content */
 html {
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 
 /* Custom scrollbar */

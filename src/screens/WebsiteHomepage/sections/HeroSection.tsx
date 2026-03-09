@@ -74,26 +74,34 @@ export function HeroSection() {
       onTouchEnd={handleTouchEnd}
       {...sectionMotionProps}
     >
-      {/* Background images — instant swap, no animation (performance) */}
+      {/* Background images — instant swap, no animation (performance).
+          <picture> serves responsive WebP variants; <img> fallback for older browsers. */}
       {heroSlides.map((slide, index) => (
         <div
           key={index}
           className={`absolute inset-0 ${index === currentSlide ? "" : "hidden"}`}
         >
-          <img
-            src={slide.bg}
-            alt={
-              index === 0
-                ? "Smart energy and sustainable living - 360watts hero"
-                : index === 1
-                  ? "Solar power and clean energy - 360watts"
-                  : ""
-            }
-            className="w-full h-full object-cover object-[70%_50%] sm:object-center"
-            {...(index === 0
-              ? ({ fetchpriority: "high" as const } as any)
-              : { loading: "lazy" as const, decoding: "async" as const })}
-          />
+          <picture>
+            <source
+              type="image/webp"
+              srcSet={slide.bgSrcSet}
+              sizes="100vw"
+            />
+            <img
+              src={slide.bgFallback}
+              alt={
+                index === 0
+                  ? "Smart energy and sustainable living - 360watts hero"
+                  : index === 1
+                    ? "Solar power and clean energy - 360watts"
+                    : ""
+              }
+              className="w-full h-full object-cover object-[70%_50%] sm:object-center"
+              {...(index === 0
+                ? ({ fetchpriority: "high" as const } as any)
+                : { loading: "lazy" as const, decoding: "async" as const })}
+            />
+          </picture>
         </div>
       ))}
 

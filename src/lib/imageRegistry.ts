@@ -3,20 +3,20 @@ import { preloadImages } from './utils';
 // Global image registry - all images used across the app
 export const APP_IMAGES = {
   // Homepage images
-  smartEnergy : "/smartEnergy.png",
-  solarPowerStation: "/solarPowerStation.jpg",
+  smartEnergy: "/smartEnergy.webp",
+  solarPowerStation: "/solarPowerStation.webp",
   finalLogo: "/final-logo-png-4x-1.png",
   footerLogo: "/logo_with_font.png",
-  image7: "/image7.png",
-  image8: "/image8.png",
-  image5: "/image5.png",
-  image6: "/image6.png",
-  image4: "/image4.png",
-  phone1401: "/phonecover.png",
+  image7: "/image7.webp",
+  image8: "/image8.webp",
+  image5: "/image5.webp",
+  image6: "/image6.webp",
+  image4: "/image4.webp",
+  phone1401: "/phonecover.webp",
   sun21: "/sun.png",
   smartHouse1: "/smarthouse.png",
-  technicianSolarPanels: "/technicianSolarPanels.jpg",
-  digitalTablet: "/digitaltablet.jpg",
+  technicianSolarPanels: "/technicianSolarPanels.webp",
+  digitalTablet: "/digitaltablet.webp",
   iconSavings: "/IconSavings.svg",
   iconEnergy: "/iconEnergy.svg",
   iconEco: "/iconEco.svg",
@@ -27,7 +27,7 @@ export const APP_IMAGES = {
   iconSmartHome: "/iconSmartHome.svg",
 
   // About page assets
-  aboutHero: "/aboutHero.jpg",
+  aboutHero: "/aboutHero.webp",
   aboutLogo: "/logo_with_font.png",
   aboutIdea: "/aboutIdea.png",
   aboutWalk: "/aboutWalk.png",
@@ -44,20 +44,20 @@ export const APP_IMAGES = {
   appIcon4: "/appIcon04.svg",
 
   // Team member photos
-  teamSrinath: "/team-srinath.jpeg",
-  teamHariprasad: "/team-hariprasad.jpeg",
-  teamParvathi: "/team-parvathi.jpeg",
-  teamSelvaNancy: "/team-selva-nancy.jpeg",
-  teamRajeev: "/team-rajeev.jpeg",
+  teamSrinath: "/team-srinath.webp",
+  teamHariprasad: "/team-hariprasad.webp",
+  teamParvathi: "/team-parvathi.webp",
+  teamSelvaNancy: "/team-selva-nancy.webp",
+  teamRajeev: "/team-rajeev.webp",
 
   // Solutions images
   solutionsVideo: "/VID-20251219-WA0000.mp4",
-  solutionsSolarHouse: "/solutionsSolarHouse.jpg",
-  solutionsSmartHomeScene: "/solutionsSmartHomeScene.png",
-  solutionsAppPhoneHero: "/image12.png",
-  solutionsAppPhoneInsights: "/image4.png",
-  solutionsAppPhoneMonitor: "/image7.png",
-  solutionsAppPhoneModes: "/image10.png",
+  solutionsSolarHouse: "/solutionsSolarHouse.webp",
+  solutionsSmartHomeScene: "/solutionsSmartHomeScene.webp",
+  solutionsAppPhoneHero: "/image12.webp",
+  solutionsAppPhoneInsights: "/image4.webp",
+  solutionsAppPhoneMonitor: "/image7.webp",
+  solutionsAppPhoneModes: "/image10.webp",
 } as const;
 
 const isImageAsset = (url: string) => /\.(png|jpe?g|svg|webp)$/i.test(url);
@@ -69,11 +69,11 @@ export const preloadAllImages = () => {
   if (hasPreloaded || typeof window === "undefined") return;
   hasPreloaded = true;
 
+  // Only preload small assets needed just after the hero — hero slide 1 is
+  // preloaded via <link rel="preload"> in index.html so it is excluded here.
   const criticalImages = [
     APP_IMAGES.finalLogo,
-    APP_IMAGES.solarPowerStation,
-    APP_IMAGES.technicianSolarPanels,
-    APP_IMAGES.digitalTablet,
+    APP_IMAGES.solarPowerStation, // slide 2 (402 KB WebP → 62 KB at 1280w in index.html preload)
   ].filter(isImageAsset) as readonly string[];
 
   const allImages = Array.from(

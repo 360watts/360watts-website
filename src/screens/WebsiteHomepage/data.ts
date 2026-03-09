@@ -92,11 +92,15 @@ export const localFinalLogo = "/final-logo-png-4x-2.png";
 export const heroSlides = [
   {
     bg: APP_IMAGES.smartEnergy,
+    bgSrcSet: "/smartEnergy-640.webp 640w, /smartEnergy-1280.webp 1280w, /smartEnergy.webp 1920w",
+    bgFallback: "/smartEnergy.png",
     title: "Smarter Energy.\nSmarter Living",
     subtitle: "360watts unites solar power and smart home automation, helping you save more, live cleaner, and control everything effortlessly.",
   },
   {
     bg: APP_IMAGES.solarPowerStation,
+    bgSrcSet: "/solarPowerStation-640.webp 640w, /solarPowerStation-1280.webp 1280w, /solarPowerStation.webp 1920w",
+    bgFallback: "/solarPowerStation.jpg",
     title: "Power Your Home.\nSave the Planet.",
     subtitle: "Harness the sun's energy with our cutting-edge solar solutions. Reduce bills and your carbon footprint simultaneously.",
   },

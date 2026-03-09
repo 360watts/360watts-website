@@ -5,7 +5,7 @@ import { revealVariant, sectionMotionProps, staggerMotionProps, cardMotionProps,
 
 export function UnifiedSolutionSection() {
   return (
-    <motion.section className="py-8 sm:py-16 md:py-20 px-4 sm:px-6 bg-transparent" {...sectionMotionProps}>
+    <motion.section className="py-8 sm:py-16 md:py-20 px-4 sm:px-6 bg-transparent overflow-hidden" {...sectionMotionProps}>
       <div className="w-full max-w-7xl mx-auto min-w-0">
         <motion.div className="text-center mb-4 sm:mb-8 md:mb-12" variants={revealVariant}>
           <h2 className="text-[22px] sm:text-[35px] md:text-[40px] font-bold text-[#0a0a0a] font-['Urbanist'] mb-1.5 sm:mb-2 tracking-tight sm:tracking-[-1.6px]">
@@ -18,11 +18,16 @@ export function UnifiedSolutionSection() {
 
         <motion.div className="flex flex-col md:flex-row gap-4 sm:gap-6 md:gap-8 lg:gap-[113px] justify-center items-stretch mb-6 sm:mb-8" {...staggerMotionProps}>
           <motion.div variants={revealVariant} {...cardMotionProps} className="relative rounded-[16px] sm:rounded-[20px] overflow-hidden w-full md:flex-1 lg:w-[567px] h-[220px] sm:h-[300px] md:h-[320px] lg:h-[342px]">
-            <img
-              src="/solar-panels-house-roof.jpg"
-              alt="Solar Solutions"
-              className="absolute inset-0 w-full h-full object-cover object-center"
-            />
+            <picture>
+              <source type="image/webp" srcSet="/solar-panels-house-roof.webp" />
+              <img
+                src="/solar-panels-house-roof.jpg"
+                alt="Solar Solutions"
+                className="absolute inset-0 w-full h-full object-cover object-center"
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(204,204,204,0.3)] to-transparent rounded-[16px] sm:rounded-[20px]" />
             <div className="absolute inset-0 p-2.5 sm:p-4 md:p-6 lg:p-[30px] flex flex-col justify-start text-left">
               <div className="flex flex-col gap-1.5 sm:gap-3 md:gap-4 lg:gap-[19px] pt-2 sm:pt-4 md:pt-6 lg:pt-[24px]">
@@ -58,6 +63,8 @@ export function UnifiedSolutionSection() {
               src={APP_IMAGES.digitalTablet}
               alt="Smart Home Solutions"
               className="absolute inset-0 w-full h-full object-cover object-center"
+              loading="lazy"
+              decoding="async"
             />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(204,204,204,0.75)] to-transparent rounded-[16px] sm:rounded-[20px]" />
             <div className="absolute inset-0 p-2.5 sm:p-4 md:p-6 lg:p-[30px] flex flex-col justify-start text-left">
