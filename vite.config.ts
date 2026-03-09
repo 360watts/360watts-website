@@ -11,4 +11,15 @@ export default defineConfig({
       plugins: [tailwind()],
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vendor-motion": ["framer-motion"],
+          "vendor-countup": ["react-countup"],
+          "vendor-intersection": ["react-intersection-observer"],
+        },
+      },
+    },
+  },
 });

@@ -56,7 +56,7 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
           : "bg-white/95 backdrop-blur-md shadow-lg py-2 lg:py-3"
       }`}
     >
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between min-w-0">
         {/* Logo */}
         <div 
           onClick={(e: React.MouseEvent) => handleNavClick(e, "hero-section")}
@@ -110,7 +110,7 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
         {/* Mobile Menu Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="lg:hidden p-1.5 rounded-lg hover:bg-black/10 transition-colors"
+          className="lg:hidden p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-black/10 transition-colors"
           aria-label="Toggle menu"
         >
           {mobileMenuOpen ? (
@@ -133,7 +133,7 @@ export const Navigation = ({ transparent = false }: NavigationProps): JSX.Elemen
               key={index}
               href={`#${item.sectionId}`}
               onClick={(e: React.MouseEvent) => handleNavClick(e, item.sectionId)}
-              className="block px-4 py-3 rounded-xl font-medium font-['Poppins'] transition-colors cursor-pointer text-neutral-700 hover:bg-gray-50"
+              className="block px-4 py-3 min-h-[44px] rounded-xl font-medium font-['Poppins'] transition-colors cursor-pointer text-neutral-700 hover:bg-gray-50"
             >
               {item.label}
             </a>
