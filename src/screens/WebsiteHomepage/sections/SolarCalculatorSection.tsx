@@ -300,10 +300,10 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
 
   return (
     <>
-      <section id="solar-calculator" className="w-full max-w-7xl mx-auto px-4 py-6 sm:py-16 md:py-20 min-w-0">
+      <section id="solar-calculator" className="w-full max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-16 md:py-20 min-w-0 overflow-x-hidden">
         <div
           ref={calculatorRef}
-          className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0f2418] via-[#0c1e14] to-[#0f2f1e] text-white shadow-[0_24px_70px_rgba(0,0,0,0.22)] border border-white/10"
+          className="relative overflow-hidden rounded-[20px] sm:rounded-[28px] bg-gradient-to-br from-[#0f2418] via-[#0c1e14] to-[#0f2f1e] text-white shadow-[0_24px_70px_rgba(0,0,0,0.22)] border border-white/10"
           style={{ opacity: 1, transform: "none" }}
           onMouseMove={handleCalcMouseMove}
         >
@@ -317,83 +317,83 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
             }}
             aria-hidden="true"
           />
-          <div className="relative grid lg:grid-cols-[1.05fr_1fr] min-w-0">
-            <div className="p-4 md:p-10 lg:p-12 flex flex-col gap-4 sm:gap-6">
+          <div className="relative grid lg:grid-cols-[1.05fr_1fr] min-w-0 gap-4 sm:gap-0">
+            <div className="p-4 sm:p-6 md:p-10 lg:p-12 flex flex-col gap-3 sm:gap-6">
               <span className="inline-flex items-center gap-2 w-fit px-2 sm:px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[10px] sm:text-sm font-semibold tracking-[0.12em] uppercase">
                 <Calculator className="w-3 h-3 sm:w-4 sm:h-4" />
                 Solar Calculator
               </span>
-              <div className="space-y-2 sm:space-y-3">
-                <h2 className="font-['Urbanist'] font-bold text-lg sm:text-3xl md:text-[34px] leading-tight text-white">
+              <div className="space-y-1.5 sm:space-y-3">
+                <h2 className="font-['Urbanist'] font-bold text-[17px] sm:text-3xl md:text-[34px] leading-tight text-white">
                   Curious? Calculate your home's solar potential
                 </h2>
                 <p className="font-['Poppins'] text-[12px] sm:text-lg text-white/80 max-w-xl">
                   Drop in a few details to preview system size, energy generation, and savings before a site survey.
                 </p>
               </div>
-              <div className="flex items-center gap-2 text-[10px] sm:text-base text-white/90">
+              <div className="flex items-center gap-2 text-[11px] sm:text-base text-white/90">
                 <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>We respond with a refined quote within one business day.</span>
               </div>
             </div>
             <form
               onSubmit={handleCalculatorSubmit}
-              className="bg-white text-[#0a0a0a] rounded-[20px] sm:rounded-[24px] m-2 sm:m-3 shadow-[0_20px_60px_rgba(0,0,0,0.12)] p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col gap-4 sm:gap-6"
+              className="bg-white text-[#0a0a0a] rounded-[16px] sm:rounded-[24px] m-2 sm:m-3 shadow-[0_20px_60px_rgba(0,0,0,0.12)] p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col gap-3 sm:gap-6 min-w-0"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2 md:col-span-2">
-                  <label className="font-['Poppins'] text-[11px] sm:text-base text-[#0a0a0a]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                <div className="flex flex-col gap-1.5 sm:gap-2 md:col-span-2">
+                  <label className="font-['Poppins'] text-[12px] sm:text-base text-[#0a0a0a]">
                     Bi-Monthly Bill Amount (₹)
                   </label>
-                  <div className="bg-[#f7fff9] border border-[#d7eadd] rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 shadow-[0_6px_20px_rgba(0,0,0,0.03)]">
+                  <div className="bg-[#f7fff9] border border-[#d7eadd] rounded-lg sm:rounded-xl px-3 sm:px-4 py-3 sm:py-3 shadow-[0_6px_20px_rgba(0,0,0,0.03)] min-h-[44px] flex items-center">
                     <input
                       type="number"
-                      className="w-full bg-transparent outline-none text-[12px] sm:text-[15px]"
-                      placeholder="Enter bill amount (e.g., 2500)"
+                      className="w-full bg-transparent outline-none text-[14px] sm:text-[15px] min-h-[24px]"
+                      placeholder="e.g. 2500"
                       value={billAmount}
                       onChange={handleBillAmountChange}
                       onKeyDown={handleKeyDown}
                       min={1}
                       inputMode="numeric"
                       pattern="[0-9]*"
+                      aria-label="Bi-monthly bill amount in rupees"
                     />
                   </div>
                   <span className="text-[10px] sm:text-[12px] text-[#4a5565]">
-                    Enter the total amount on your latest TANGEDCO bill (bottom of the paper). Choose this OR estimated units below.
+                    Total from your latest TANGEDCO bill. OR use units below.
                   </span>
                 </div>
-                <div className="flex flex-col gap-2 md:col-span-2">
-                  <label className="font-['Poppins'] text-[11px] sm:text-base text-[#0a0a0a]">
+                <div className="flex flex-col gap-1.5 sm:gap-2 md:col-span-2">
+                  <label className="font-['Poppins'] text-[12px] sm:text-base text-[#0a0a0a]">
                     OR Estimated Bi-Monthly Units (kWh)
                   </label>
-                  <div className="bg-[#f7fff9] border border-[#d7eadd] rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 shadow-[0_6px_20px_rgba(0,0,0,0.03)]">
+                  <div className="bg-[#f7fff9] border border-[#d7eadd] rounded-lg sm:rounded-xl px-3 sm:px-4 py-3 sm:py-3 shadow-[0_6px_20px_rgba(0,0,0,0.03)] min-h-[44px] flex items-center">
                     <input
                       type="number"
-                      className="w-full bg-transparent outline-none text-[12px] sm:text-[15px]"
-                      placeholder="Enter Billing Units (e.g., 400)"
+                      className="w-full bg-transparent outline-none text-[14px] sm:text-[15px] min-h-[24px]"
+                      placeholder="e.g. 400"
                       value={estimatedUnits ?? ""}
                       onChange={handleEstimatedUnitsChange}
                       onKeyDown={handleKeyDown}
                       min={1}
                       inputMode="numeric"
                       pattern="[0-9]*"
+                      aria-label="Estimated bi-monthly units in kWh"
                     />
                   </div>
                   <span className="text-[10px] sm:text-[12px] text-[#4a5565]">
-                    If you know your bi-monthly electricity consumption in kWh. Choose this OR bill amount above.
+                    Bi-monthly consumption in kWh. OR use bill amount above.
                   </span>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                <div className="flex flex-wrap gap-3">
-                  <button
-                    type="submit"
-                    className="bg-gradient-to-r from-[#ffd166] via-[#ffb347] to-[#ff6b00] text-white font-semibold text-[12px] sm:text-base px-4 sm:px-8 py-2 sm:py-3 rounded-lg sm:rounded-xl shadow-[0_10px_30px_rgba(255,107,0,0.25)] hover:opacity-95 active:scale-95 transition"
-                  >
-                    Calculate
-                  </button>
-                </div>
-                <p className="text-[10px] sm:text-[14px] text-[#4a5565] font-['Poppins']">
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto min-h-[44px] bg-gradient-to-r from-[#ffd166] via-[#ffb347] to-[#ff6b00] text-white font-semibold text-[14px] sm:text-base px-5 sm:px-8 py-3 rounded-lg sm:rounded-xl shadow-[0_10px_30px_rgba(255,107,0,0.25)] hover:opacity-95 active:scale-95 transition order-2 sm:order-1"
+                >
+                  Calculate
+                </button>
+                <p className="text-[10px] sm:text-[14px] text-[#4a5565] font-['Poppins'] order-1 sm:order-2">
                   Instant preview—no OTP or payment needed.
                 </p>
               </div>
@@ -406,29 +406,29 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
         {showResults && (
           <motion.section
             id="solar-calculator-result"
-            className="w-full max-w-7xl mx-auto px-4 py-4 sm:py-8 min-w-0"
+            className="w-full max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8 min-w-0 overflow-x-hidden"
             ref={resultRef}
             initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={reduceMotion ? undefined : { opacity: 0, y: 8 }}
             transition={{ duration: 0.35, ease: "easeOut" }}
           >
-            <div className="relative overflow-hidden rounded-[28px] border border-[#d7eadd] bg-white shadow-[0_18px_60px_rgba(0,0,0,0.08)]">
+            <div className="relative overflow-hidden rounded-[20px] sm:rounded-[28px] border border-[#d7eadd] bg-white shadow-[0_18px_60px_rgba(0,0,0,0.08)]">
               <div className="absolute -top-10 left-6 h-32 w-32 rounded-full bg-[#dcfce7] blur-3xl" aria-hidden="true" />
               <div className="absolute bottom-[-80px] right-[-40px] h-48 w-48 rounded-full bg-[#e0f2fe] blur-3xl" aria-hidden="true" />
-              <div className="relative p-4 sm:p-6 md:p-10 flex flex-col gap-4 sm:gap-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <div className="space-y-2">
+              <div className="relative p-4 sm:p-6 md:p-10 flex flex-col gap-3 sm:gap-6">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4">
+                  <div className="space-y-1.5 sm:space-y-2 min-w-0">
                     <div className="inline-block px-3 py-1 bg-gradient-to-r from-[#dcfce7] to-[#ddefff] rounded-full">
                       <span className="text-[11px] sm:text-[13px] font-semibold text-[#017c54] font-['Urbanist']">
                         Instant results
                       </span>
                     </div>
-                    <h3 className="font-['Urbanist'] font-bold text-[16px] sm:text-[28px] md:text-[32px] text-[#0a0a0a] leading-tight">
+                    <h3 className="font-['Urbanist'] font-bold text-[18px] sm:text-[28px] md:text-[32px] text-[#0a0a0a] leading-tight">
                       Your instant solar estimate
                     </h3>
-                    <p className="text-[11px] sm:text-base text-[#4a5565] max-w-2xl font-['Poppins']">
-                      These numbers are calculated based on your inputs. Final proposal is validated after our on-site survey.
+                    <p className="text-[11px] sm:text-sm md:text-base text-[#4a5565] max-w-2xl font-['Poppins']">
+                      Based on your inputs. Final proposal after our on-site survey.
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
@@ -510,18 +510,18 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                 {calcResult && primaryStats.length > 0 ? (
                   <>
                     <div
-                      className="flex flex-wrap items-center gap-2 rounded-xl border-l-4 border-[#00a63e] bg-gradient-to-r from-[#dcfce7] to-[#f7fff9] px-4 py-3 sm:px-5 sm:py-4"
+                      className="flex flex-wrap items-center gap-2 rounded-xl border-l-4 border-[#00a63e] bg-gradient-to-r from-[#dcfce7] to-[#f7fff9] px-3 py-2.5 sm:px-5 sm:py-4"
                       role="status"
                       aria-live="polite"
                     >
                       <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-[#00a63e] flex-shrink-0 mt-0.5" aria-hidden />
-                      <p className="font-['Poppins'] text-[13px] sm:text-[15px] text-[#0a0a0a] leading-snug">
+                      <p className="font-['Poppins'] text-[12px] sm:text-[15px] text-[#0a0a0a] leading-snug">
                         A <span className="font-['Urbanist'] font-bold text-[#0a0a0a]">{calcResult.recommendedCapacityKw.toFixed(1)} kW</span> system could save you <span className="font-['Urbanist'] font-bold text-[#0a0a0a]">₹{(calcResult.annualSavings / 1000).toFixed(0)}k/yr</span> — estimated investment <span className="font-['Urbanist'] font-bold text-[#0a0a0a]">₹{(calcResult.estimatedCost / 100000).toFixed(1)}L</span>.
                       </p>
                     </div>
 
                     <motion.div
-                      className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6"
+                      className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6"
                       {...(reduceMotion ? {} : staggerMotionProps)}
                     >
                       {primaryStats.map((stat) => {
@@ -531,33 +531,33 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                           <motion.div
                             key={stat.label}
                             variants={revealVariant}
-                            className="group relative overflow-hidden rounded-[20px] border-2 border-[#00a63e]/25 bg-white shadow-[0_10px_30px_rgba(0,0,0,0.06)] p-5 flex flex-col gap-2 transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(0,0,0,0.12)]"
+                            className="group relative overflow-hidden rounded-[16px] sm:rounded-[20px] border-2 border-[#00a63e]/25 bg-white shadow-[0_10px_30px_rgba(0,0,0,0.06)] p-4 sm:p-5 flex flex-col gap-1.5 sm:gap-2 transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(0,0,0,0.12)] min-w-0"
                           >
                             <div className={`absolute inset-0 bg-gradient-to-br ${stat.accent} opacity-80 transition-transform duration-300 group-hover:scale-105`} aria-hidden="true" />
-                            <div className="relative flex items-start justify-between gap-3">
-                              <p className="font-['Poppins'] text-[15px] text-[#0a0a0a] leading-tight">{stat.label}</p>
-                              <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/80 border border-[#d7eadd] shadow-sm transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-[1px]">
-                                <Icon className="w-5 h-5 text-[#0a0a0a] group-hover:text-[#0f2f1e]" aria-hidden />
+                            <div className="relative flex items-start justify-between gap-2 sm:gap-3">
+                              <p className="font-['Poppins'] text-[13px] sm:text-[15px] text-[#0a0a0a] leading-tight">{stat.label}</p>
+                              <span className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/80 border border-[#d7eadd] shadow-sm transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-[1px] flex-shrink-0">
+                                <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-[#0a0a0a] group-hover:text-[#0f2f1e]" aria-hidden />
                               </span>
                             </div>
-                            <div className="relative flex items-baseline gap-1">
-                              <span className="font-['Urbanist'] font-bold text-[34px] md:text-[38px] text-[#0a0a0a] leading-none">
+                            <div className="relative flex items-baseline gap-1 flex-wrap">
+                              <span className="font-['Urbanist'] font-bold text-[28px] sm:text-[34px] md:text-[38px] text-[#0a0a0a] leading-none">
                                 {isResultVisible && !reduceMotion ? (
                                   <CountUp key={`${stat.label}-${isResultVisible}`} end={stat.value} duration={1.25} decimals={stat.decimals} separator="," prefix={stat.prefix} />
                                 ) : (
                                   `${stat.prefix}${staticValue}`
                                 )}
                               </span>
-                              {stat.suffix ? <span className="font-['Poppins'] text-[16px] text-[#4a5565] leading-none">{stat.suffix}</span> : null}
+                              {stat.suffix ? <span className="font-['Poppins'] text-[14px] sm:text-[16px] text-[#4a5565] leading-none">{stat.suffix}</span> : null}
                             </div>
-                            {stat.helper ? <p className="relative font-['Poppins'] text-sm text-[#4a5565] leading-relaxed">{stat.helper}</p> : null}
+                            {stat.helper ? <p className="relative font-['Poppins'] text-[12px] sm:text-sm text-[#4a5565] leading-relaxed">{stat.helper}</p> : null}
                           </motion.div>
                         );
                       })}
                     </motion.div>
 
                     <motion.div
-                      className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
+                      className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6"
                       {...(reduceMotion ? {} : staggerMotionProps)}
                     >
                       {secondaryStats.map((stat) => {
@@ -567,26 +567,26 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                           <motion.div
                             key={stat.label}
                             variants={revealVariant}
-                            className="group relative overflow-hidden rounded-[20px] border border-[#e2efe6] bg-white shadow-[0_10px_30px_rgba(0,0,0,0.06)] p-5 flex flex-col gap-2 transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(0,0,0,0.12)]"
+                            className="group relative overflow-hidden rounded-[16px] sm:rounded-[20px] border border-[#e2efe6] bg-white shadow-[0_10px_30px_rgba(0,0,0,0.06)] p-3 sm:p-5 flex flex-col gap-1 sm:gap-2 transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(0,0,0,0.12)] min-w-0"
                           >
                             <div className={`absolute inset-0 bg-gradient-to-br ${stat.accent} opacity-80 transition-transform duration-300 group-hover:scale-105`} aria-hidden="true" />
-                            <div className="relative flex items-start justify-between gap-3">
-                              <p className="font-['Poppins'] text-[15px] text-[#0a0a0a] leading-tight">{stat.label}</p>
-                              <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/80 border border-[#d7eadd] shadow-sm transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-[1px]">
-                                <Icon className="w-5 h-5 text-[#0a0a0a] group-hover:text-[#0f2f1e]" aria-hidden />
+                            <div className="relative flex items-start justify-between gap-2 sm:gap-3">
+                              <p className="font-['Poppins'] text-[11px] sm:text-[15px] text-[#0a0a0a] leading-tight line-clamp-2 sm:line-clamp-none">{stat.label}</p>
+                              <span className="inline-flex items-center justify-center w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/80 border border-[#d7eadd] shadow-sm flex-shrink-0">
+                                <Icon className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-[#0a0a0a] group-hover:text-[#0f2f1e]" aria-hidden />
                               </span>
                             </div>
-                            <div className="relative flex items-baseline gap-1">
-                              <span className="font-['Urbanist'] font-bold text-[30px] md:text-[32px] text-[#0a0a0a] leading-none">
+                            <div className="relative flex items-baseline gap-1 flex-wrap">
+                              <span className="font-['Urbanist'] font-bold text-[22px] sm:text-[30px] md:text-[32px] text-[#0a0a0a] leading-none">
                                 {isResultVisible && !reduceMotion ? (
                                   <CountUp key={`${stat.label}-${isResultVisible}`} end={stat.value} duration={1.25} decimals={stat.decimals} separator="," prefix={stat.prefix} />
                                 ) : (
                                   `${stat.prefix}${staticValue}`
                                 )}
                               </span>
-                              {stat.suffix ? <span className="font-['Poppins'] text-[16px] text-[#4a5565] leading-none">{stat.suffix}</span> : null}
+                              {stat.suffix ? <span className="font-['Poppins'] text-[12px] sm:text-[16px] text-[#4a5565] leading-none">{stat.suffix}</span> : null}
                             </div>
-                            {stat.helper ? <p className="relative font-['Poppins'] text-sm text-[#4a5565] leading-relaxed">{stat.helper}</p> : null}
+                            {stat.helper ? <p className="relative font-['Poppins'] text-[10px] sm:text-sm text-[#4a5565] leading-relaxed line-clamp-2 sm:line-clamp-none">{stat.helper}</p> : null}
                           </motion.div>
                         );
                       })}
@@ -625,14 +625,14 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                   </div>
                 )}
 
-              <div className="mt-6 p-6 bg-gradient-to-r from-[#f0fdf4] to-[#f7fff9] border border-[#d7eadd] rounded-[20px]">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div className="space-y-2">
-                    <h4 className="font-['Urbanist'] font-bold text-[18px] sm:text-[20px] text-[#0a0a0a]">
+              <div className="mt-4 sm:mt-6 p-4 sm:p-6 bg-gradient-to-r from-[#f0fdf4] to-[#f7fff9] border border-[#d7eadd] rounded-[16px] sm:rounded-[20px]">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                  <div className="space-y-1 sm:space-y-2 min-w-0">
+                    <h4 className="font-['Urbanist'] font-bold text-[16px] sm:text-[20px] text-[#0a0a0a]">
                       Ready to go solar?
                     </h4>
-                    <p className="text-sm text-[#4a5565] max-w-lg">
-                      Get a free, detailed consultation with our solar experts. We'll visit your home, assess your roof, and provide a customized proposal.
+                    <p className="text-[12px] sm:text-sm text-[#4a5565] max-w-lg">
+                      Free consultation: we visit your home, assess your roof, and provide a customized proposal.
                     </p>
                   </div>
                   <button
@@ -640,10 +640,10 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                     onClick={() => {
                       document.getElementById("contact-section")?.scrollIntoView({ behavior: "smooth" });
                     }}
-                    className="bg-gradient-to-r from-[#ffd166] via-[#ffb347] to-[#ff6b00] text-white font-semibold px-6 sm:px-8 py-3 rounded-xl shadow-[0_10px_30px_rgba(255,107,0,0.25)] hover:opacity-95 active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6b00] focus-visible:ring-offset-2"
+                    className="w-full sm:w-auto min-h-[44px] bg-gradient-to-r from-[#ffd166] via-[#ffb347] to-[#ff6b00] text-white font-semibold text-[14px] sm:text-base px-5 sm:px-8 py-3 rounded-xl shadow-[0_10px_30px_rgba(255,107,0,0.25)] hover:opacity-95 active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6b00] focus-visible:ring-offset-2 flex-shrink-0"
                     aria-label="Get free consultation"
                   >
-                    <MessageCircle className="w-4 h-4" />
+                    <MessageCircle className="w-4 h-4" aria-hidden />
                     Get Free Consultation
                   </button>
                 </div>
