@@ -15,9 +15,9 @@ const slides = [
 
 /** 3D carousel: full circle loop (360 / n). */
 const ANGLE_PER_SLIDE = 360 / slides.length;
-/** Smooth/liquid transition (cubic-bezier) — not jarring. */
-const EASE_FLUID = [0.33, 1, 0.68, 1];
-const TRANSITION_DURATION = 0.55;
+/** Smooth ease-out so rotation decelerates into place (no snap). */
+const EASE_CAROUSEL = [0.22, 1, 0.36, 1] as const;
+const TRANSITION_DURATION = 0.75;
 /** Focal point: scale and opacity for non-center cards (depth of field). */
 const CENTER_SCALE = 1;
 const SIDE_SCALE = 0.88;
@@ -106,7 +106,7 @@ export function AppShowcaseSection() {
                 <button
                   key={index}
                   onClick={() => setCurrentAppSlide(index)}
-                  className={`flex items-start gap-4 w-full text-left transition-opacity duration-300 min-h-[44px] py-1 ${
+                  className={`flex items-start gap-4 w-full text-left transition-opacity duration-500 ease-out min-h-[44px] py-1 ${
                     index === currentAppSlide ? "opacity-100" : "opacity-50 hover:opacity-75"
                   }`}
                 >
@@ -153,7 +153,7 @@ export function AppShowcaseSection() {
                 transition={{
                   type: "tween",
                   duration: reduceMotion ? 0 : TRANSITION_DURATION,
-                  ease: EASE_FLUID,
+                  ease: EASE_CAROUSEL,
                 }}
               >
                 {slides.map((slide, i) => {
@@ -181,7 +181,7 @@ export function AppShowcaseSection() {
                       opacity: isCenter ? 1 : SIDE_OPACITY,
                       backfaceVisibility: "visible",
                       WebkitBackfaceVisibility: "visible",
-                      transition: "opacity 0.25s ease, transform 0.25s ease",
+                      transition: `opacity ${TRANSITION_DURATION}s cubic-bezier(0.22, 1, 0.36, 1), transform ${TRANSITION_DURATION}s cubic-bezier(0.22, 1, 0.36, 1)`,
                     }}
                   >
                     <img
@@ -213,10 +213,10 @@ export function AppShowcaseSection() {
                   aria-selected={i === currentAppSlide}
                   aria-label={slide.alt}
                   onClick={() => setCurrentAppSlide(i)}
-                  className="group min-w-[44px] min-h-[44px] flex items-center justify-center transition-transform duration-200 hover:scale-110 active:scale-95"
+                  className="group min-w-[44px] min-h-[44px] flex items-center justify-center transition-transform duration-300 ease-out hover:scale-110 active:scale-95"
                 >
                   <span
-                    className={`h-2 rounded-full transition-all duration-300 ${
+                    className={`h-2 rounded-full transition-all duration-500 ease-out ${
                       i === currentAppSlide ? "bg-white w-6" : "bg-white/40 w-2 group-hover:bg-white/70"
                     }`}
                   />
