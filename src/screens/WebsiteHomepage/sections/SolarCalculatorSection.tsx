@@ -15,6 +15,23 @@ import {
 } from "lucide-react";
 import { calculateSolarRequirementsFromBill, BillInputs } from "../../../utils/solar-physics";
 import { reduceMotion, revealVariant, staggerMotionProps } from "../lib/motion";
+import { use3DTilt } from "../lib/use3DTilt";
+
+function ResultStatTilt({ children }: { children: React.ReactNode }) {
+  const tilt = use3DTilt({ maxDeg: 4, disabled: reduceMotion });
+  return (
+    <div style={tilt.wrapperStyle} className="min-w-0">
+      <motion.div
+        style={tilt.cardStyle}
+        onMouseMove={tilt.onMouseMove}
+        onMouseLeave={tilt.onMouseLeave}
+        className="h-full"
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
 
 export function SolarCalculatorSection() {
   const [billAmount, setBillAmount] = useState<string>("");
@@ -578,11 +595,11 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                         const Icon = stat.icon;
                         const staticValue = stat.value.toLocaleString(undefined, { maximumFractionDigits: stat.decimals });
                         return (
-                          <motion.div
-                            key={stat.label}
-                            variants={revealVariant}
-                            className="group relative overflow-hidden rounded-[16px] sm:rounded-[20px] border-2 border-[#00a63e]/25 bg-white shadow-[0_10px_30px_rgba(0,0,0,0.06)] p-4 sm:p-5 flex flex-col gap-1.5 sm:gap-2 transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(0,0,0,0.12)] min-w-0"
-                          >
+                          <ResultStatTilt key={stat.label}>
+                            <motion.div
+                              variants={revealVariant}
+                              className="group relative overflow-hidden rounded-[16px] sm:rounded-[20px] border-2 border-[#00a63e]/25 bg-white shadow-[0_10px_30px_rgba(0,0,0,0.06)] p-4 sm:p-5 flex flex-col gap-1.5 sm:gap-2 transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(0,0,0,0.12)] min-w-0 h-full"
+                            >
                             <div className={`absolute inset-0 bg-gradient-to-br ${stat.accent} opacity-80 transition-transform duration-300 group-hover:scale-105`} aria-hidden="true" />
                             <div className="relative flex items-start justify-between gap-2 sm:gap-3">
                               <p className="font-['Poppins'] text-[13px] sm:text-[15px] text-[#0a0a0a] leading-tight">{stat.label}</p>
@@ -601,7 +618,8 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                               {stat.suffix ? <span className="font-['Poppins'] text-[14px] sm:text-[16px] text-[#4a5565] leading-none">{stat.suffix}</span> : null}
                             </div>
                             {stat.helper ? <p className="relative font-['Poppins'] text-[12px] sm:text-sm text-[#4a5565] leading-relaxed">{stat.helper}</p> : null}
-                          </motion.div>
+                            </motion.div>
+                          </ResultStatTilt>
                         );
                       })}
                     </motion.div>
@@ -614,11 +632,11 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                         const Icon = stat.icon;
                         const staticValue = stat.value.toLocaleString(undefined, { maximumFractionDigits: stat.decimals });
                         return (
-                          <motion.div
-                            key={stat.label}
-                            variants={revealVariant}
-                            className="group relative overflow-hidden rounded-[16px] sm:rounded-[20px] border border-[#e2efe6] bg-white shadow-[0_10px_30px_rgba(0,0,0,0.06)] p-3 sm:p-5 flex flex-col gap-1 sm:gap-2 transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(0,0,0,0.12)] min-w-0"
-                          >
+                          <ResultStatTilt key={stat.label}>
+                            <motion.div
+                              variants={revealVariant}
+                              className="group relative overflow-hidden rounded-[16px] sm:rounded-[20px] border border-[#e2efe6] bg-white shadow-[0_10px_30px_rgba(0,0,0,0.06)] p-3 sm:p-5 flex flex-col gap-1 sm:gap-2 transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(0,0,0,0.12)] min-w-0 h-full"
+                            >
                             <div className={`absolute inset-0 bg-gradient-to-br ${stat.accent} opacity-80 transition-transform duration-300 group-hover:scale-105`} aria-hidden="true" />
                             <div className="relative flex items-start justify-between gap-2 sm:gap-3">
                               <p className="font-['Poppins'] text-[11px] sm:text-[15px] text-[#0a0a0a] leading-tight line-clamp-2 sm:line-clamp-none">{stat.label}</p>
@@ -637,7 +655,8 @@ Feel free to call us at +91 9087610051, via phone call or WhatsApp.`;
                               {stat.suffix ? <span className="font-['Poppins'] text-[12px] sm:text-[16px] text-[#4a5565] leading-none">{stat.suffix}</span> : null}
                             </div>
                             {stat.helper ? <p className="relative font-['Poppins'] text-[10px] sm:text-sm text-[#4a5565] leading-relaxed line-clamp-2 sm:line-clamp-none">{stat.helper}</p> : null}
-                          </motion.div>
+                            </motion.div>
+                          </ResultStatTilt>
                         );
                       })}
                     </motion.div>

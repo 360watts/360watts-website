@@ -1,9 +1,13 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { APP_IMAGES } from "../../../lib/imageRegistry";
-import { revealVariant, sectionMotionProps, staggerMotionProps, cardMotionProps, ctaMotionProps } from "../lib/motion";
+import { revealVariant, sectionMotionProps, staggerMotionProps, cardMotionProps, ctaMotionProps, reduceMotion } from "../lib/motion";
+import { use3DTilt } from "../lib/use3DTilt";
 
 export function UnifiedSolutionSection() {
+  const tilt1 = use3DTilt({ maxDeg: 6, disabled: reduceMotion });
+  const tilt2 = use3DTilt({ maxDeg: 6, disabled: reduceMotion });
+
   return (
     <motion.section className="py-8 sm:py-16 md:py-20 px-4 sm:px-6 bg-transparent overflow-hidden" {...sectionMotionProps}>
       <div className="w-full max-w-7xl mx-auto min-w-0">
@@ -17,7 +21,15 @@ export function UnifiedSolutionSection() {
         </motion.div>
 
         <motion.div className="flex flex-col md:flex-row gap-4 sm:gap-6 md:gap-8 lg:gap-[113px] justify-center items-stretch mb-6 sm:mb-8" {...staggerMotionProps}>
-          <motion.div variants={revealVariant} {...cardMotionProps} className="relative rounded-[16px] sm:rounded-[20px] overflow-hidden w-full md:flex-1 lg:w-[567px] h-[220px] sm:h-[300px] md:h-[320px] lg:h-[342px]">
+          <div style={tilt1.wrapperStyle} className="w-full md:flex-1 min-w-0">
+            <motion.div
+              variants={revealVariant}
+              {...(reduceMotion ? {} : cardMotionProps)}
+              style={tilt1.cardStyle}
+              onMouseMove={tilt1.onMouseMove}
+              onMouseLeave={tilt1.onMouseLeave}
+              className="relative rounded-[16px] sm:rounded-[20px] overflow-hidden w-full lg:w-[567px] h-[220px] sm:h-[300px] md:h-[320px] lg:h-[342px]"
+            >
             <picture>
               <source type="image/webp" srcSet="/solar-panels-house-roof.webp" />
               <img
@@ -50,15 +62,24 @@ export function UnifiedSolutionSection() {
                     Total control. Zero worries.
                   </p>
                 </div>
-              </div>
             </div>
-          </motion.div>
+          </div>
+            </motion.div>
+          </div>
 
           <div className="hidden md:flex items-center justify-center w-8 md:w-12 h-8 md:h-12 text-[#4a5565] text-3xl md:text-5xl font-light mt-20 md:mt-24">
             +
           </div>
 
-          <motion.div variants={revealVariant} {...cardMotionProps} className="relative rounded-[16px] sm:rounded-[20px] overflow-hidden w-full md:flex-1 lg:w-[567px] h-[220px] sm:h-[300px] md:h-[320px] lg:h-[342px]">
+          <div style={tilt2.wrapperStyle} className="w-full md:flex-1 min-w-0">
+            <motion.div
+              variants={revealVariant}
+              {...(reduceMotion ? {} : cardMotionProps)}
+              style={tilt2.cardStyle}
+              onMouseMove={tilt2.onMouseMove}
+              onMouseLeave={tilt2.onMouseLeave}
+              className="relative rounded-[16px] sm:rounded-[20px] overflow-hidden w-full lg:w-[567px] h-[220px] sm:h-[300px] md:h-[320px] lg:h-[342px]"
+            >
             <img
               src={APP_IMAGES.digitalTablet}
               alt="Smart Home Solutions"
@@ -84,7 +105,8 @@ export function UnifiedSolutionSection() {
                 </div>
               </div>
             </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </motion.div>
 
         <motion.div className="text-center" variants={revealVariant}>

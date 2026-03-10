@@ -3,7 +3,9 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { APP_IMAGES } from "../../../lib/imageRegistry";
 import { processSteps } from "../data";
-import { revealVariant, sectionMotionProps, staggerMotionProps, cardMotionProps, ctaMotionProps } from "../lib/motion";
+import { revealVariant, sectionMotionProps, staggerMotionProps, cardMotionProps, ctaMotionProps, reduceMotion } from "../lib/motion";
+
+const COLUMN_TILT_DEG = 2.5;
 
 export function HowItWorksSection() {
   const [activeCard, setActiveCard] = useState<"solar" | "smartHome" | null>(null);
@@ -30,10 +32,19 @@ export function HowItWorksSection() {
           </p>
         </motion.div>
 
-        <motion.div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 md:gap-8 lg:gap-12" {...staggerMotionProps}>
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 md:gap-8 lg:gap-12"
+          {...staggerMotionProps}
+          style={{ perspective: 1000, transformStyle: "preserve-3d" }}
+        >
           <motion.div
             variants={revealVariant}
-            {...cardMotionProps}
+            {...(reduceMotion ? {} : cardMotionProps)}
+            animate={{
+              rotateY: !reduceMotion && activeCard === "solar" ? COLUMN_TILT_DEG : 0,
+            }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            style={{ transformStyle: "preserve-3d" }}
             className={`bg-white/80 backdrop-blur-sm rounded-[20px] sm:rounded-[28px] md:rounded-[32px] p-3 sm:p-7 md:p-10 shadow-[0_8px_40px_rgba(0,0,0,0.06)] border-2 transition-shadow duration-500 cursor-pointer ${
               activeCard === "solar"
                 ? "border-[#00a63e] shadow-[0_20px_60px_rgba(0,166,62,0.2)]"
@@ -92,7 +103,12 @@ export function HowItWorksSection() {
 
           <motion.div
             variants={revealVariant}
-            {...cardMotionProps}
+            {...(reduceMotion ? {} : cardMotionProps)}
+            animate={{
+              rotateY: !reduceMotion && activeCard === "smartHome" ? -COLUMN_TILT_DEG : 0,
+            }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            style={{ transformStyle: "preserve-3d" }}
             className={`bg-white/80 backdrop-blur-sm rounded-[20px] sm:rounded-[28px] md:rounded-[32px] p-3 sm:p-7 md:p-10 shadow-[0_8px_40px_rgba(0,0,0,0.06)] border-2 transition-shadow duration-500 cursor-pointer ${
               activeCard === "smartHome"
                 ? "border-[#3b82f6] shadow-[0_20px_60px_rgba(59,130,246,0.2)]"

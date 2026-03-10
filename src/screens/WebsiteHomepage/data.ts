@@ -44,7 +44,7 @@ export const teamMembers = [
   { name: "Hariprasad", role: "Solar Design Engineer", photo: APP_IMAGES.teamHariprasad },
   { name: "Parvathi", role: "Product Designer", photo: APP_IMAGES.teamParvathi },
   { name: "Nancy", role: "IoT Developer", photo: APP_IMAGES.teamSelvaNancy },
-  { name: "Rajeev", role: "Data/ML Engineer", photo: APP_IMAGES.teamRajeev },
+  { name: "Rajeev", role: "AI/ML Engineer", photo: APP_IMAGES.teamRajeev },
 ];
 
 export const faqSections: FaqSection[] = [

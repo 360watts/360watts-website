@@ -2,7 +2,30 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { APP_IMAGES } from "../../../lib/imageRegistry";
 import { storySteps, teamMembers } from "../data";
-import { revealVariant, sectionMotionProps, staggerMotionProps, storyStepVariants } from "../lib/motion";
+import { revealVariant, sectionMotionProps, staggerMotionProps, storyStepVariants, reduceMotion } from "../lib/motion";
+import { use3DTilt } from "../lib/use3DTilt";
+
+function TiltCard({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const tilt = use3DTilt({ maxDeg: 5, disabled: reduceMotion });
+  return (
+    <div style={tilt.wrapperStyle} className={className}>
+      <motion.div
+        style={tilt.cardStyle}
+        onMouseMove={tilt.onMouseMove}
+        onMouseLeave={tilt.onMouseLeave}
+        className="h-full"
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
 
 export function AboutSection() {
   return (
@@ -52,10 +75,12 @@ export function AboutSection() {
                   className={`flex flex-col ${step.align === "left" ? "md:flex-row" : "md:flex-row-reverse"} items-center gap-6 sm:gap-8 md:gap-12 relative`}
                 >
                   <div className="w-full md:w-1/2">
-                    <div className="shadow-sm border border-[#e5f3e9] rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 bg-transparent relative z-10">
-                      <h3 className="text-lg sm:text-xl md:text-2xl font-bold font-['Urbanist'] mb-2 sm:mb-3 leading-snug">{step.title}</h3>
-                      {step.body && <p className="text-[#4a5565] font-['Poppins'] text-sm sm:text-base md:text-lg leading-relaxed">{step.body}</p>}
-                    </div>
+                    <TiltCard>
+                      <div className="shadow-sm border border-[#e5f3e9] rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 bg-transparent relative z-10">
+                        <h3 className="text-lg sm:text-xl md:text-2xl font-bold font-['Urbanist'] mb-2 sm:mb-3 leading-snug">{step.title}</h3>
+                        {step.body && <p className="text-[#4a5565] font-['Poppins'] text-sm sm:text-base md:text-lg leading-relaxed">{step.body}</p>}
+                      </div>
+                    </TiltCard>
                   </div>
                   <div className="w-full md:w-1/2 flex justify-center relative z-10">
                     <img
@@ -92,13 +117,15 @@ export function AboutSection() {
 
           <motion.div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 sm:gap-6 md:gap-8 justify-items-center" {...staggerMotionProps}>
             {teamMembers.map((member, idx) => (
-              <motion.div key={idx} variants={revealVariant} className="flex flex-col items-center text-center gap-2 sm:gap-3">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full overflow-hidden bg-[#e8f5ed] flex items-center justify-center">
-                  <img src={member.photo} alt={member.name} className="w-full h-full object-cover" loading="lazy" decoding="async" onError={(e) => { (e.target as HTMLImageElement).src = APP_IMAGES.aboutAvatar; }} />
-                </div>
-                <p className="text-[11px] sm:text-[13px] md:text-base font-semibold font-['Urbanist'] leading-tight">{member.name}</p>
-                <p className="text-[10px] sm:text-[11px] md:text-[12px] lg:text-[13px] text-[#4a5565] font-['Poppins'] leading-snug">{member.role}</p>
-              </motion.div>
+              <TiltCard key={idx} className="flex flex-col items-center">
+                <motion.div variants={revealVariant} className="flex flex-col items-center text-center gap-2 sm:gap-3">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full overflow-hidden bg-[#e8f5ed] flex items-center justify-center">
+                    <img src={member.photo} alt={member.name} className="w-full h-full object-cover" loading="lazy" decoding="async" onError={(e) => { (e.target as HTMLImageElement).src = APP_IMAGES.aboutAvatar; }} />
+                  </div>
+                  <p className="text-[11px] sm:text-[13px] md:text-base font-semibold font-['Urbanist'] leading-tight">{member.name}</p>
+                  <p className="text-[10px] sm:text-[11px] md:text-[12px] lg:text-[13px] text-[#4a5565] font-['Poppins'] leading-snug">{member.role}</p>
+                </motion.div>
+              </TiltCard>
             ))}
           </motion.div>
         </div>

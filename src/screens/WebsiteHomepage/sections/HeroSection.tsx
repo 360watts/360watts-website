@@ -26,6 +26,8 @@ export function HeroSection() {
   });
   const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
   const heroY = useTransform(scrollYProgress, [0, 0.5], [0, -30]);
+  // Optional subtle 3D: content block tilts back slightly as user scrolls (low/experimental)
+  const heroRotateX = useTransform(scrollYProgress, [0, 0.5], [0, 2]);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -107,12 +109,23 @@ export function HeroSection() {
 
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(30,30,30,0.4)] to-[rgba(30,30,30,0.8)]" />
 
-      {/* Text content — scroll-progress fades out; AnimatePresence transitions between slides */}
+      {/* Text content — scroll-progress fades out; optional subtle 3D tilt on scroll */}
       <motion.div
         className="relative z-10 h-full flex items-center"
         style={reduceMotion ? undefined : { opacity: heroOpacity, y: heroY }}
       >
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 text-left min-w-0">
+        <div
+          className="w-full max-w-7xl mx-auto px-4 sm:px-6 text-left min-w-0"
+          style={reduceMotion ? undefined : { perspective: 1200, transformStyle: "preserve-3d" }}
+        >
+          <motion.div
+            style={
+              reduceMotion
+                ? undefined
+                : { rotateX: heroRotateX, transformStyle: "preserve-3d" }
+            }
+            className="max-w-3xl"
+          >
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -120,7 +133,7 @@ export function HeroSection() {
               initial="enter"
               animate="center"
               exit="exit"
-              className="max-w-3xl px-0 sm:px-0 mr-auto text-left min-w-0"
+              className="px-0 sm:px-0 mr-auto text-left min-w-0"
             >
               <h1 className="text-[18px] sm:text-3xl md:text-4xl lg:text-6xl xl:text-[99px] font-bold text-[rgba(247,255,249,0.8)] font-['Urbanist'] mb-1.5 sm:mb-4 md:mb-6 leading-[1.1] tracking-tight sm:tracking-[-2px] md:tracking-[-3.96px] whitespace-pre-line">
                 {heroSlides[currentSlide].title}
@@ -142,6 +155,7 @@ export function HeroSection() {
               </motion.div>
             </motion.div>
           </AnimatePresence>
+          </motion.div>
         </div>
       </motion.div>
 
