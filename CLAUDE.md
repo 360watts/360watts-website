@@ -12,9 +12,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - React Router DOM (client-side routing)
 - Tailwind CSS (styling)
 - Shadcn UI components (Button, Card, Input, Label, Select)
-- Framer Motion (animations)
+- Framer Motion (animations) — wrapped in `MotionConfig reducedMotion="user"` for accessibility
 - React Leaflet (maps on Contact page)
 - Lucide React (icons)
+- `react-helmet-async` (SEO meta tags)
+- `react-countup` + `react-intersection-observer` (animated counters)
 
 ## Development Commands
 
@@ -39,22 +41,28 @@ npm run build
 project/
 ├── src/
 │   ├── components/
-│   │   ├── ui/           # Shadcn UI components (button, card, input, label, select)
-│   │   ├── Navigation.tsx # Fixed navigation bar with smooth scroll
+│   │   ├── ui/             # Shadcn UI components (button, card, input, label, select)
+│   │   ├── Navigation.tsx  # Fixed navigation bar with smooth scroll
 │   │   └── ScrollToTop.tsx # Route change scroll handler
 │   ├── screens/
 │   │   ├── WebsiteHomepage/
-│   │   │   ├── WebsiteHomepage.tsx  # Main homepage (large file, ~300+ lines)
-│   │   │   └── components/          # Homepage sections
+│   │   │   ├── WebsiteHomepage.tsx  # Main homepage compositor
+│   │   │   └── sections/            # One file per homepage section
 │   │   │       ├── HeroSection.tsx
-│   │   │       ├── BenefitsSection.tsx
+│   │   │       ├── SolutionsSection.tsx
 │   │   │       ├── UnifiedSolutionSection.tsx
-│   │   │       ├── AppSection.tsx
-│   │   │       └── HowItWorksSection.tsx
-│   │   ├── Solutions/    # Solar & Smart Home solutions page
-│   │   ├── About/        # About Us with team section
-│   │   ├── Contact/      # Contact form with map
-│   │   └── FAQ/          # Frequently Asked Questions
+│   │   │       ├── Why360wattsSection.tsx
+│   │   │       ├── AppShowcaseSection.tsx
+│   │   │       ├── HowItWorksSection.tsx
+│   │   │       ├── SolarCalculatorSection.tsx
+│   │   │       ├── AboutSection.tsx
+│   │   │       ├── FAQSection.tsx
+│   │   │       ├── ContactSection.tsx
+│   │   │       └── FooterSection.tsx
+│   │   ├── Solutions.tsx  # Solar & Smart Home solutions page
+│   │   ├── About.tsx      # About Us with team section
+│   │   ├── Contact.tsx    # Contact form with map
+│   │   └── FAQ.tsx        # Frequently Asked Questions
 │   ├── lib/
 │   │   ├── utils.ts         # Tailwind class merging utility
 │   │   └── imageRegistry.ts # Central image preloading registry
@@ -69,14 +77,15 @@ project/
 ### Key Architectural Patterns
 
 **1. Route-Based Code Splitting**
-- Each page is a separate screen component in `src/screens/`
-- Homepage sections are further broken down into sub-components
+- Each page is a separate screen component in `src/screens/` (flat files, not subdirectories)
+- Secondary pages (`/solutions`, `/about`, `/contact`, `/faq`) are lazy-loaded via `React.lazy`
+- Homepage sections live in `src/screens/WebsiteHomepage/sections/` and are composed in `WebsiteHomepage.tsx`
 - All routes defined in `src/index.tsx` using React Router
 
 **2. Centralized Image Management**
 - All images registered in `src/lib/imageRegistry.ts`
 - Critical images preloaded on app start
-- Remaining images lazy-loaded after 1.2s delay
+- Remaining images deferred until `requestIdleCallback` fires (or 2s fallback after window load)
 - Images stored in `/public` and referenced with absolute paths (e.g., `/image7.png`)
 
 **3. Navigation System**
@@ -187,3 +196,9 @@ Refer to these files for more details:
 - `IMPROVEMENTS.md` - Project history and refactoring notes
 - `HOSTINGER_DEPLOYMENT.md` - Deployment instructions for Hostinger
 - `README.md` - Basic setup instructions
+
+## Production Fault Log
+
+Faults, root causes, and fixes are recorded in [`FAULT_LOG.md`](./FAULT_LOG.md) at the repo root.
+
+**Workflow:** discover fault → open GitHub Issue → fix (reference issue # in commits) → append entry to `FAULT_LOG.md` → close issue.
